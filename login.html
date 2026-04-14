@@ -228,6 +228,26 @@
   <script>
     lucide.createIcons();
 
+    // ── User accounts database ──
+    const USERS = {
+      'estaliya@adata.kz': { password: 'Aliya123', name: 'Алия Есталиева', role: 'admin', title: 'Главный администратор' },
+      'timeke@adata.kz':   { password: 'Timeke123', name: 'Тимеке', role: 'manager', title: 'Менеджер' },
+      'user@adata.kz':     { password: 'User123', name: 'Пользователь', role: 'user', title: 'Сотрудник' }
+    };
+
+    // Check if already logged in
+    const session = localStorage.getItem('do_session');
+    if (session) {
+      window.location.href = 'dashboard.html';
+    }
+
+    // Autofill from remembered account
+    const remembered = localStorage.getItem('do_remember');
+    if (remembered) {
+      document.getElementById('email').value = remembered;
+      document.getElementById('remember').checked = true;
+    }
+
     // Toggle password visibility
     document.getElementById('togglePwdBtn').addEventListener('click', function() {
       const input = document.getElementById('password');
@@ -246,7 +266,11 @@
     ['email', 'password'].forEach(id => {
       document.getElementById(id).addEventListener('input', function() {
         this.closest('.relative').querySelector('input').classList.remove('border-red-400');
-        document.getElementById('formError').classList.add('hidden');
+        const errorBox = document.getElementById('formError');
+        errorBox.classList.add('hidden');
+        // Reset error styling
+        errorBox.classList.remove('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
+        errorBox.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
       });
     });
 
@@ -256,14 +280,20 @@
 
       const email = document.getElementById('email');
       const password = document.getElementById('password');
+      const remember = document.getElementById('remember');
       const errorBox = document.getElementById('formError');
       const errorText = document.getElementById('errorText');
-      let hasError = false;
 
-      // Reset
+      // Reset styles
       email.classList.remove('border-red-400');
       password.classList.remove('border-red-400');
+      errorBox.classList.remove('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
+      errorBox.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
+      const errIcon = errorBox.querySelector('[data-lucide]');
+      if (errIcon) errIcon.setAttribute('data-lucide', 'alert-circle');
 
+      // ── Validation ──
+      let hasError = false;
       if (!email.value.trim() && !password.value.trim()) {
         errorText.textContent = 'Введите email и пароль для входа в систему';
         email.classList.add('border-red-400');
@@ -281,16 +311,11 @@
         errorText.textContent = 'Введите пароль';
         password.classList.add('border-red-400');
         hasError = true;
-      } else if (password.value.length < 6) {
-        errorText.textContent = 'Пароль должен содержать минимум 6 символов';
-        password.classList.add('border-red-400');
-        hasError = true;
       }
 
       if (hasError) {
         errorBox.classList.remove('hidden');
         lucide.createIcons();
-        // Shake the errored inputs
         document.querySelectorAll('.border-red-400').forEach(el => {
           el.parentElement.classList.add('shake');
           setTimeout(() => el.parentElement.classList.remove('shake'), 400);
@@ -298,7 +323,7 @@
         return;
       }
 
-      // Simulate login — show spinner
+      // ── Authentication ──
       const btn = document.getElementById('submitBtn');
       const btnText = document.getElementById('btnText');
       const btnIcon = document.getElementById('btnIcon');
@@ -311,20 +336,66 @@
       btnSpinner.classList.remove('hidden');
 
       setTimeout(() => {
-        btn.disabled = false;
-        btn.classList.remove('opacity-80', 'cursor-not-allowed');
-        btnText.textContent = 'Войти';
-        btnIcon.classList.remove('hidden');
-        btnSpinner.classList.add('hidden');
+        const emailVal = email.value.trim().toLowerCase();
+        const passVal = password.value;
+        const user = USERS[emailVal];
 
-        // Show success (demo)
-        errorBox.classList.remove('hidden');
-        errorBox.classList.remove('bg-red-50', 'border-red-200', 'text-red-700');
+        if (!user || user.password !== passVal) {
+          // Wrong credentials
+          btn.disabled = false;
+          btn.classList.remove('opacity-80', 'cursor-not-allowed');
+          btnText.textContent = 'Войти';
+          btnIcon.classList.remove('hidden');
+          btnSpinner.classList.add('hidden');
+
+          errorText.textContent = 'Неверный email или пароль. Попробуйте снова.';
+          errorBox.classList.remove('hidden');
+          email.classList.add('border-red-400');
+          password.classList.add('border-red-400');
+          lucide.createIcons();
+
+          document.querySelectorAll('.border-red-400').forEach(el => {
+            el.parentElement.classList.add('shake');
+            setTimeout(() => el.parentElement.classList.remove('shake'), 400);
+          });
+          return;
+        }
+
+        // ── Success ──
+        // Save session
+        const sessionData = {
+          email: emailVal,
+          name: user.name,
+          role: user.role,
+          title: user.title,
+          loginAt: new Date().toISOString()
+        };
+        localStorage.setItem('do_session', JSON.stringify(sessionData));
+
+        // Remember me
+        if (remember.checked) {
+          localStorage.setItem('do_remember', emailVal);
+        } else {
+          localStorage.removeItem('do_remember');
+        }
+
+        // Show success
+        errorBox.classList.remove('hidden', 'bg-red-50', 'border-red-200', 'text-red-700');
         errorBox.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-700');
         errorText.textContent = 'Авторизация прошла успешно. Переход...';
-        errorBox.querySelector('[data-lucide]').setAttribute('data-lucide', 'check-circle');
+        const icon = errorBox.querySelector('[data-lucide]');
+        if (icon) icon.setAttribute('data-lucide', 'check-circle');
         lucide.createIcons();
-      }, 1800);
+
+        btnText.textContent = 'Успешно';
+        btnSpinner.classList.add('hidden');
+        btnIcon.classList.remove('hidden');
+
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+      }, 1500);
     });
   </script>
 </body>
