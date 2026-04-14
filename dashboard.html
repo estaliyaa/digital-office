@@ -22,35 +22,63 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in { animation: fadeIn 0.3s ease-out forwards; opacity: 0; }
     .sidebar { transition: width 0.25s ease, transform 0.25s ease; }
-    .sidebar-label { transition: opacity 0.15s ease, width 0.15s ease; }
+    .sidebar-label { transition: opacity 0.15s ease, width 0.15s ease; white-space: nowrap; }
     .sidebar.collapsed .sidebar-label { opacity: 0; width: 0; overflow: hidden; }
     .sidebar.collapsed .sidebar-section-title { opacity: 0; height: 0; margin: 0; padding: 0; overflow: hidden; }
     .sidebar.collapsed .sidebar-user-info { display: none; }
     .sidebar.collapsed .logo-full { display: none; }
     .sidebar.collapsed .logo-icon { display: flex; }
     .sidebar:not(.collapsed) .logo-icon { display: none; }
+    .sidebar.collapsed .sidebar-header { justify-content: center; padding: 0; }
+    .sidebar.collapsed .sidebar-toggle-inner { display: none; }
+    .sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+    .sidebar.collapsed #sidebarUserBtn { justify-content: center; }
     .page-content { display: none; }
     .page-content.active { display: block; }
+    /* Floating toggle button */
+    .sidebar-toggle-float {
+      position: absolute;
+      top: 20px;
+      right: -14px;
+      width: 28px;
+      height: 28px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s ease;
+      opacity: 0;
+    }
+    .sidebar:hover .sidebar-toggle-float,
+    .sidebar-toggle-float:hover { opacity: 1; }
+    .sidebar-toggle-float:hover { background: #f1f5f9; transform: scale(1.1); }
   </style>
 </head>
 <body class="font-sans bg-slate-50 min-h-screen flex">
 
   <!-- ═══ SIDEBAR ═══ -->
   <aside id="sidebar" class="sidebar w-64 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 left-0 z-40">
-    <!-- Logo + Toggle -->
-    <div class="h-16 flex items-center justify-between px-4 border-b border-slate-200 shrink-0">
+    <!-- Floating toggle button on sidebar edge -->
+    <button id="toggleSidebar" class="sidebar-toggle-float">
+      <i data-lucide="chevron-left" id="toggleIcon" class="w-4 h-4 text-slate-500"></i>
+    </button>
+
+    <!-- Logo -->
+    <div class="sidebar-header h-16 flex items-center px-4 border-b border-slate-200 shrink-0">
       <a href="dashboard.html" class="logo-full">
         <img src="logo-dark.svg" alt="Digital Office" class="h-5">
       </a>
       <a href="dashboard.html" class="logo-icon items-center justify-center hidden">
-        <svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="28" height="21" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle opacity="0.5" cx="24" cy="12" r="12" fill="#4f46e5"/>
           <path d="M0 0H12C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24H0V0Z" fill="#4f46e5"/>
         </svg>
       </a>
-      <button id="toggleSidebar" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
-        <i data-lucide="panel-left-close" id="toggleIcon" class="w-5 h-5"></i>
-      </button>
     </div>
 
     <!-- Navigation -->
@@ -552,12 +580,12 @@
         sidebar.classList.remove('-translate-x-full');
         sidebar.style.width = '72px';
         mainArea.style.marginLeft = '72px';
-        toggleIcon.setAttribute('data-lucide', 'panel-left-open');
+        toggleIcon.setAttribute('data-lucide', 'chevron-right');
       } else {
         sidebar.classList.remove('collapsed', '-translate-x-full');
         sidebar.style.width = '256px';
         mainArea.style.marginLeft = '256px';
-        toggleIcon.setAttribute('data-lucide', 'panel-left-close');
+        toggleIcon.setAttribute('data-lucide', 'chevron-left');
       }
       lucide.createIcons();
     }
