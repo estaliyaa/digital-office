@@ -13,390 +13,511 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          }
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
       }
     }
   </script>
   <style>
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in { animation: fadeInUp 0.4s ease-out forwards; opacity: 0; }
-    .fade-in-1 { animation-delay: 0.05s; }
-    .fade-in-2 { animation-delay: 0.1s; }
-    .fade-in-3 { animation-delay: 0.15s; }
-    .fade-in-4 { animation-delay: 0.2s; }
-    .fade-in-5 { animation-delay: 0.25s; }
-    .fade-in-6 { animation-delay: 0.3s; }
-    .fade-in-7 { animation-delay: 0.35s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; opacity: 0; }
+    .sidebar { transition: width 0.25s ease, transform 0.25s ease; }
+    .sidebar-label { transition: opacity 0.15s ease, width 0.15s ease; }
+    .sidebar.collapsed .sidebar-label { opacity: 0; width: 0; overflow: hidden; }
+    .sidebar.collapsed .sidebar-section-title { opacity: 0; height: 0; margin: 0; padding: 0; overflow: hidden; }
+    .sidebar.collapsed .sidebar-user-info { display: none; }
+    .sidebar.collapsed .logo-full { display: none; }
+    .sidebar.collapsed .logo-icon { display: flex; }
+    .sidebar:not(.collapsed) .logo-icon { display: none; }
+    .page-content { display: none; }
+    .page-content.active { display: block; }
   </style>
 </head>
-<body class="font-sans bg-slate-50 min-h-screen">
+<body class="font-sans bg-slate-50 min-h-screen flex">
 
-  <!-- Top Bar -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-      <!-- Logo -->
-      <div class="flex items-center gap-8">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside id="sidebar" class="sidebar w-64 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 left-0 z-40">
+    <!-- Logo + Toggle -->
+    <div class="h-16 flex items-center justify-between px-4 border-b border-slate-200 shrink-0">
+      <a href="dashboard.html" class="logo-full">
         <img src="logo-dark.svg" alt="Digital Office" class="h-5">
-        <!-- Nav (admin & manager only) -->
-        <nav id="mainNav" class="hidden md:flex items-center gap-1 text-sm font-medium">
-        </nav>
-      </div>
+      </a>
+      <a href="dashboard.html" class="logo-icon w-9 h-9 bg-indigo-600 rounded-xl items-center justify-center hidden">
+        <span class="text-white font-bold text-sm">DO</span>
+      </a>
+      <button id="toggleSidebar" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="panel-left-close" id="toggleIcon" class="w-5 h-5"></i>
+      </button>
+    </div>
 
-      <!-- Right side -->
-      <div class="flex items-center gap-4">
-        <!-- Role badge -->
-        <span id="roleBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"></span>
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+      <!-- Main section -->
+      <p class="sidebar-section-title text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Основное</p>
 
-        <!-- User menu -->
-        <div class="relative">
-          <button id="userMenuBtn" class="flex items-center gap-2.5 hover:bg-slate-50 rounded-xl px-3 py-2 transition-colors">
-            <div id="userAvatar" class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"></div>
-            <div class="hidden sm:block text-left">
-              <p id="userName" class="text-sm font-semibold text-slate-900 leading-tight"></p>
-              <p id="userTitle" class="text-xs text-slate-500 leading-tight"></p>
-            </div>
-            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+      <button data-page="statistics" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="bar-chart-3" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Статистика</span>
+      </button>
+      <button data-page="tasks" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="clipboard-check" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Задачи</span>
+      </button>
+      <button data-page="automation" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="zap" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Автоматизации</span>
+      </button>
+      <button data-page="notifications" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all relative">
+        <i data-lucide="bell" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Уведомления</span>
+        <span id="notifBadge" class="ml-auto bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center sidebar-label">3</span>
+      </button>
+
+      <!-- Documents section -->
+      <p class="sidebar-section-title text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-5 mb-2">Документы</p>
+
+      <button data-page="personnel" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="user-check" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Кадровые документы</span>
+      </button>
+      <button data-page="office" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="inbox" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Канцелярия</span>
+      </button>
+      <button data-page="registry" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="archive" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Реестр документов</span>
+      </button>
+
+      <!-- Organization section -->
+      <p class="sidebar-section-title text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-5 mb-2">Организация</p>
+
+      <button data-page="structure" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="network" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Структура предприятия</span>
+      </button>
+    </nav>
+
+    <!-- User section at bottom -->
+    <div class="border-t border-slate-200 p-3 shrink-0">
+      <div class="relative">
+        <button id="sidebarUserBtn" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors">
+          <div id="sidebarAvatar" class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"></div>
+          <div class="sidebar-user-info text-left min-w-0 flex-1">
+            <p id="sidebarName" class="text-sm font-semibold text-slate-900 truncate"></p>
+            <p id="sidebarRole" class="text-xs text-slate-500 truncate"></p>
+          </div>
+          <i data-lucide="chevron-up" class="w-4 h-4 text-slate-400 shrink-0 sidebar-label"></i>
+        </button>
+
+        <!-- User dropdown -->
+        <div id="sidebarDropdown" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg shadow-slate-200/50 border border-slate-200 py-2 z-50">
+          <div class="px-4 py-2 border-b border-slate-100">
+            <p id="dropName" class="text-sm font-semibold text-slate-900"></p>
+            <p id="dropEmail" class="text-xs text-slate-500"></p>
+          </div>
+          <a href="#" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
+            Мой профиль
+          </a>
+          <a href="#" id="settingsLink" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
+            Настройки
+          </a>
+          <div class="border-t border-slate-100 my-1"></div>
+          <button id="logoutBtn" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Выйти из системы
           </button>
-
-          <!-- Dropdown -->
-          <div id="userDropdown" class="hidden absolute right-0 top-12 w-56 bg-white rounded-xl shadow-lg shadow-slate-200/50 border border-slate-200 py-2 z-50">
-            <div class="px-4 py-2 border-b border-slate-100 sm:hidden">
-              <p id="dropName" class="text-sm font-semibold text-slate-900"></p>
-              <p id="dropEmail" class="text-xs text-slate-500"></p>
-            </div>
-            <a href="#" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-              <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-              Мой профиль
-            </a>
-            <a href="#" id="settingsLink" class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-              <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
-              Настройки
-            </a>
-            <div class="border-t border-slate-100 my-1"></div>
-            <button id="logoutBtn" class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-              <i data-lucide="log-out" class="w-4 h-4"></i>
-              Выйти из системы
-            </button>
-          </div>
         </div>
       </div>
     </div>
-  </header>
+  </aside>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Welcome -->
-    <div class="mb-8 fade-in fade-in-1">
-      <h1 class="text-2xl font-bold text-slate-900 mb-1">Добро пожаловать, <span id="greetName"></span></h1>
-      <p class="text-slate-500" id="greetSub"></p>
-    </div>
+  <!-- Mobile overlay -->
+  <div id="mobileOverlay" class="fixed inset-0 bg-black/30 z-30 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="statsGrid">
-      <!-- Stats injected by JS based on role -->
-    </div>
-
-    <!-- Two-column layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Left column (2/3) -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- Quick Actions -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 fade-in fade-in-4">
-          <h2 class="text-lg font-semibold text-slate-900 mb-4">Быстрые действия</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="quickActions">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 fade-in fade-in-5">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-slate-900">Последние действия</h2>
-            <span class="text-xs text-slate-400">Сегодня</span>
-          </div>
-          <div class="space-y-4" id="activityFeed">
-            <!-- Injected by JS -->
-          </div>
+  <!-- ═══ MAIN AREA ═══ -->
+  <div id="mainArea" class="flex-1 ml-64 transition-all duration-250">
+    <!-- Top Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 h-16 flex items-center px-6 justify-between">
+      <div class="flex items-center gap-4">
+        <button id="mobileMenuBtn" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <div>
+          <h1 id="pageTitle" class="text-lg font-semibold text-slate-900"></h1>
         </div>
       </div>
+      <div class="flex items-center gap-3">
+        <span id="roleBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"></span>
+        <button id="headerNotifBtn" data-page="notifications" class="nav-item-header w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 relative transition-colors">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
+        </button>
+      </div>
+    </header>
 
-      <!-- Right column (1/3) -->
-      <div class="space-y-6">
-        <!-- Profile Card -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 fade-in fade-in-6">
-          <h2 class="text-lg font-semibold text-slate-900 mb-4">Мой профиль</h2>
-          <div class="text-center mb-4">
-            <div id="profileAvatar" class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3"></div>
-            <p id="profileName" class="font-semibold text-slate-900"></p>
-            <p id="profileTitle" class="text-sm text-slate-500"></p>
-          </div>
-          <div class="space-y-3 text-sm">
-            <div class="flex items-center gap-3 text-slate-600">
-              <i data-lucide="mail" class="w-4 h-4 text-slate-400 shrink-0"></i>
-              <span id="profileEmail" class="truncate"></span>
-            </div>
-            <div class="flex items-center gap-3 text-slate-600">
-              <i data-lucide="shield" class="w-4 h-4 text-slate-400 shrink-0"></i>
-              <span id="profileRole"></span>
-            </div>
-            <div class="flex items-center gap-3 text-slate-600">
-              <i data-lucide="clock" class="w-4 h-4 text-slate-400 shrink-0"></i>
-              <span id="profileLogin"></span>
-            </div>
-          </div>
+    <!-- Page Content Area -->
+    <main class="p-6">
+
+      <!-- ══ PAGE: Статистика ══ -->
+      <div id="page-statistics" class="page-content active">
+        <div class="mb-6 fade-in">
+          <h2 class="text-xl font-bold text-slate-900 mb-1">Добро пожаловать, <span id="greetName"></span></h2>
+          <p class="text-slate-500" id="greetSub"></p>
         </div>
-
-        <!-- System Info (admin only) -->
-        <div id="systemInfo" class="bg-white rounded-2xl border border-slate-200 p-6 hidden fade-in fade-in-7">
-          <h2 class="text-lg font-semibold text-slate-900 mb-4">Система</h2>
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-slate-500">Версия</span>
-              <span class="font-medium text-slate-900">1.0.0</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6" id="statsGrid"></div>
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div class="xl:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-base font-semibold text-slate-900 mb-4">Быстрые действия</h3>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="quickActions"></div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500">Пользователей</span>
-              <span class="font-medium text-slate-900">3</span>
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-semibold text-slate-900">Последние действия</h3>
+                <span class="text-xs text-slate-400">Сегодня</span>
+              </div>
+              <div class="space-y-4" id="activityFeed"></div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500">Статус</span>
-              <span class="inline-flex items-center gap-1 font-medium text-emerald-600">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                Активна
-              </span>
+          </div>
+          <div class="space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 class="text-base font-semibold text-slate-900 mb-4">Мой профиль</h3>
+              <div class="text-center mb-4">
+                <div id="profileAvatar" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold mx-auto mb-3"></div>
+                <p id="profileName" class="font-semibold text-slate-900"></p>
+                <p id="profileTitle" class="text-sm text-slate-500"></p>
+              </div>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex items-center gap-2.5 text-slate-600"><i data-lucide="mail" class="w-4 h-4 text-slate-400 shrink-0"></i><span id="profileEmail" class="truncate"></span></div>
+                <div class="flex items-center gap-2.5 text-slate-600"><i data-lucide="shield" class="w-4 h-4 text-slate-400 shrink-0"></i><span id="profileRoleText"></span></div>
+                <div class="flex items-center gap-2.5 text-slate-600"><i data-lucide="clock" class="w-4 h-4 text-slate-400 shrink-0"></i><span id="profileLogin"></span></div>
+              </div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-slate-500">Среда</span>
-              <span class="font-medium text-slate-900">Production</span>
+            <div id="systemInfo" class="bg-white rounded-2xl border border-slate-200 p-6 hidden">
+              <h3 class="text-base font-semibold text-slate-900 mb-4">Система</h3>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex justify-between"><span class="text-slate-500">Версия</span><span class="font-medium text-slate-900">1.0.0</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Пользователей</span><span class="font-medium text-slate-900">3</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Статус</span><span class="inline-flex items-center gap-1 font-medium text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активна</span></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-200 mt-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-slate-400">
+      <!-- ══ PAGE: Задачи ══ -->
+      <div id="page-tasks" class="page-content">
+        <div class="flex items-center justify-between mb-6">
+          <div><p class="text-slate-500 text-sm">Управление задачами и поручениями</p></div>
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Новая задача</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="grid grid-cols-3 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>Задача</span><span>Статус</span><span>Срок</span>
+          </div>
+          <div class="divide-y divide-slate-100">
+            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
+              <div><p class="text-sm font-medium text-slate-900">Подготовить квартальный отчёт</p><p class="text-xs text-slate-500">Финансовый отдел</p></div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>В работе</span>
+              <span class="text-sm text-slate-500">18 апр 2026</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
+              <div><p class="text-sm font-medium text-slate-900">Согласовать договор с ТОО "Бета"</p><p class="text-xs text-slate-500">Юридический отдел</p></div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>На проверке</span>
+              <span class="text-sm text-slate-500">15 апр 2026</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
+              <div><p class="text-sm font-medium text-slate-900">Обновить штатное расписание</p><p class="text-xs text-slate-500">HR отдел</p></div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Завершена</span>
+              <span class="text-sm text-slate-500">12 апр 2026</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
+              <div><p class="text-sm font-medium text-slate-900">Провести инвентаризацию</p><p class="text-xs text-slate-500">Бухгалтерия</p></div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Просрочена</span>
+              <span class="text-sm text-slate-500">10 апр 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Автоматизации ══ -->
+      <div id="page-automation" class="page-content">
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-slate-500 text-sm">Настройка автоматических процессов</p>
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="file-check" class="w-5 h-5 text-emerald-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Согласование документов</p><p class="text-xs text-slate-500">Автоматическая маршрутизация</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">При создании документа автоматически назначается цепочка согласования по типу документа.</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="bell-ring" class="w-5 h-5 text-amber-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Уведомления о сроках</p><p class="text-xs text-slate-500">За 3 дня до дедлайна</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическая отправка напоминаний исполнителям о приближающихся сроках задач.</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Приём сотрудника</p><p class="text-xs text-slate-500">Генерация документов</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическое создание приказа, трудового договора и карточки сотрудника при оформлении.</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><i data-lucide="archive" class="w-5 h-5 text-slate-500"></i></div><div><p class="text-sm font-semibold text-slate-900">Архивация документов</p><p class="text-xs text-slate-500">Через 90 дней</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Пауза</span></div><p class="text-sm text-slate-500">Автоматический перенос завершённых документов в архив через 90 дней после закрытия.</p></div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Кадровые документы ══ -->
+      <div id="page-personnel" class="page-content">
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-slate-500 text-sm">Приказы, трудовые договоры и кадровый учёт</p>
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать документ</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="grid grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>Документ</span><span>Тип</span><span>Сотрудник</span><span>Дата</span></div>
+          <div class="divide-y divide-slate-100">
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Приказ о приёме № 42</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><p class="text-sm text-slate-600">Иванов А.С.</p><span class="text-sm text-slate-500">14 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Трудовой договор № 2026-087</p><span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Договор</span><p class="text-sm text-slate-600">Петрова М.К.</p><span class="text-sm text-slate-500">12 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Заявление на отпуск</p><span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full w-fit">Заявление</span><p class="text-sm text-slate-600">Сидорова Е.В.</p><span class="text-sm text-slate-500">11 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Приказ об увольнении № 38</p><span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><p class="text-sm text-slate-600">Козлов Р.Д.</p><span class="text-sm text-slate-500">10 апр 2026</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Канцелярия ══ -->
+      <div id="page-office" class="page-content">
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-slate-500 text-sm">Входящая и исходящая корреспонденция</p>
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Зарегистрировать</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-1"><div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="inbox" class="w-5 h-5 text-indigo-600"></i></div><div><p class="text-2xl font-bold text-slate-900">23</p><p class="text-sm text-slate-500">Входящие</p></div></div></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-1"><div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="send" class="w-5 h-5 text-emerald-600"></i></div><div><p class="text-2xl font-bold text-slate-900">15</p><p class="text-sm text-slate-500">Исходящие</p></div></div></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="grid grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>Документ</span><span>Направление</span><span>Отправитель</span><span>Дата</span></div>
+          <div class="divide-y divide-slate-100">
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Письмо от НПП «Сигма»</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Входящий</span><p class="text-sm text-slate-600">НПП «Сигма»</p><span class="text-sm text-slate-500">14 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Ответ на запрос № 312</p><span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Исходящий</span><p class="text-sm text-slate-600">Adata</p><span class="text-sm text-slate-500">13 апр 2026</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Уведомления ══ -->
+      <div id="page-notifications" class="page-content">
+        <p class="text-slate-500 text-sm mb-6">Системные уведомления и оповещения</p>
+        <div class="space-y-3">
+          <div class="bg-white rounded-2xl border border-indigo-200 border-l-4 border-l-indigo-500 p-5 flex items-start gap-4"><div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="file-signature" class="w-4 h-4 text-indigo-600"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Требуется подпись ЭЦП</p><p class="text-sm text-slate-500 mt-0.5">Договор № 2026-0415 ожидает вашей подписи</p><p class="text-xs text-slate-400 mt-1">5 минут назад</p></div><span class="w-2 h-2 bg-indigo-500 rounded-full mt-2 shrink-0"></span></div>
+          <div class="bg-white rounded-2xl border border-amber-200 border-l-4 border-l-amber-500 p-5 flex items-start gap-4"><div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-4 h-4 text-amber-600"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Срок задачи истекает</p><p class="text-sm text-slate-500 mt-0.5">«Квартальный отчёт» — осталось 2 дня</p><p class="text-xs text-slate-400 mt-1">1 час назад</p></div><span class="w-2 h-2 bg-amber-500 rounded-full mt-2 shrink-0"></span></div>
+          <div class="bg-white rounded-2xl border border-emerald-200 border-l-4 border-l-emerald-500 p-5 flex items-start gap-4"><div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Сотрудник оформлен</p><p class="text-sm text-slate-500 mt-0.5">Иванов А.С. принят на должность инженера</p><p class="text-xs text-slate-400 mt-1">3 часа назад</p></div><span class="w-2 h-2 bg-emerald-500 rounded-full mt-2 shrink-0"></span></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-start gap-4 opacity-60"><div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Новый вход в систему</p><p class="text-sm text-slate-500 mt-0.5">timeke@adata.kz выполнил вход</p><p class="text-xs text-slate-400 mt-1">Вчера, 18:45</p></div></div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Структура предприятия ══ -->
+      <div id="page-structure" class="page-content">
+        <p class="text-slate-500 text-sm mb-6">Организационная структура компании</p>
+        <div class="bg-white rounded-2xl border border-slate-200 p-8">
+          <!-- Org chart -->
+          <div class="flex flex-col items-center">
+            <div class="bg-indigo-600 text-white rounded-2xl px-6 py-4 text-center shadow-lg shadow-indigo-600/20"><p class="font-bold">Генеральный директор</p><p class="text-indigo-200 text-sm">Есталиева А.</p></div>
+            <div class="w-px h-8 bg-slate-300"></div>
+            <div class="flex gap-8 items-start">
+              <div class="flex flex-col items-center">
+                <div class="bg-white border-2 border-indigo-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">HR отдел</p><p class="text-xs text-slate-500">8 сотрудников</p></div>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="bg-white border-2 border-emerald-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">Финансы</p><p class="text-xs text-slate-500">6 сотрудников</p></div>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="bg-white border-2 border-amber-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">Юридический</p><p class="text-xs text-slate-500">4 сотрудника</p></div>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="bg-white border-2 border-violet-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">IT отдел</p><p class="text-xs text-slate-500">6 сотрудников</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Реестр документов ══ -->
+      <div id="page-registry" class="page-content">
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-slate-500 text-sm">Единый реестр всех документов организации</p>
+          <div class="flex items-center gap-2">
+            <div class="relative"><i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="text" placeholder="Поиск документов..." class="pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-64"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="grid grid-cols-5 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>№</span><span>Название</span><span>Тип</span><span>Статус</span><span>Дата</span></div>
+          <div class="divide-y divide-slate-100">
+            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0415</span><p class="text-sm font-medium text-slate-900">Договор поставки</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Договор</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">14 апр</span></div>
+            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0414</span><p class="text-sm font-medium text-slate-900">Акт сверки за март</p><span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full w-fit">Акт</span><span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full w-fit">На подписи</span><span class="text-sm text-slate-500">13 апр</span></div>
+            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0412</span><p class="text-sm font-medium text-slate-900">Договор с ТОО «Альфа»</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Договор</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">12 апр</span></div>
+            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0398</span><p class="text-sm font-medium text-slate-900">Приказ о приёме</p><span class="text-xs text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">10 апр</span></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 px-6 py-4 text-center text-sm text-slate-400">
       &copy; 2026 Adata. Digital Office — продукт компании Adata.
-    </div>
-  </footer>
+    </footer>
+  </div>
 
   <script>
     // ── Auth Guard ──
     const session = JSON.parse(localStorage.getItem('do_session') || 'null');
-    if (!session) {
-      window.location.href = 'login.html';
-    }
-
+    if (!session) { window.location.href = 'login.html'; }
     const { name, email, role, title, loginAt } = session || {};
 
-    // ── Role config ──
+    // ── Role config (stats, actions, activity for statistics page) ──
     const ROLE_CONFIG = {
-      admin: {
-        color: 'bg-indigo-600',
-        badgeClass: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
-        label: 'Администратор',
-        nav: ['Главная', 'Сотрудники', 'Документы', 'Отчёты', 'Настройки'],
-        stats: [
-          { icon: 'users', label: 'Сотрудники', value: '24', change: '+3 за месяц', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-text', label: 'Документы', value: '156', change: '12 на подпись', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'file-signature', label: 'Подписи ЭЦП', value: '89', change: '5 ожидают', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'building', label: 'Контрагенты', value: '18', change: '+2 новых', color: 'text-violet-600', bg: 'bg-violet-50' }
-        ],
-        actions: [
-          { icon: 'user-plus', label: 'Добавить сотрудника', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-plus', label: 'Создать документ', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'file-signature', label: 'Подписать ЭЦП', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'building-2', label: 'Добавить контрагента', color: 'text-violet-600', bg: 'bg-violet-50' },
-          { icon: 'bar-chart-3', label: 'Отчёты', color: 'text-sky-600', bg: 'bg-sky-50' },
-          { icon: 'settings', label: 'Настройки', color: 'text-slate-600', bg: 'bg-slate-100' }
-        ],
-        activity: [
-          { icon: 'user-plus', text: 'Добавлен новый сотрудник <b>Иванов А.С.</b>', time: '10 мин назад', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-signature', text: 'Подписан договор <b>№ 2026-0412</b> c ТОО "Альфа"', time: '1 час назад', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'file-text', text: 'Создан приказ о приёме <b>Петрова М.К.</b>', time: '2 часа назад', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'log-in', text: 'Вход в систему пользователя <b>timeke@adata.kz</b>', time: '3 часа назад', color: 'text-slate-500', bg: 'bg-slate-100' }
-        ]
+      admin: { color: 'bg-indigo-600', badgeClass: 'bg-indigo-50 text-indigo-700 border border-indigo-200', label: 'Администратор',
+        stats: [{ icon:'users',label:'Сотрудники',value:'24',change:'+3 за месяц',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-text',label:'Документы',value:'156',change:'12 на подпись',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'file-signature',label:'Подписи ЭЦП',value:'89',change:'5 ожидают',color:'text-amber-600',bg:'bg-amber-50' },{ icon:'building',label:'Контрагенты',value:'18',change:'+2 новых',color:'text-violet-600',bg:'bg-violet-50' }],
+        actions: [{ icon:'user-plus',label:'Добавить сотрудника',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-plus',label:'Создать документ',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'file-signature',label:'Подписать ЭЦП',color:'text-amber-600',bg:'bg-amber-50' },{ icon:'building-2',label:'Добавить контрагента',color:'text-violet-600',bg:'bg-violet-50' },{ icon:'bar-chart-3',label:'Отчёты',color:'text-sky-600',bg:'bg-sky-50' },{ icon:'settings',label:'Настройки',color:'text-slate-600',bg:'bg-slate-100' }],
+        activity: [{ icon:'user-plus',text:'Добавлен сотрудник <b>Иванов А.С.</b>',time:'10 мин назад',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-signature',text:'Подписан договор <b>№ 2026-0412</b>',time:'1 час назад',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'file-text',text:'Создан приказ о приёме <b>Петрова М.К.</b>',time:'2 часа назад',color:'text-amber-600',bg:'bg-amber-50' }]
       },
-      manager: {
-        color: 'bg-emerald-600',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-        label: 'Менеджер',
-        nav: ['Главная', 'Сотрудники', 'Документы', 'Отчёты'],
-        stats: [
-          { icon: 'users', label: 'Команда', value: '8', change: 'Ваш отдел', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-text', label: 'Документы', value: '42', change: '3 на подпись', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'file-signature', label: 'Подписи ЭЦП', value: '28', change: '2 ожидают', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'clipboard-check', label: 'Задачи', value: '5', change: 'В работе', color: 'text-violet-600', bg: 'bg-violet-50' }
-        ],
-        actions: [
-          { icon: 'file-plus', label: 'Создать документ', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'file-signature', label: 'Подписать ЭЦП', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'users', label: 'Моя команда', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'bar-chart-3', label: 'Отчёты', color: 'text-sky-600', bg: 'bg-sky-50' },
-          { icon: 'clipboard-check', label: 'Мои задачи', color: 'text-violet-600', bg: 'bg-violet-50' },
-          { icon: 'message-square', label: 'Сообщения', color: 'text-slate-600', bg: 'bg-slate-100' }
-        ],
-        activity: [
-          { icon: 'file-signature', text: 'Подписан акт <b>№ 2026-0398</b>', time: '30 мин назад', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'file-text', text: 'Создана заявка на отпуск <b>Сидорова Е.В.</b>', time: '2 часа назад', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'clipboard-check', text: 'Завершена задача <b>"Квартальный отчёт"</b>', time: '4 часа назад', color: 'text-indigo-600', bg: 'bg-indigo-50' }
-        ]
+      manager: { color: 'bg-emerald-600', badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200', label: 'Менеджер',
+        stats: [{ icon:'users',label:'Команда',value:'8',change:'Ваш отдел',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-text',label:'Документы',value:'42',change:'3 на подпись',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'file-signature',label:'Подписи ЭЦП',value:'28',change:'2 ожидают',color:'text-amber-600',bg:'bg-amber-50' },{ icon:'clipboard-check',label:'Задачи',value:'5',change:'В работе',color:'text-violet-600',bg:'bg-violet-50' }],
+        actions: [{ icon:'file-plus',label:'Создать документ',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'file-signature',label:'Подписать ЭЦП',color:'text-amber-600',bg:'bg-amber-50' },{ icon:'users',label:'Моя команда',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'bar-chart-3',label:'Отчёты',color:'text-sky-600',bg:'bg-sky-50' }],
+        activity: [{ icon:'file-signature',text:'Подписан акт <b>№ 2026-0398</b>',time:'30 мин назад',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'file-text',text:'Заявка на отпуск <b>Сидорова Е.В.</b>',time:'2 часа назад',color:'text-amber-600',bg:'bg-amber-50' }]
       },
-      user: {
-        color: 'bg-slate-600',
-        badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200',
-        label: 'Пользователь',
-        nav: ['Главная', 'Мои документы'],
-        stats: [
-          { icon: 'file-text', label: 'Мои документы', value: '12', change: '1 новый', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-signature', label: 'На подпись', value: '2', change: 'Ожидают', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'clipboard-check', label: 'Задачи', value: '3', change: 'В работе', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'calendar', label: 'Отпуск', value: '18', change: 'Дней осталось', color: 'text-violet-600', bg: 'bg-violet-50' }
-        ],
-        actions: [
-          { icon: 'file-text', label: 'Мои документы', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-signature', label: 'Подписать', color: 'text-amber-600', bg: 'bg-amber-50' },
-          { icon: 'calendar', label: 'Заявка на отпуск', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { icon: 'message-square', label: 'Сообщения', color: 'text-slate-600', bg: 'bg-slate-100' }
-        ],
-        activity: [
-          { icon: 'file-text', text: 'Получен документ <b>"Доп. соглашение №3"</b>', time: '1 час назад', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-          { icon: 'file-signature', text: 'Требуется подпись: <b>Акт сверки за март</b>', time: '3 часа назад', color: 'text-amber-600', bg: 'bg-amber-50' }
-        ]
+      user: { color: 'bg-slate-600', badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200', label: 'Пользователь',
+        stats: [{ icon:'file-text',label:'Мои документы',value:'12',change:'1 новый',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-signature',label:'На подпись',value:'2',change:'Ожидают',color:'text-amber-600',bg:'bg-amber-50' },{ icon:'clipboard-check',label:'Задачи',value:'3',change:'В работе',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'calendar',label:'Отпуск',value:'18',change:'Дней осталось',color:'text-violet-600',bg:'bg-violet-50' }],
+        actions: [{ icon:'file-text',label:'Мои документы',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-signature',label:'Подписать',color:'text-amber-600',bg:'bg-amber-50' },{ icon:'calendar',label:'Заявка на отпуск',color:'text-emerald-600',bg:'bg-emerald-50' },{ icon:'message-square',label:'Сообщения',color:'text-slate-600',bg:'bg-slate-100' }],
+        activity: [{ icon:'file-text',text:'Получен документ <b>"Доп. соглашение №3"</b>',time:'1 час назад',color:'text-indigo-600',bg:'bg-indigo-50' },{ icon:'file-signature',text:'Требуется подпись: <b>Акт сверки</b>',time:'3 часа назад',color:'text-amber-600',bg:'bg-amber-50' }]
       }
     };
-
     const cfg = ROLE_CONFIG[role] || ROLE_CONFIG.user;
+    const initials = name ? name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '?';
 
-    // ── Render UI ──
+    // ── Page titles ──
+    const PAGE_TITLES = {
+      statistics: 'Статистика', tasks: 'Задачи', automation: 'Автоматизации',
+      notifications: 'Уведомления', personnel: 'Кадровые документы', office: 'Канцелярия',
+      registry: 'Реестр документов', structure: 'Структура предприятия'
+    };
 
-    // Initials
-    const initials = name ? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '?';
-
-    // Header
-    document.getElementById('userAvatar').className = `w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${cfg.color}`;
-    document.getElementById('userAvatar').textContent = initials;
-    document.getElementById('userName').textContent = name;
-    document.getElementById('userTitle').textContent = title;
-
-    // Role badge
+    // ── Render header/user info ──
+    document.getElementById('sidebarAvatar').className = `w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${cfg.color}`;
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarName').textContent = name;
+    document.getElementById('sidebarRole').textContent = title;
+    document.getElementById('dropName').textContent = name;
+    document.getElementById('dropEmail').textContent = email;
     const badge = document.getElementById('roleBadge');
     badge.className = `hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${cfg.badgeClass}`;
     badge.innerHTML = `<i data-lucide="shield" class="w-3 h-3"></i>${cfg.label}`;
+    if (role === 'user') document.getElementById('settingsLink').classList.add('hidden');
 
-    // Nav
-    const nav = document.getElementById('mainNav');
-    cfg.nav.forEach((item, i) => {
-      const a = document.createElement('a');
-      a.href = '#';
-      a.className = i === 0
-        ? 'px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700'
-        : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors';
-      a.textContent = item;
-      nav.appendChild(a);
-    });
-
-    // Greeting
+    // ── Render statistics page ──
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Доброе утро' : hour < 18 ? 'Добрый день' : 'Добрый вечер';
     document.getElementById('greetName').textContent = name.split(' ')[0];
     document.getElementById('greetSub').textContent = `${greeting}! Вот краткая сводка по вашей рабочей области.`;
 
-    // Stats
-    const statsGrid = document.getElementById('statsGrid');
-    cfg.stats.forEach((s, i) => {
-      statsGrid.innerHTML += `
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 fade-in fade-in-${i + 2}">
-          <div class="flex items-center justify-between mb-3">
-            <div class="w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center">
-              <i data-lucide="${s.icon}" class="w-5 h-5 ${s.color}"></i>
-            </div>
-          </div>
-          <p class="text-2xl font-bold text-slate-900">${s.value}</p>
-          <p class="text-sm text-slate-500 mt-0.5">${s.label}</p>
-          <p class="text-xs ${s.color} mt-1 font-medium">${s.change}</p>
-        </div>`;
-    });
+    const sg = document.getElementById('statsGrid');
+    cfg.stats.forEach(s => { sg.innerHTML += `<div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center justify-between mb-3"><div class="w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center"><i data-lucide="${s.icon}" class="w-5 h-5 ${s.color}"></i></div></div><p class="text-2xl font-bold text-slate-900">${s.value}</p><p class="text-sm text-slate-500 mt-0.5">${s.label}</p><p class="text-xs ${s.color} mt-1 font-medium">${s.change}</p></div>`; });
+    const qa = document.getElementById('quickActions');
+    cfg.actions.forEach(a => { qa.innerHTML += `<button class="flex flex-col items-center gap-2.5 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all group"><div class="w-10 h-10 ${a.bg} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform"><i data-lucide="${a.icon}" class="w-5 h-5 ${a.color}"></i></div><span class="text-sm font-medium text-slate-700">${a.label}</span></button>`; });
+    const af = document.getElementById('activityFeed');
+    cfg.activity.forEach(a => { af.innerHTML += `<div class="flex items-start gap-3"><div class="w-8 h-8 ${a.bg} rounded-lg flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="${a.icon}" class="w-4 h-4 ${a.color}"></i></div><div class="flex-1 min-w-0"><p class="text-sm text-slate-700">${a.text}</p><p class="text-xs text-slate-400 mt-0.5">${a.time}</p></div></div>`; });
 
-    // Quick Actions
-    const actionsGrid = document.getElementById('quickActions');
-    cfg.actions.forEach(a => {
-      actionsGrid.innerHTML += `
-        <button class="flex flex-col items-center gap-2.5 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all group">
-          <div class="w-10 h-10 ${a.bg} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-            <i data-lucide="${a.icon}" class="w-5 h-5 ${a.color}"></i>
-          </div>
-          <span class="text-sm font-medium text-slate-700">${a.label}</span>
-        </button>`;
-    });
-
-    // Activity
-    const feed = document.getElementById('activityFeed');
-    cfg.activity.forEach(a => {
-      feed.innerHTML += `
-        <div class="flex items-start gap-3">
-          <div class="w-8 h-8 ${a.bg} rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-            <i data-lucide="${a.icon}" class="w-4 h-4 ${a.color}"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm text-slate-700">${a.text}</p>
-            <p class="text-xs text-slate-400 mt-0.5">${a.time}</p>
-          </div>
-        </div>`;
-    });
-
-    // Profile card
-    document.getElementById('profileAvatar').className = `w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3 ${cfg.color}`;
+    document.getElementById('profileAvatar').className = `w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold mx-auto mb-3 ${cfg.color}`;
     document.getElementById('profileAvatar').textContent = initials;
     document.getElementById('profileName').textContent = name;
     document.getElementById('profileTitle').textContent = title;
     document.getElementById('profileEmail').textContent = email;
-    document.getElementById('profileRole').textContent = cfg.label;
+    document.getElementById('profileRoleText').textContent = cfg.label;
+    document.getElementById('profileLogin').textContent = `Вход: ${new Date(loginAt).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
+    if (role === 'admin') document.getElementById('systemInfo').classList.remove('hidden');
 
-    // Login time
-    const loginDate = new Date(loginAt);
-    document.getElementById('profileLogin').textContent = `Вход: ${loginDate.toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
+    // ── Page navigation ──
+    function navigateTo(pageId) {
+      document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.add('active');
+      document.getElementById('pageTitle').textContent = PAGE_TITLES[pageId] || pageId;
 
-    // Dropdown name (mobile)
-    document.getElementById('dropName').textContent = name;
-    document.getElementById('dropEmail').textContent = email;
-
-    // System info (admin only)
-    if (role === 'admin') {
-      document.getElementById('systemInfo').classList.remove('hidden');
+      // Highlight active nav
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        if (btn.dataset.page === pageId) {
+          btn.classList.add('bg-indigo-50', 'text-indigo-700');
+          btn.classList.remove('text-slate-600', 'hover:bg-slate-50');
+        } else {
+          btn.classList.remove('bg-indigo-50', 'text-indigo-700');
+          btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+        }
+      });
     }
 
-    // Settings link (admin only)
-    if (role === 'user') {
-      document.getElementById('settingsLink').classList.add('hidden');
+    // Nav click handlers
+    document.querySelectorAll('.nav-item, .nav-item-header').forEach(btn => {
+      btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+    });
+
+    // Init on statistics
+    navigateTo('statistics');
+
+    // ── Sidebar toggle ──
+    const sidebar = document.getElementById('sidebar');
+    const mainArea = document.getElementById('mainArea');
+    const toggleIcon = document.getElementById('toggleIcon');
+    let collapsed = localStorage.getItem('do_sidebar') === 'collapsed';
+
+    const isMobile = () => window.innerWidth < 1024;
+
+    function applySidebarState() {
+      if (isMobile()) {
+        sidebar.style.width = '256px';
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.add('-translate-x-full');
+        mainArea.style.marginLeft = '0';
+      } else if (collapsed) {
+        sidebar.classList.add('collapsed');
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.style.width = '72px';
+        mainArea.style.marginLeft = '72px';
+        toggleIcon.setAttribute('data-lucide', 'panel-left-open');
+      } else {
+        sidebar.classList.remove('collapsed', '-translate-x-full');
+        sidebar.style.width = '256px';
+        mainArea.style.marginLeft = '256px';
+        toggleIcon.setAttribute('data-lucide', 'panel-left-close');
+      }
+      lucide.createIcons();
+    }
+    applySidebarState();
+    window.addEventListener('resize', applySidebarState);
+
+    document.getElementById('toggleSidebar').addEventListener('click', () => {
+      collapsed = !collapsed;
+      localStorage.setItem('do_sidebar', collapsed ? 'collapsed' : 'expanded');
+      applySidebarState();
+    });
+
+    // ── Mobile sidebar ──
+    document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileSidebar);
+    function toggleMobileSidebar() {
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      if (isHidden) {
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.style.width = '256px';
+        sidebar.classList.remove('collapsed');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+      }
+      document.getElementById('mobileOverlay').classList.toggle('hidden');
     }
 
-    // ── Interactions ──
-
-    // User menu toggle
-    document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+    // ── User dropdown ──
+    document.getElementById('sidebarUserBtn').addEventListener('click', function(e) {
       e.stopPropagation();
-      document.getElementById('userDropdown').classList.toggle('hidden');
+      document.getElementById('sidebarDropdown').classList.toggle('hidden');
     });
     document.addEventListener('click', () => {
-      document.getElementById('userDropdown').classList.add('hidden');
+      document.getElementById('sidebarDropdown').classList.add('hidden');
     });
 
-    // Logout
+    // ── Logout ──
     document.getElementById('logoutBtn').addEventListener('click', function() {
       localStorage.removeItem('do_session');
       window.location.href = 'login.html';
     });
 
-    // Init icons
     lucide.createIcons();
   </script>
 </body>
