@@ -385,32 +385,35 @@
         <input type="file" id="photoUpload" accept="image/*" class="hidden">
 
         <div class="max-w-3xl">
-          <!-- Tabs -->
-          <div class="flex gap-6 border-b border-slate-200 mb-6">
-            <button data-profile-tab="personal" class="profile-tab pb-3 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 transition-colors">Профиль</button>
-            <button data-profile-tab="security" class="profile-tab pb-3 text-sm font-medium text-slate-400 hover:text-slate-600 border-b-2 border-transparent transition-colors">Безопасность</button>
-            <button data-profile-tab="notifications-settings" class="profile-tab pb-3 text-sm font-medium text-slate-400 hover:text-slate-600 border-b-2 border-transparent transition-colors">Уведомления</button>
+          <!-- Profile header card -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
+            <div class="flex items-center gap-5">
+              <div class="relative group">
+                <div id="profilePageAvatar" class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-bold overflow-hidden shadow-sm"></div>
+                <button id="avatarWrapper" class="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
+                  <i data-lucide="camera" class="w-5 h-5 text-white"></i>
+                </button>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 id="profileHeaderName" class="text-xl font-bold text-slate-900"></h3>
+                <p id="profileHeaderTitle" class="text-sm text-slate-500 mt-0.5"></p>
+                <p id="profileHeaderEmail" class="text-sm text-slate-400 mt-0.5"></p>
+              </div>
+              <button id="editProfileBtn" class="text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors shrink-0">
+                <span class="flex items-center gap-1.5"><i data-lucide="pencil" class="w-4 h-4"></i> Редактировать</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Tab: Profile -->
+          <!-- Tabs -->
+          <div class="flex gap-6 border-b border-slate-200 mb-5">
+            <button data-profile-tab="personal" class="profile-tab pb-3 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 transition-colors">Личные данные</button>
+            <button data-profile-tab="security" class="profile-tab pb-3 text-sm font-medium text-slate-400 hover:text-slate-600 border-b-2 border-transparent transition-colors">Безопасность</button>
+          </div>
+
+          <!-- Tab: Personal data -->
           <div id="profileTab-personal" class="profile-tab-content">
             <div class="bg-white rounded-2xl border border-slate-200">
-              <!-- Row: Photo -->
-              <div class="flex items-center gap-4 px-6 py-5 border-b border-slate-100">
-                <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
-                  <i data-lucide="image" class="w-5 h-5 text-slate-400"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-slate-900">Фото профиля</p>
-                  <p class="text-xs text-slate-400 mt-0.5">JPG или PNG. Макс. 2 МБ</p>
-                </div>
-                <div class="flex items-center gap-3 shrink-0">
-                  <div id="profilePageAvatar" class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold overflow-hidden"></div>
-                  <button id="avatarWrapper" class="text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-1.5 rounded-lg transition-colors">Загрузить</button>
-                </div>
-              </div>
-
-              <!-- Rows: Personal data -->
               <div id="profileFields">
                 <!-- Filled by JS -->
               </div>
@@ -492,56 +495,6 @@
                   <p class="text-xs text-slate-400 mt-0.5">Управление устройствами, на которых выполнен вход</p>
                 </div>
                 <button class="text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-1.5 rounded-lg transition-colors">Просмотр</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tab: Notifications Settings -->
-          <div id="profileTab-notifications-settings" class="profile-tab-content hidden">
-            <div class="bg-white rounded-2xl border border-slate-200">
-              <!-- Row: Email notifications -->
-              <div class="flex items-center gap-4 px-6 py-5 border-b border-slate-100">
-                <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
-                  <i data-lucide="mail" class="w-5 h-5 text-slate-400"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-slate-900">Уведомления по почте</p>
-                  <p class="text-xs text-slate-400 mt-0.5">Получать уведомления на электронную почту</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input type="checkbox" checked class="sr-only peer">
-                  <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
-
-              <!-- Row: Task notifications -->
-              <div class="flex items-center gap-4 px-6 py-5 border-b border-slate-100">
-                <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
-                  <i data-lucide="clipboard-check" class="w-5 h-5 text-slate-400"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-slate-900">Уведомления о задачах</p>
-                  <p class="text-xs text-slate-400 mt-0.5">Новые задачи, изменения статусов и дедлайны</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input type="checkbox" checked class="sr-only peer">
-                  <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
-
-              <!-- Row: Document notifications -->
-              <div class="flex items-center gap-4 px-6 py-5">
-                <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
-                  <i data-lucide="file-text" class="w-5 h-5 text-slate-400"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-slate-900">Уведомления о документах</p>
-                  <p class="text-xs text-slate-400 mt-0.5">Документы на подпись и согласование</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input type="checkbox" checked class="sr-only peer">
-                  <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
               </div>
             </div>
           </div>
@@ -834,10 +787,10 @@
     function renderProfileAvatar() {
       const ppAvatar = document.getElementById('profilePageAvatar');
       if (profilePhoto) {
-        ppAvatar.className = 'w-10 h-10 rounded-full overflow-hidden';
+        ppAvatar.className = 'w-20 h-20 rounded-2xl overflow-hidden shadow-sm';
         ppAvatar.innerHTML = `<img src="${profilePhoto}" class="w-full h-full object-cover" alt="Profile">`;
       } else {
-        ppAvatar.className = `w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-gradient-to-br ${pastelGradient}`;
+        ppAvatar.className = `w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-sm bg-gradient-to-br ${pastelGradient}`;
         ppAvatar.innerHTML = '';
         ppAvatar.textContent = getProfileInitials();
       }
@@ -845,6 +798,9 @@
 
     function renderProfileHeader() {
       renderProfileAvatar();
+      document.getElementById('profileHeaderName').textContent = profileData.fullName;
+      document.getElementById('profileHeaderTitle').textContent = profileData.position;
+      document.getElementById('profileHeaderEmail').textContent = profileData.email;
     }
 
     renderProfileFields();
@@ -864,6 +820,22 @@
         showAlert('Фото профиля обновлено', 'success');
       };
       reader.readAsDataURL(file);
+    });
+
+    // Edit profile button (header card)
+    document.getElementById('editProfileBtn').addEventListener('click', () => {
+      isEditing = true;
+      renderProfileFields();
+      document.getElementById('editActions').classList.remove('hidden');
+      // Switch to personal tab
+      document.querySelectorAll('.profile-tab').forEach(t => {
+        t.classList.remove('text-indigo-600', 'border-indigo-600');
+        t.classList.add('text-slate-400', 'border-transparent');
+      });
+      document.querySelector('[data-profile-tab="personal"]').classList.remove('text-slate-400', 'border-transparent');
+      document.querySelector('[data-profile-tab="personal"]').classList.add('text-indigo-600', 'border-indigo-600');
+      document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById('profileTab-personal').classList.remove('hidden');
     });
 
     // Edit toggle
