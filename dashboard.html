@@ -6,6 +6,7 @@
   <title>Digital Office - Панель управления</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -185,65 +186,105 @@
           <p class="text-slate-500" id="greetSub"></p>
         </div>
 
-        <!-- Summary cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="summaryCards">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-6 h-6 text-amber-600"></i></div>
-            <div><p class="text-2xl font-bold text-slate-900" id="countToday">3</p><p class="text-sm text-slate-500">На сегодня</p></div>
+        <!-- Summary cards row -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5 text-amber-600"></i></div>
+              <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Сегодня</span>
+            </div>
+            <p class="text-2xl font-bold text-slate-900">3</p>
+            <p class="text-sm text-slate-500 mt-0.5">Задачи на сегодня</p>
           </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="users" class="w-6 h-6 text-indigo-600"></i></div>
-            <div><p class="text-2xl font-bold text-slate-900" id="countInvolved">5</p><p class="text-sm text-slate-500">Я участник</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="loader" class="w-5 h-5 text-indigo-600"></i></div>
+              <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Активные</span>
+            </div>
+            <p class="text-2xl font-bold text-slate-900">12</p>
+            <p class="text-sm text-slate-500 mt-0.5">В работе</p>
           </div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
-            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="file-edit" class="w-6 h-6 text-emerald-600"></i></div>
-            <div><p class="text-2xl font-bold text-slate-900" id="countCreated">4</p><p class="text-sm text-slate-500">Мной создано</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i></div>
+              <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+8 за неделю</span>
+            </div>
+            <p class="text-2xl font-bold text-slate-900">47</p>
+            <p class="text-sm text-slate-500 mt-0.5">Завершено</p>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center"><i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i></div>
+              <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">Внимание</span>
+            </div>
+            <p class="text-2xl font-bold text-slate-900">2</p>
+            <p class="text-sm text-slate-500 mt-0.5">Просрочено</p>
           </div>
         </div>
 
-        <!-- Block 1: Tasks for today -->
-        <div class="bg-white rounded-2xl border border-slate-200 mb-5">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center"><i data-lucide="clock" class="w-4.5 h-4.5 text-amber-600"></i></div>
-              <div>
-                <h3 class="text-sm font-semibold text-slate-900">Задачи на сегодня</h3>
-                <p class="text-xs text-slate-400">Требуют вашего внимания</p>
+        <!-- Charts row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+          <!-- Bar chart: weekly activity -->
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-semibold text-slate-900">Активность за неделю</h3>
+              <div class="flex items-center gap-4 text-xs text-slate-400">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>Создано</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Завершено</span>
               </div>
             </div>
-            <button onclick="navigateTo('tasks')" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+            <div class="h-56"><canvas id="weeklyChart"></canvas></div>
           </div>
-          <div class="divide-y divide-slate-100" id="todayTasks"></div>
+          <!-- Doughnut chart: tasks by status -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-6">
+            <h3 class="text-sm font-semibold text-slate-900 mb-4">Задачи по статусу</h3>
+            <div class="h-44 flex items-center justify-center"><canvas id="statusChart"></canvas></div>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-xs">
+              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span><span class="text-slate-600">Новые <span class="font-semibold text-slate-900 ml-auto">5</span></span></div>
+              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span class="text-slate-600">В работе <span class="font-semibold text-slate-900 ml-auto">12</span></span></div>
+              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-slate-600">Завершено <span class="font-semibold text-slate-900 ml-auto">47</span></span></div>
+              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-slate-600">Просрочено <span class="font-semibold text-slate-900 ml-auto">2</span></span></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Block 2: Tasks user is involved in -->
-        <div class="bg-white rounded-2xl border border-slate-200 mb-5">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-4.5 h-4.5 text-indigo-600"></i></div>
-              <div>
+        <!-- Task lists row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- Block 1: Tasks for today -->
+          <div class="bg-white rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4 text-amber-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">На сегодня</h3>
+              </div>
+              <button onclick="navigateTo('tasks')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div class="divide-y divide-slate-100" id="todayTasks"></div>
+          </div>
+
+          <!-- Block 2: Tasks user is involved in -->
+          <div class="bg-white rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 text-indigo-600"></i></div>
                 <h3 class="text-sm font-semibold text-slate-900">Я участник</h3>
-                <p class="text-xs text-slate-400">Задачи и заявки с вашим участием</p>
               </div>
+              <button onclick="navigateTo('tasks')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
             </div>
-            <button onclick="navigateTo('tasks')" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+            <div class="divide-y divide-slate-100" id="involvedTasks"></div>
           </div>
-          <div class="divide-y divide-slate-100" id="involvedTasks"></div>
-        </div>
 
-        <!-- Block 3: Tasks created by user -->
-        <div class="bg-white rounded-2xl border border-slate-200">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center"><i data-lucide="file-edit" class="w-4.5 h-4.5 text-emerald-600"></i></div>
-              <div>
+          <!-- Block 3: Tasks created by user -->
+          <div class="bg-white rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center"><i data-lucide="file-edit" class="w-4 h-4 text-emerald-600"></i></div>
                 <h3 class="text-sm font-semibold text-slate-900">Создано мной</h3>
-                <p class="text-xs text-slate-400">Ваши заявки и задачи</p>
               </div>
+              <button onclick="navigateTo('my-requests')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
             </div>
-            <button onclick="navigateTo('my-requests')" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">Мои заявки <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+            <div class="divide-y divide-slate-100" id="createdTasks"></div>
           </div>
-          <div class="divide-y divide-slate-100" id="createdTasks"></div>
         </div>
       </div>
 
@@ -572,46 +613,81 @@
         'Новая':         { color: 'text-indigo-700', bg: 'bg-indigo-50', dot: 'bg-indigo-500' },
       };
       const s = map[status] || map['В работе'];
-      return `<span class="inline-flex items-center gap-1.5 text-xs font-medium ${s.color} ${s.bg} px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full ${s.dot}"></span>${status}</span>`;
+      return `<span class="inline-flex items-center gap-1.5 text-xs font-medium ${s.color} ${s.bg} px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full ${s.dot}"></span>${status}</span>`;
     }
 
-    function renderTaskRow(task) {
-      return `<div class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer">
+    function renderCompactRow(task) {
+      return `<div class="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors cursor-pointer">
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-slate-900">${task.title}</p>
+          <p class="text-sm font-medium text-slate-900 truncate">${task.title}</p>
           <p class="text-xs text-slate-400 mt-0.5">${task.subtitle}</p>
         </div>
         <div class="shrink-0">${statusBadge(task.status)}</div>
-        <span class="text-xs text-slate-400 shrink-0 w-20 text-right">${task.date}</span>
       </div>`;
     }
 
-    // Tasks for today (user needs to do)
+    // Tasks for today
     const todayTasks = [
-      { title: 'Подписать договор поставки № 2026-0415', subtitle: 'ТОО «Альфа» · Требуется ЭЦП', status: 'Ожидает', date: '14 апр' },
-      { title: 'Согласовать заявку на отпуск', subtitle: 'Сидорова Е.В. · HR отдел', status: 'На согласовании', date: '14 апр' },
-      { title: 'Проверить квартальный отчёт', subtitle: 'Финансовый отдел', status: 'На проверке', date: '14 апр' },
+      { title: 'Подписать договор № 2026-0415', subtitle: 'ТОО «Альфа» · ЭЦП', status: 'Ожидает' },
+      { title: 'Согласовать заявку на отпуск', subtitle: 'Сидорова Е.В. · HR', status: 'На согласовании' },
+      { title: 'Проверить квартальный отчёт', subtitle: 'Финансовый отдел', status: 'На проверке' },
     ];
-    document.getElementById('todayTasks').innerHTML = todayTasks.map(renderTaskRow).join('');
+    document.getElementById('todayTasks').innerHTML = todayTasks.map(renderCompactRow).join('');
 
     // Tasks user is involved in
     const involvedTasks = [
-      { title: 'Внедрение системы электронного документооборота', subtitle: 'IT отдел · Исполнитель', status: 'В работе', date: '18 апр' },
-      { title: 'Подготовка к аудиту за Q1', subtitle: 'Бухгалтерия · Наблюдатель', status: 'В работе', date: '20 апр' },
-      { title: 'Обновление штатного расписания', subtitle: 'HR отдел · Согласующий', status: 'На согласовании', date: '15 апр' },
-      { title: 'Закупка серверного оборудования', subtitle: 'IT отдел · Инициатор', status: 'Одобрена', date: '12 апр' },
-      { title: 'Организация корпоративного обучения', subtitle: 'HR отдел · Участник', status: 'Новая', date: '22 апр' },
+      { title: 'Внедрение электронного документооборота', subtitle: 'IT · Исполнитель', status: 'В работе' },
+      { title: 'Подготовка к аудиту Q1', subtitle: 'Бухгалтерия · Наблюдатель', status: 'В работе' },
+      { title: 'Обновление штатного расписания', subtitle: 'HR · Согласующий', status: 'На согласовании' },
     ];
-    document.getElementById('involvedTasks').innerHTML = involvedTasks.map(renderTaskRow).join('');
+    document.getElementById('involvedTasks').innerHTML = involvedTasks.map(renderCompactRow).join('');
 
     // Tasks created by user
     const createdTasks = [
-      { title: 'Заявка на закупку оборудования', subtitle: 'Снабжение · 3 согласующих', status: 'На согласовании', date: '13 апр' },
-      { title: 'Запрос на доступ к ИС «Бухгалтерия»', subtitle: 'IT отдел', status: 'Одобрена', date: '11 апр' },
-      { title: 'Заявка на командировку в Астану', subtitle: 'Командировки · 20-22 апреля', status: 'Ожидает', date: '10 апр' },
-      { title: 'Заявление на отпуск', subtitle: 'Кадровая · 01-14 мая', status: 'Новая', date: '14 апр' },
+      { title: 'Заявка на закупку оборудования', subtitle: 'Снабжение · 3 согласующих', status: 'На согласовании' },
+      { title: 'Запрос на доступ к ИС', subtitle: 'IT отдел', status: 'Одобрена' },
+      { title: 'Заявка на командировку', subtitle: 'Командировки · 20-22 апр', status: 'Ожидает' },
     ];
-    document.getElementById('createdTasks').innerHTML = createdTasks.map(renderTaskRow).join('');
+    document.getElementById('createdTasks').innerHTML = createdTasks.map(renderCompactRow).join('');
+
+    // ── Charts ──
+    // Weekly activity bar chart
+    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+    new Chart(weeklyCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+        datasets: [
+          { label: 'Создано', data: [5, 8, 6, 9, 7, 2, 1], backgroundColor: 'rgba(99,102,241,0.8)', borderRadius: 6, barPercentage: 0.5, categoryPercentage: 0.6 },
+          { label: 'Завершено', data: [3, 5, 7, 6, 8, 1, 0], backgroundColor: 'rgba(16,185,129,0.8)', borderRadius: 6, barPercentage: 0.5, categoryPercentage: 0.6 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 12, family: 'Inter' }, color: '#94a3b8' } },
+          y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11, family: 'Inter' }, color: '#94a3b8', stepSize: 2 }, border: { display: false } }
+        }
+      }
+    });
+
+    // Doughnut chart: tasks by status
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Новые', 'В работе', 'Завершено', 'Просрочено'],
+        datasets: [{ data: [5, 12, 47, 2], backgroundColor: ['#6366f1','#f59e0b','#10b981','#ef4444'], borderWidth: 0, spacing: 3 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '70%',
+        plugins: {
+          legend: { display: false },
+          tooltip: { bodyFont: { family: 'Inter' }, titleFont: { family: 'Inter' } }
+        }
+      }
+    });
 
     // ── Page navigation ──
     function navigateTo(pageId) {
