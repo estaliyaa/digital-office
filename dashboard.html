@@ -83,49 +83,34 @@
 
     <!-- Navigation -->
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-      <!-- Main section -->
-      <p class="sidebar-section-title text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Основное</p>
-
       <button data-page="statistics" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
         <i data-lucide="bar-chart-3" class="w-5 h-5 shrink-0"></i>
         <span class="sidebar-label">Статистика</span>
       </button>
       <button data-page="tasks" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
         <i data-lucide="clipboard-check" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Задачи</span>
+        <span class="sidebar-label">Все задачи</span>
       </button>
-      <button data-page="automation" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
-        <i data-lucide="zap" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Автоматизации</span>
+      <button data-page="my-requests" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="file-edit" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Мои заявки</span>
       </button>
       <button data-page="notifications" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all relative">
         <i data-lucide="bell" class="w-5 h-5 shrink-0"></i>
         <span class="sidebar-label">Уведомления</span>
         <span id="notifBadge" class="ml-auto bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center sidebar-label">3</span>
       </button>
-
-      <!-- Documents section -->
-      <p class="sidebar-section-title text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-5 mb-2">Документы</p>
-
-      <button data-page="personnel" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
-        <i data-lucide="user-check" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Кадровые документы</span>
-      </button>
-      <button data-page="office" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
-        <i data-lucide="inbox" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Канцелярия</span>
+      <button data-page="structure" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="network" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Структура предприятия</span>
       </button>
       <button data-page="registry" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
         <i data-lucide="archive" class="w-5 h-5 shrink-0"></i>
         <span class="sidebar-label">Реестр документов</span>
       </button>
-
-      <!-- Organization section -->
-      <p class="sidebar-section-title text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-5 mb-2">Организация</p>
-
-      <button data-page="structure" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
-        <i data-lucide="network" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Структура предприятия</span>
+      <button data-page="processes" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
+        <i data-lucide="git-branch" class="w-5 h-5 shrink-0"></i>
+        <span class="sidebar-label">Все процессы</span>
       </button>
     </nav>
 
@@ -274,52 +259,18 @@
         </div>
       </div>
 
-      <!-- ══ PAGE: Автоматизации ══ -->
-      <div id="page-automation" class="page-content">
+      <!-- ══ PAGE: Мои заявки ══ -->
+      <div id="page-my-requests" class="page-content">
         <div class="flex items-center justify-between mb-6">
-          <p class="text-slate-500 text-sm">Настройка автоматических процессов</p>
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="file-check" class="w-5 h-5 text-emerald-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Согласование документов</p><p class="text-xs text-slate-500">Автоматическая маршрутизация</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">При создании документа автоматически назначается цепочка согласования по типу документа.</p></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="bell-ring" class="w-5 h-5 text-amber-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Уведомления о сроках</p><p class="text-xs text-slate-500">За 3 дня до дедлайна</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическая отправка напоминаний исполнителям о приближающихся сроках задач.</p></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Приём сотрудника</p><p class="text-xs text-slate-500">Генерация документов</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическое создание приказа, трудового договора и карточки сотрудника при оформлении.</p></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><i data-lucide="archive" class="w-5 h-5 text-slate-500"></i></div><div><p class="text-sm font-semibold text-slate-900">Архивация документов</p><p class="text-xs text-slate-500">Через 90 дней</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Пауза</span></div><p class="text-sm text-slate-500">Автоматический перенос завершённых документов в архив через 90 дней после закрытия.</p></div>
-        </div>
-      </div>
-
-      <!-- ══ PAGE: Кадровые документы ══ -->
-      <div id="page-personnel" class="page-content">
-        <div class="flex items-center justify-between mb-6">
-          <p class="text-slate-500 text-sm">Приказы, трудовые договоры и кадровый учёт</p>
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать документ</button>
+          <p class="text-slate-500 text-sm">Заявки, созданные вами</p>
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать заявку</button>
         </div>
         <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div class="grid grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>Документ</span><span>Тип</span><span>Сотрудник</span><span>Дата</span></div>
+          <div class="grid grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>Заявка</span><span>Тип</span><span>Статус</span><span>Дата</span></div>
           <div class="divide-y divide-slate-100">
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Приказ о приёме № 42</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><p class="text-sm text-slate-600">Иванов А.С.</p><span class="text-sm text-slate-500">14 апр 2026</span></div>
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Трудовой договор № 2026-087</p><span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Договор</span><p class="text-sm text-slate-600">Петрова М.К.</p><span class="text-sm text-slate-500">12 апр 2026</span></div>
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Заявление на отпуск</p><span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full w-fit">Заявление</span><p class="text-sm text-slate-600">Сидорова Е.В.</p><span class="text-sm text-slate-500">11 апр 2026</span></div>
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Приказ об увольнении № 38</p><span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><p class="text-sm text-slate-600">Козлов Р.Д.</p><span class="text-sm text-slate-500">10 апр 2026</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ PAGE: Канцелярия ══ -->
-      <div id="page-office" class="page-content">
-        <div class="flex items-center justify-between mb-6">
-          <p class="text-slate-500 text-sm">Входящая и исходящая корреспонденция</p>
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Зарегистрировать</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-1"><div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="inbox" class="w-5 h-5 text-indigo-600"></i></div><div><p class="text-2xl font-bold text-slate-900">23</p><p class="text-sm text-slate-500">Входящие</p></div></div></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-1"><div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="send" class="w-5 h-5 text-emerald-600"></i></div><div><p class="text-2xl font-bold text-slate-900">15</p><p class="text-sm text-slate-500">Исходящие</p></div></div></div>
-        </div>
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div class="grid grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>Документ</span><span>Направление</span><span>Отправитель</span><span>Дата</span></div>
-          <div class="divide-y divide-slate-100">
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Письмо от НПП «Сигма»</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Входящий</span><p class="text-sm text-slate-600">НПП «Сигма»</p><span class="text-sm text-slate-500">14 апр 2026</span></div>
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Ответ на запрос № 312</p><span class="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Исходящий</span><p class="text-sm text-slate-600">Adata</p><span class="text-sm text-slate-500">13 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Заявка на отпуск</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Кадровая</span><span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>На согласовании</span><span class="text-sm text-slate-500">14 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Запрос на оборудование</p><span class="text-xs text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full w-fit">Снабжение</span><span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Одобрена</span><span class="text-sm text-slate-500">11 апр 2026</span></div>
+            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Заявка на командировку</p><span class="text-xs text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full w-fit">Командировки</span><span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Одобрена</span><span class="text-sm text-slate-500">8 апр 2026</span></div>
           </div>
         </div>
       </div>
@@ -377,6 +328,20 @@
             <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0412</span><p class="text-sm font-medium text-slate-900">Договор с ТОО «Альфа»</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Договор</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">12 апр</span></div>
             <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0398</span><p class="text-sm font-medium text-slate-900">Приказ о приёме</p><span class="text-xs text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">10 апр</span></div>
           </div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Все процессы ══ -->
+      <div id="page-processes" class="page-content">
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-slate-500 text-sm">Бизнес-процессы и автоматизации организации</p>
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать процесс</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="file-check" class="w-5 h-5 text-emerald-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Согласование документов</p><p class="text-xs text-slate-500">Автоматическая маршрутизация</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">При создании документа автоматически назначается цепочка согласования по типу документа.</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="bell-ring" class="w-5 h-5 text-amber-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Уведомления о сроках</p><p class="text-xs text-slate-500">За 3 дня до дедлайна</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическая отправка напоминаний исполнителям о приближающихся сроках задач.</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Приём сотрудника</p><p class="text-xs text-slate-500">Генерация документов</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическое создание приказа, трудового договора и карточки сотрудника при оформлении.</p></div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><i data-lucide="archive" class="w-5 h-5 text-slate-500"></i></div><div><p class="text-sm font-semibold text-slate-900">Архивация документов</p><p class="text-xs text-slate-500">Через 90 дней</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Пауза</span></div><p class="text-sm text-slate-500">Автоматический перенос завершённых документов в архив через 90 дней после закрытия.</p></div>
         </div>
       </div>
 
@@ -548,9 +513,9 @@
 
     // ── Page titles ──
     const PAGE_TITLES = {
-      statistics: 'Статистика', tasks: 'Задачи', automation: 'Автоматизации',
-      notifications: 'Уведомления', personnel: 'Кадровые документы', office: 'Канцелярия',
-      registry: 'Реестр документов', structure: 'Структура предприятия', profile: 'Личный профиль'
+      statistics: 'Статистика', tasks: 'Все задачи', 'my-requests': 'Мои заявки',
+      notifications: 'Уведомления', structure: 'Структура предприятия',
+      registry: 'Реестр документов', processes: 'Все процессы', profile: 'Личный профиль'
     };
 
     // ── Render header/user info ──
