@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Office - Dev</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-sans bg-slate-950 min-h-screen text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo.svg" alt="Digital Office" class="w-9 h-9">
+        <span class="text-lg font-bold tracking-tight">Digital Office</span>
+      </div>
+      <div class="flex items-center gap-2 bg-amber-500/10 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-amber-500/20">
+        <i data-lucide="code-2" class="w-3.5 h-3.5"></i>
+        DEV MODE
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-12">
+    <!-- Title -->
+    <div class="mb-12">
+      <h1 class="text-3xl font-bold mb-3">Карта страниц</h1>
+      <p class="text-slate-400 text-lg">Навигация по всем экранам проекта Digital Office</p>
+    </div>
+
+    <!-- Auth Section -->
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center">
+          <i data-lucide="lock" class="w-4 h-4 text-indigo-400"></i>
+        </div>
+        <h2 class="text-xl font-semibold">Авторизация</h2>
+        <span class="text-xs font-medium text-slate-500 bg-slate-800 px-2.5 py-1 rounded-full">4 экрана</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Login -->
+        <a href="login.html" class="group block bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/50 hover:bg-slate-900/80 transition-all duration-200">
+          <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/20 transition-colors">
+            <i data-lucide="log-in" class="w-5 h-5 text-indigo-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-1.5">Вход в систему</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">Электронная почта, пароль, запомнить меня</p>
+          <div class="flex items-center gap-1.5 mt-4 text-xs font-medium text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span>Открыть</span>
+            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+          </div>
+        </a>
+
+        <!-- Forgot Password -->
+        <a href="forgot-password.html" class="group block bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/50 hover:bg-slate-900/80 transition-all duration-200">
+          <div class="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+            <i data-lucide="key-round" class="w-5 h-5 text-amber-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-1.5">Забыли пароль</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">Ввод email для восстановления доступа</p>
+          <div class="flex items-center gap-1.5 mt-4 text-xs font-medium text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span>Открыть</span>
+            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+          </div>
+        </a>
+
+        <!-- Verify Code -->
+        <a href="verify-code.html" class="group block bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/50 hover:bg-slate-900/80 transition-all duration-200">
+          <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-1.5">Код подтверждения</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">6-значный код, повторная отправка</p>
+          <div class="flex items-center gap-1.5 mt-4 text-xs font-medium text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span>Открыть</span>
+            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+          </div>
+        </a>
+
+        <!-- Reset Password -->
+        <a href="reset-password.html" class="group block bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/50 hover:bg-slate-900/80 transition-all duration-200">
+          <div class="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-violet-500/20 transition-colors">
+            <i data-lucide="lock-keyhole" class="w-5 h-5 text-violet-400"></i>
+          </div>
+          <h3 class="font-semibold text-white mb-1.5">Новый пароль</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">Создание пароля, требования, подтверждение</p>
+          <div class="flex items-center gap-1.5 mt-4 text-xs font-medium text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span>Открыть</span>
+            <i data-lucide="arrow-right" class="w-3 h-3"></i>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Flow diagram -->
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
+          <i data-lucide="git-branch" class="w-4 h-4 text-slate-400"></i>
+        </div>
+        <h2 class="text-xl font-semibold">Пользовательский поток</h2>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <div class="flex items-center gap-2 bg-indigo-500/10 text-indigo-300 px-4 py-2.5 rounded-xl border border-indigo-500/20 font-medium">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            Авторизация
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+          <div class="flex items-center gap-2 bg-amber-500/10 text-amber-300 px-4 py-2.5 rounded-xl border border-amber-500/20 font-medium">
+            <i data-lucide="key-round" class="w-4 h-4"></i>
+            Забыли пароль
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+          <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-300 px-4 py-2.5 rounded-xl border border-emerald-500/20 font-medium">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            Код подтверждения
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+          <div class="flex items-center gap-2 bg-violet-500/10 text-violet-300 px-4 py-2.5 rounded-xl border border-violet-500/20 font-medium">
+            <i data-lucide="lock-keyhole" class="w-4 h-4"></i>
+            Новый пароль
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+          <div class="flex items-center gap-2 bg-emerald-500/10 text-emerald-300 px-4 py-2.5 rounded-xl border border-emerald-500/20 font-medium">
+            <i data-lucide="circle-check-big" class="w-4 h-4"></i>
+            Успех
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+          <div class="flex items-center gap-2 bg-indigo-500/10 text-indigo-300 px-4 py-2.5 rounded-xl border border-indigo-500/20 font-medium">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            Авторизация
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech stack -->
+    <section>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
+          <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
+        </div>
+        <h2 class="text-xl font-semibold">Технологии</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-sky-500/10 rounded-lg flex items-center justify-center">
+              <i data-lucide="wind" class="w-4 h-4 text-sky-400"></i>
+            </div>
+            <h3 class="font-semibold">Tailwind CSS</h3>
+          </div>
+          <p class="text-sm text-slate-500">Утилитарный CSS-фреймворк, только стандартные цвета</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center">
+              <i data-lucide="pen-tool" class="w-4 h-4 text-orange-400"></i>
+            </div>
+            <h3 class="font-semibold">Lucide Icons</h3>
+          </div>
+          <p class="text-sm text-slate-500">Открытая библиотека иконок, лёгкая и консистентная</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center">
+              <i data-lucide="type" class="w-4 h-4 text-violet-400"></i>
+            </div>
+            <h3 class="font-semibold">Inter Font</h3>
+          </div>
+          <p class="text-sm text-slate-500">Современный шрифт от Google Fonts, 400-700 начертания</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 mt-16">
+    <div class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between text-sm text-slate-600">
+      <span>&copy; 2025 Digital Office</span>
+      <span>Dev Page v1.0</span>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
