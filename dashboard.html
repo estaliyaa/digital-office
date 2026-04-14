@@ -179,48 +179,71 @@
 
       <!-- ══ PAGE: Статистика ══ -->
       <div id="page-statistics" class="page-content active">
+        <!-- Greeting -->
         <div class="mb-6 fade-in">
           <h2 class="text-xl font-bold text-slate-900 mb-1">Добро пожаловать, <span id="greetName"></span></h2>
           <p class="text-slate-500" id="greetSub"></p>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6" id="statsGrid"></div>
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div class="xl:col-span-2 space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6">
-              <h3 class="text-base font-semibold text-slate-900 mb-4">Быстрые действия</h3>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="quickActions"></div>
-            </div>
-            <div class="bg-white rounded-2xl border border-slate-200 p-6">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base font-semibold text-slate-900">Последние действия</h3>
-                <span class="text-xs text-slate-400">Сегодня</span>
-              </div>
-              <div class="space-y-4" id="activityFeed"></div>
-            </div>
+
+        <!-- Summary cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="summaryCards">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
+            <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-6 h-6 text-amber-600"></i></div>
+            <div><p class="text-2xl font-bold text-slate-900" id="countToday">3</p><p class="text-sm text-slate-500">На сегодня</p></div>
           </div>
-          <div class="space-y-6">
-            <div class="bg-white rounded-2xl border border-slate-200 p-6">
-              <h3 class="text-base font-semibold text-slate-900 mb-4">Мой профиль</h3>
-              <div class="text-center mb-4">
-                <div id="profileAvatar" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold mx-auto mb-3"></div>
-                <p id="profileName" class="font-semibold text-slate-900"></p>
-                <p id="profileTitle" class="text-sm text-slate-500"></p>
-              </div>
-              <div class="space-y-2.5 text-sm">
-                <div class="flex items-center gap-2.5 text-slate-600"><i data-lucide="mail" class="w-4 h-4 text-slate-400 shrink-0"></i><span id="profileEmail" class="truncate"></span></div>
-                <div class="flex items-center gap-2.5 text-slate-600"><i data-lucide="shield" class="w-4 h-4 text-slate-400 shrink-0"></i><span id="profileRoleText"></span></div>
-                <div class="flex items-center gap-2.5 text-slate-600"><i data-lucide="clock" class="w-4 h-4 text-slate-400 shrink-0"></i><span id="profileLogin"></span></div>
-              </div>
-            </div>
-            <div id="systemInfo" class="bg-white rounded-2xl border border-slate-200 p-6 hidden">
-              <h3 class="text-base font-semibold text-slate-900 mb-4">Система</h3>
-              <div class="space-y-2.5 text-sm">
-                <div class="flex justify-between"><span class="text-slate-500">Версия</span><span class="font-medium text-slate-900">1.0.0</span></div>
-                <div class="flex justify-between"><span class="text-slate-500">Пользователей</span><span class="font-medium text-slate-900">3</span></div>
-                <div class="flex justify-between"><span class="text-slate-500">Статус</span><span class="inline-flex items-center gap-1 font-medium text-emerald-600"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активна</span></div>
-              </div>
-            </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
+            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="users" class="w-6 h-6 text-indigo-600"></i></div>
+            <div><p class="text-2xl font-bold text-slate-900" id="countInvolved">5</p><p class="text-sm text-slate-500">Я участник</p></div>
           </div>
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center gap-4">
+            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="file-edit" class="w-6 h-6 text-emerald-600"></i></div>
+            <div><p class="text-2xl font-bold text-slate-900" id="countCreated">4</p><p class="text-sm text-slate-500">Мной создано</p></div>
+          </div>
+        </div>
+
+        <!-- Block 1: Tasks for today -->
+        <div class="bg-white rounded-2xl border border-slate-200 mb-5">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center"><i data-lucide="clock" class="w-4.5 h-4.5 text-amber-600"></i></div>
+              <div>
+                <h3 class="text-sm font-semibold text-slate-900">Задачи на сегодня</h3>
+                <p class="text-xs text-slate-400">Требуют вашего внимания</p>
+              </div>
+            </div>
+            <button onclick="navigateTo('tasks')" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+          <div class="divide-y divide-slate-100" id="todayTasks"></div>
+        </div>
+
+        <!-- Block 2: Tasks user is involved in -->
+        <div class="bg-white rounded-2xl border border-slate-200 mb-5">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-4.5 h-4.5 text-indigo-600"></i></div>
+              <div>
+                <h3 class="text-sm font-semibold text-slate-900">Я участник</h3>
+                <p class="text-xs text-slate-400">Задачи и заявки с вашим участием</p>
+              </div>
+            </div>
+            <button onclick="navigateTo('tasks')" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+          <div class="divide-y divide-slate-100" id="involvedTasks"></div>
+        </div>
+
+        <!-- Block 3: Tasks created by user -->
+        <div class="bg-white rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center"><i data-lucide="file-edit" class="w-4.5 h-4.5 text-emerald-600"></i></div>
+              <div>
+                <h3 class="text-sm font-semibold text-slate-900">Создано мной</h3>
+                <p class="text-xs text-slate-400">Ваши заявки и задачи</p>
+              </div>
+            </div>
+            <button onclick="navigateTo('my-requests')" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors">Мои заявки <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+          <div class="divide-y divide-slate-100" id="createdTasks"></div>
         </div>
       </div>
 
@@ -536,22 +559,59 @@
     document.getElementById('greetName').textContent = name.split(' ')[0];
     document.getElementById('greetSub').textContent = `${greeting}! Вот краткая сводка по вашей рабочей области.`;
 
-    const sg = document.getElementById('statsGrid');
-    cfg.stats.forEach(s => { sg.innerHTML += `<div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center justify-between mb-3"><div class="w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center"><i data-lucide="${s.icon}" class="w-5 h-5 ${s.color}"></i></div></div><p class="text-2xl font-bold text-slate-900">${s.value}</p><p class="text-sm text-slate-500 mt-0.5">${s.label}</p><p class="text-xs ${s.color} mt-1 font-medium">${s.change}</p></div>`; });
-    const qa = document.getElementById('quickActions');
-    cfg.actions.forEach(a => { qa.innerHTML += `<button class="flex flex-col items-center gap-2.5 p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all group"><div class="w-10 h-10 ${a.bg} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform"><i data-lucide="${a.icon}" class="w-5 h-5 ${a.color}"></i></div><span class="text-sm font-medium text-slate-700">${a.label}</span></button>`; });
-    const af = document.getElementById('activityFeed');
-    cfg.activity.forEach(a => { af.innerHTML += `<div class="flex items-start gap-3"><div class="w-8 h-8 ${a.bg} rounded-lg flex items-center justify-center shrink-0 mt-0.5"><i data-lucide="${a.icon}" class="w-4 h-4 ${a.color}"></i></div><div class="flex-1 min-w-0"><p class="text-sm text-slate-700">${a.text}</p><p class="text-xs text-slate-400 mt-0.5">${a.time}</p></div></div>`; });
+    // Status badge helper
+    function statusBadge(status) {
+      const map = {
+        'В работе':      { color: 'text-amber-700', bg: 'bg-amber-50', dot: 'bg-amber-500' },
+        'На согласовании':{ color: 'text-amber-700', bg: 'bg-amber-50', dot: 'bg-amber-500' },
+        'На проверке':   { color: 'text-sky-700', bg: 'bg-sky-50', dot: 'bg-sky-500' },
+        'Ожидает':       { color: 'text-violet-700', bg: 'bg-violet-50', dot: 'bg-violet-500' },
+        'Завершена':     { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
+        'Одобрена':      { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
+        'Просрочена':    { color: 'text-red-700', bg: 'bg-red-50', dot: 'bg-red-500' },
+        'Новая':         { color: 'text-indigo-700', bg: 'bg-indigo-50', dot: 'bg-indigo-500' },
+      };
+      const s = map[status] || map['В работе'];
+      return `<span class="inline-flex items-center gap-1.5 text-xs font-medium ${s.color} ${s.bg} px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full ${s.dot}"></span>${status}</span>`;
+    }
 
-    const avatarGradient = role === 'admin' ? 'from-indigo-500 to-violet-600' : role === 'manager' ? 'from-emerald-500 to-teal-600' : 'from-slate-500 to-slate-600';
-    document.getElementById('profileAvatar').className = `w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold mx-auto mb-3 bg-gradient-to-br shadow-lg ${avatarGradient}`;
-    document.getElementById('profileAvatar').textContent = initials;
-    document.getElementById('profileName').textContent = name;
-    document.getElementById('profileTitle').textContent = title;
-    document.getElementById('profileEmail').textContent = email;
-    document.getElementById('profileRoleText').textContent = cfg.label;
-    document.getElementById('profileLogin').textContent = `Вход: ${new Date(loginAt).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
-    if (role === 'admin') document.getElementById('systemInfo').classList.remove('hidden');
+    function renderTaskRow(task) {
+      return `<div class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors cursor-pointer">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-slate-900">${task.title}</p>
+          <p class="text-xs text-slate-400 mt-0.5">${task.subtitle}</p>
+        </div>
+        <div class="shrink-0">${statusBadge(task.status)}</div>
+        <span class="text-xs text-slate-400 shrink-0 w-20 text-right">${task.date}</span>
+      </div>`;
+    }
+
+    // Tasks for today (user needs to do)
+    const todayTasks = [
+      { title: 'Подписать договор поставки № 2026-0415', subtitle: 'ТОО «Альфа» · Требуется ЭЦП', status: 'Ожидает', date: '14 апр' },
+      { title: 'Согласовать заявку на отпуск', subtitle: 'Сидорова Е.В. · HR отдел', status: 'На согласовании', date: '14 апр' },
+      { title: 'Проверить квартальный отчёт', subtitle: 'Финансовый отдел', status: 'На проверке', date: '14 апр' },
+    ];
+    document.getElementById('todayTasks').innerHTML = todayTasks.map(renderTaskRow).join('');
+
+    // Tasks user is involved in
+    const involvedTasks = [
+      { title: 'Внедрение системы электронного документооборота', subtitle: 'IT отдел · Исполнитель', status: 'В работе', date: '18 апр' },
+      { title: 'Подготовка к аудиту за Q1', subtitle: 'Бухгалтерия · Наблюдатель', status: 'В работе', date: '20 апр' },
+      { title: 'Обновление штатного расписания', subtitle: 'HR отдел · Согласующий', status: 'На согласовании', date: '15 апр' },
+      { title: 'Закупка серверного оборудования', subtitle: 'IT отдел · Инициатор', status: 'Одобрена', date: '12 апр' },
+      { title: 'Организация корпоративного обучения', subtitle: 'HR отдел · Участник', status: 'Новая', date: '22 апр' },
+    ];
+    document.getElementById('involvedTasks').innerHTML = involvedTasks.map(renderTaskRow).join('');
+
+    // Tasks created by user
+    const createdTasks = [
+      { title: 'Заявка на закупку оборудования', subtitle: 'Снабжение · 3 согласующих', status: 'На согласовании', date: '13 апр' },
+      { title: 'Запрос на доступ к ИС «Бухгалтерия»', subtitle: 'IT отдел', status: 'Одобрена', date: '11 апр' },
+      { title: 'Заявка на командировку в Астану', subtitle: 'Командировки · 20-22 апреля', status: 'Ожидает', date: '10 апр' },
+      { title: 'Заявление на отпуск', subtitle: 'Кадровая · 01-14 мая', status: 'Новая', date: '14 апр' },
+    ];
+    document.getElementById('createdTasks').innerHTML = createdTasks.map(renderTaskRow).join('');
 
     // ── Page navigation ──
     function navigateTo(pageId) {
