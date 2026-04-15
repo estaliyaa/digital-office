@@ -409,16 +409,11 @@
 
       <!-- ══ PAGE: Все процессы ══ -->
       <div id="page-processes" class="page-content">
-        <div class="flex items-center justify-between mb-6">
-          <p class="text-slate-500 text-sm">Бизнес-процессы и автоматизации организации</p>
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать процесс</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="file-check" class="w-5 h-5 text-emerald-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Согласование документов</p><p class="text-xs text-slate-500">Автоматическая маршрутизация</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">При создании документа автоматически назначается цепочка согласования по типу документа.</p></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="bell-ring" class="w-5 h-5 text-amber-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Уведомления о сроках</p><p class="text-xs text-slate-500">За 3 дня до дедлайна</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическая отправка напоминаний исполнителям о приближающихся сроках задач.</p></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i></div><div><p class="text-sm font-semibold text-slate-900">Приём сотрудника</p><p class="text-xs text-slate-500">Генерация документов</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Активен</span></div><p class="text-sm text-slate-500">Автоматическое создание приказа, трудового договора и карточки сотрудника при оформлении.</p></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><i data-lucide="archive" class="w-5 h-5 text-slate-500"></i></div><div><p class="text-sm font-semibold text-slate-900">Архивация документов</p><p class="text-xs text-slate-500">Через 90 дней</p></div><span class="ml-auto inline-flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Пауза</span></div><p class="text-sm text-slate-500">Автоматический перенос завершённых документов в архив через 90 дней после закрытия.</p></div>
-        </div>
+        <!-- Breadcrumbs -->
+        <div id="processesBreadcrumbs" class="flex items-center gap-1.5 text-sm text-slate-500 mb-5"></div>
+
+        <!-- Dynamic content -->
+        <div id="processesContent"></div>
       </div>
 
       <!-- ══ PAGE: Личный профиль ══ -->
@@ -731,11 +726,223 @@
     });
 
     // ── Page navigation ──
+    // ══ PROCESSES DATA & RENDERING ══
+    const PROCESS_DEPARTMENTS = [
+      { id:'hr', name:'HR', desc:'Кадровые процессы', icon:'users', color:'indigo', count:6 },
+      { id:'sb', name:'СБ', desc:'Служба безопасности', icon:'shield', color:'rose', count:3 },
+      { id:'fin', name:'Бухгалтерия', desc:'Финансовые операции', icon:'calculator', color:'emerald', count:5 },
+      { id:'it', name:'IT', desc:'Техническая поддержка', icon:'cpu', color:'sky', count:4 },
+      { id:'legal', name:'Юридический', desc:'Договоры и согласования', icon:'scale', color:'violet', count:3 },
+      { id:'admin', name:'Администрация', desc:'Приказы и распоряжения', icon:'briefcase', color:'amber', count:4 },
+    ];
+
+    const PROCESS_TYPES = {
+      hr: [
+        { id:'vacation', name:'Отпускные', desc:'Оформление ежегодного отпуска', icon:'palmtree', active:12 },
+        { id:'sick', name:'Больничные', desc:'Больничный лист сотрудника', icon:'heart-pulse', active:3 },
+        { id:'unpaid', name:'Без содержания', desc:'Отпуск за свой счёт', icon:'calendar-x', active:2 },
+        { id:'biz-trip', name:'Командировка', desc:'Служебная поездка', icon:'plane', active:5 },
+        { id:'hire', name:'Приём сотрудника', desc:'Оформление на работу', icon:'user-plus', active:1 },
+        { id:'fire', name:'Увольнение', desc:'Расторжение договора', icon:'user-minus', active:0 },
+      ],
+      sb: [
+        { id:'access', name:'Выдача пропуска', desc:'Новый пропуск в здание', icon:'key-round', active:4 },
+        { id:'check', name:'Проверка кандидата', desc:'Согласование с СБ', icon:'user-check', active:2 },
+        { id:'incident', name:'Инцидент', desc:'Регистрация инцидента', icon:'alert-triangle', active:1 },
+      ],
+      fin: [
+        { id:'invoice', name:'Оплата счёта', desc:'Согласование оплаты', icon:'receipt', active:8 },
+        { id:'expense', name:'Авансовый отчёт', desc:'Отчёт по расходам', icon:'wallet', active:3 },
+        { id:'bonus', name:'Премия', desc:'Начисление премии', icon:'gift', active:2 },
+        { id:'contract-pay', name:'Договор оплаты', desc:'Платёжные обязательства', icon:'file-text', active:4 },
+        { id:'salary', name:'Зарплата', desc:'Расчёт заработной платы', icon:'banknote', active:1 },
+      ],
+      it: [
+        { id:'access-it', name:'Доступ к системе', desc:'Выдача учётной записи', icon:'lock', active:6 },
+        { id:'equipment', name:'Заявка на оборудование', desc:'Выдача техники', icon:'laptop', active:3 },
+        { id:'repair', name:'Ремонт техники', desc:'Сервисный запрос', icon:'wrench', active:2 },
+        { id:'software', name:'Установка ПО', desc:'Запрос программного обеспечения', icon:'download', active:1 },
+      ],
+      legal: [
+        { id:'contract', name:'Договор', desc:'Согласование договора', icon:'file-signature', active:5 },
+        { id:'nda', name:'NDA', desc:'Соглашение о неразглашении', icon:'shield-check', active:2 },
+        { id:'claim', name:'Претензия', desc:'Претензионная работа', icon:'gavel', active:1 },
+      ],
+      admin: [
+        { id:'order', name:'Приказ', desc:'Внутренний приказ', icon:'file-check', active:3 },
+        { id:'memo', name:'Служебная записка', desc:'Докладная', icon:'sticky-note', active:4 },
+        { id:'meeting', name:'Протокол совещания', desc:'Результаты встречи', icon:'users-round', active:2 },
+        { id:'directive', name:'Распоряжение', desc:'Распоряжение руководства', icon:'megaphone', active:1 },
+      ],
+    };
+
+    // Sample process instances
+    function generateInstances(typeId, typeName) {
+      const stages = ['Черновик','Согласование HR','Согласование руководителя','Подписание','Завершено'];
+      const people = ['Алиев Б.К.','Нурланов С.М.','Жумабаева А.Т.','Касымов Д.Р.','Оспанова Л.Е.','Бекенов Т.А.','Сериков Р.Н.'];
+      const statusColors = {
+        'Черновик': 'slate', 'Согласование HR': 'indigo', 'Согласование руководителя': 'violet',
+        'Подписание': 'amber', 'Завершено': 'emerald', 'Отклонено': 'rose'
+      };
+      const rows = [];
+      for (let i=1; i<=8; i++) {
+        const stageIdx = Math.min(stages.length-1, Math.floor(Math.random()*stages.length));
+        const stage = stages[stageIdx];
+        rows.push({
+          id: `${typeId.toUpperCase()}-${String(1000+i)}`,
+          applicant: people[i % people.length],
+          created: `${String(i+1).padStart(2,'0')}.04.2026`,
+          stage,
+          stageColor: statusColors[stage],
+          stageIdx,
+          totalStages: stages.length,
+        });
+      }
+      return rows;
+    }
+
+    let processView = { level: 'departments', dept: null, type: null };
+
+    function renderProcesses() {
+      const bc = document.getElementById('processesBreadcrumbs');
+      const content = document.getElementById('processesContent');
+      if (!bc || !content) return;
+
+      // Breadcrumbs
+      let crumbs = `<button onclick="setProcessView('departments')" class="hover:text-indigo-600 transition-colors">Все процессы</button>`;
+      if (processView.level !== 'departments') {
+        const dept = PROCESS_DEPARTMENTS.find(d => d.id === processView.dept);
+        crumbs += `<i data-lucide="chevron-right" class="w-4 h-4"></i><button onclick="setProcessView('types','${dept.id}')" class="hover:text-indigo-600 transition-colors">${dept.name}</button>`;
+      }
+      if (processView.level === 'instances') {
+        const type = PROCESS_TYPES[processView.dept].find(t => t.id === processView.type);
+        crumbs += `<i data-lucide="chevron-right" class="w-4 h-4"></i><span class="text-slate-900 font-medium">${type.name}</span>`;
+      }
+      bc.innerHTML = crumbs;
+
+      // Content
+      if (processView.level === 'departments') {
+        content.innerHTML = `
+          <div class="flex items-center justify-between mb-6">
+            <p class="text-slate-500 text-sm">Выберите подразделение для просмотра процессов</p>
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать процесс</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${PROCESS_DEPARTMENTS.map(d => `
+              <button onclick="setProcessView('types','${d.id}')" class="group bg-white rounded-2xl border border-slate-200 p-5 text-left hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/50 transition-all">
+                <div class="flex items-start gap-3 mb-4">
+                  <div class="w-12 h-12 bg-${d.color}-50 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <i data-lucide="${d.icon}" class="w-6 h-6 text-${d.color}-600"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-base font-semibold text-slate-900">${d.name}</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">${d.desc}</p>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                  <span class="text-xs text-slate-500">${d.count} процессов</span>
+                  <span class="text-xs font-medium text-indigo-600 flex items-center gap-1 group-hover:gap-1.5 transition-all">Открыть <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        `;
+      } else if (processView.level === 'types') {
+        const dept = PROCESS_DEPARTMENTS.find(d => d.id === processView.dept);
+        const types = PROCESS_TYPES[processView.dept] || [];
+        content.innerHTML = `
+          <div class="flex items-center justify-between mb-6">
+            <p class="text-slate-500 text-sm">Процессы подразделения <span class="font-medium text-slate-900">${dept.name}</span></p>
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Новый процесс</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${types.map(t => `
+              <button onclick="setProcessView('instances','${dept.id}','${t.id}')" class="group bg-white rounded-2xl border border-slate-200 p-5 text-left hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/50 transition-all">
+                <div class="flex items-start gap-3 mb-4">
+                  <div class="w-11 h-11 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
+                    <i data-lucide="${t.icon}" class="w-5 h-5 text-slate-600 group-hover:text-indigo-600 transition-colors"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-sm font-semibold text-slate-900">${t.name}</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">${t.desc}</p>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                  <span class="text-xs font-medium ${t.active > 0 ? 'text-indigo-600' : 'text-slate-400'}">${t.active > 0 ? t.active + ' активных' : 'Нет активных'}</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors"></i>
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        `;
+      } else if (processView.level === 'instances') {
+        const dept = PROCESS_DEPARTMENTS.find(d => d.id === processView.dept);
+        const type = PROCESS_TYPES[processView.dept].find(t => t.id === processView.type);
+        const rows = generateInstances(type.id, type.name);
+        content.innerHTML = `
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">${type.name}</h2>
+              <p class="text-slate-500 text-sm mt-0.5">${type.desc} · ${rows.length} заявок</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative"><i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="text" placeholder="Поиск..." class="pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-56"></div>
+              <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span class="col-span-2">ID</span>
+              <span class="col-span-3">Заявитель</span>
+              <span class="col-span-2">Дата</span>
+              <span class="col-span-4">Текущий этап</span>
+              <span class="col-span-1 text-right">Действия</span>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${rows.map(r => `
+                <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-slate-50 transition-colors">
+                  <span class="col-span-2 text-sm font-medium text-slate-900">${r.id}</span>
+                  <span class="col-span-3 text-sm text-slate-700">${r.applicant}</span>
+                  <span class="col-span-2 text-sm text-slate-500">${r.created}</span>
+                  <div class="col-span-4">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <span class="inline-flex items-center gap-1.5 text-xs font-medium text-${r.stageColor}-700 bg-${r.stageColor}-50 px-2 py-0.5 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-${r.stageColor}-500"></span>${r.stage}
+                      </span>
+                      <span class="text-xs text-slate-400">${r.stageIdx+1}/${r.totalStages}</span>
+                    </div>
+                    <div class="h-1 bg-slate-100 rounded-full overflow-hidden">
+                      <div class="h-full bg-${r.stageColor}-500" style="width:${((r.stageIdx+1)/r.totalStages)*100}%"></div>
+                    </div>
+                  </div>
+                  <div class="col-span-1 text-right">
+                    <button class="text-slate-400 hover:text-indigo-600 transition-colors"><i data-lucide="eye" class="w-4 h-4 inline"></i></button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function setProcessView(level, dept, type) {
+      processView = { level, dept: dept || null, type: type || null };
+      renderProcesses();
+    }
+
     function navigateTo(pageId) {
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('page-' + pageId);
       if (target) target.classList.add('active');
       document.getElementById('pageTitle').textContent = PAGE_TITLES[pageId] || pageId;
+
+      if (pageId === 'processes') {
+        processView = { level: 'departments', dept: null, type: null };
+        renderProcesses();
+      }
 
       // Highlight active nav
       document.querySelectorAll('.nav-item').forEach(btn => {
