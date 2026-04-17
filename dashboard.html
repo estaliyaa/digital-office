@@ -313,50 +313,52 @@
           </div>
         </div>
 
-        <!-- MAIN FOCUS: Tasks for today — full width, prominent -->
-        <div class="bg-white rounded-2xl border border-indigo-200 shadow-sm shadow-indigo-100/50 mb-6 overflow-hidden">
-          <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-violet-50/40">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-sm shadow-indigo-500/30"><i data-lucide="clock" class="w-5 h-5 text-white"></i></div>
-              <div>
-                <h3 class="text-base font-bold text-slate-900">Задачи на сегодня</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Требуют вашего внимания — <span class="font-semibold text-indigo-600">5 задач</span></p>
-              </div>
-            </div>
-            <button onclick="navigateTo('tasks')" class="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
-          </div>
-          <!-- Table header -->
-          <div class="grid grid-cols-12 gap-4 px-6 py-2.5 border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            <span class="col-span-5">Задача</span>
-            <span class="col-span-2">Приоритет</span>
-            <span class="col-span-3">Статус</span>
-            <span class="col-span-2 text-right">Срок</span>
-          </div>
-          <div class="divide-y divide-slate-100" id="todayTasks"></div>
-        </div>
-
-        <!-- Charts + secondary task lists -->
+        <!-- Active tasks + Charts side by side -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-          <!-- Bar chart: weekly activity -->
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-semibold text-slate-900">Активность за неделю</h3>
-              <div class="flex items-center gap-4 text-xs text-slate-400">
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>Создано</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Завершено</span>
+          <!-- Active tasks — 2 cols -->
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-indigo-200 shadow-sm shadow-indigo-100/50 overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-violet-50/40">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-sm shadow-indigo-500/30"><i data-lucide="zap" class="w-5 h-5 text-white"></i></div>
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">Активные задачи</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Требуют вашего внимания — <span class="font-semibold text-indigo-600">5 задач</span></p>
+                </div>
               </div>
+              <button onclick="navigateTo('tasks')" class="text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
             </div>
-            <div class="h-56"><canvas id="weeklyChart"></canvas></div>
+            <div class="grid grid-cols-12 gap-4 px-6 py-2.5 border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span class="col-span-5">Задача</span>
+              <span class="col-span-2">Приоритет</span>
+              <span class="col-span-3">Статус</span>
+              <span class="col-span-2 text-right">Срок</span>
+            </div>
+            <div class="divide-y divide-slate-100 flex-1" id="todayTasks"></div>
           </div>
-          <!-- Doughnut chart: tasks by status -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-6">
-            <h3 class="text-sm font-semibold text-slate-900 mb-4">Задачи по статусу</h3>
-            <div class="h-44 flex items-center justify-center"><canvas id="statusChart"></canvas></div>
-            <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 text-xs">
-              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span><span class="text-slate-600">Новые <span class="font-semibold text-slate-900">5</span></span></div>
-              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><span class="text-slate-600">В работе <span class="font-semibold text-slate-900">12</span></span></div>
-              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-slate-600">Завершено <span class="font-semibold text-slate-900">47</span></span></div>
-              <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><span class="text-slate-600">Просрочено <span class="font-semibold text-slate-900">2</span></span></div>
+
+          <!-- Charts stacked — 1 col -->
+          <div class="flex flex-col gap-5">
+            <!-- Bar chart: weekly activity -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 flex-1">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-slate-900">Активность за неделю</h3>
+                <div class="flex items-center gap-3 text-xs text-slate-400">
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500"></span>Создано</span>
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Завершено</span>
+                </div>
+              </div>
+              <div class="h-36"><canvas id="weeklyChart"></canvas></div>
+            </div>
+            <!-- Doughnut chart: tasks by status -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5">
+              <h3 class="text-sm font-semibold text-slate-900 mb-3">Задачи по статусу</h3>
+              <div class="h-32 flex items-center justify-center"><canvas id="statusChart"></canvas></div>
+              <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-3 text-xs">
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span class="text-slate-600">Новые <span class="font-semibold text-slate-900">5</span></span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="text-slate-600">В работе <span class="font-semibold text-slate-900">12</span></span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-slate-600">Завершено <span class="font-semibold text-slate-900">47</span></span></div>
+                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-slate-600">Просрочено <span class="font-semibold text-slate-900">2</span></span></div>
+              </div>
             </div>
           </div>
         </div>
