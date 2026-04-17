@@ -281,27 +281,27 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div class="bg-white rounded-2xl border border-slate-200 p-5">
             <div class="flex items-center justify-between mb-3">
-              <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5 text-amber-600"></i></div>
-              <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Сегодня</span>
+              <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><i data-lucide="clipboard-list" class="w-5 h-5 text-slate-600"></i></div>
+              <span class="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">Всего</span>
             </div>
-            <p class="text-2xl font-bold text-slate-900">5</p>
-            <p class="text-sm text-slate-500 mt-0.5">Задачи на сегодня</p>
+            <p class="text-2xl font-bold text-slate-900">66</p>
+            <p class="text-sm text-slate-500 mt-0.5">Все задачи</p>
           </div>
           <div class="bg-white rounded-2xl border border-slate-200 p-5">
             <div class="flex items-center justify-between mb-3">
-              <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="loader" class="w-5 h-5 text-indigo-600"></i></div>
+              <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center"><i data-lucide="file-edit" class="w-5 h-5 text-indigo-600"></i></div>
               <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Активные</span>
             </div>
-            <p class="text-2xl font-bold text-slate-900">12</p>
-            <p class="text-sm text-slate-500 mt-0.5">В работе</p>
+            <p class="text-2xl font-bold text-slate-900">4</p>
+            <p class="text-sm text-slate-500 mt-0.5">Активные задачи, созданные мной</p>
           </div>
           <div class="bg-white rounded-2xl border border-slate-200 p-5">
             <div class="flex items-center justify-between mb-3">
-              <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i></div>
-              <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">+8 за неделю</span>
+              <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5 text-amber-600"></i></div>
+              <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Скоро</span>
             </div>
-            <p class="text-2xl font-bold text-slate-900">47</p>
-            <p class="text-sm text-slate-500 mt-0.5">Завершено</p>
+            <p class="text-2xl font-bold text-slate-900">3</p>
+            <p class="text-sm text-slate-500 mt-0.5">Истекают</p>
           </div>
           <div class="bg-white rounded-2xl border border-slate-200 p-5">
             <div class="flex items-center justify-between mb-3">
@@ -362,27 +362,40 @@
         </div>
 
         <!-- Secondary task lists -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <!-- Block 2: Tasks user is involved in -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- Block 1: My active tasks -->
           <div class="bg-white rounded-2xl border border-slate-200">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 text-indigo-600"></i></div>
-                <h3 class="text-sm font-semibold text-slate-900">Я участник</h3>
-                <span class="text-xs text-slate-400 font-medium">5</span>
+                <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="loader" class="w-4 h-4 text-indigo-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Мои активные задачи</h3>
+                <span class="text-xs text-slate-400 font-medium" id="myActiveCount">0</span>
               </div>
-              <button onclick="navigateTo('tasks')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все задачи <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+              <button onclick="navigateTo('tasks')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
             </div>
-            <div class="divide-y divide-slate-100" id="involvedTasks"></div>
+            <div class="divide-y divide-slate-100" id="myActiveTasks"></div>
           </div>
 
-          <!-- Block 3: Tasks created by user -->
+          <!-- Block 2: All tasks -->
+          <div class="bg-white rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="clipboard-list" class="w-4 h-4 text-slate-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Все задачи</h3>
+                <span class="text-xs text-slate-400 font-medium" id="allTasksCount">0</span>
+              </div>
+              <button onclick="navigateTo('tasks')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div class="divide-y divide-slate-100" id="allTasksList"></div>
+          </div>
+
+          <!-- Block 3: Created by me -->
           <div class="bg-white rounded-2xl border border-slate-200">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center"><i data-lucide="file-edit" class="w-4 h-4 text-emerald-600"></i></div>
                 <h3 class="text-sm font-semibold text-slate-900">Создано мной</h3>
-                <span class="text-xs text-slate-400 font-medium">4</span>
+                <span class="text-xs text-slate-400 font-medium" id="createdByMeCount">0</span>
               </div>
               <button onclick="navigateTo('my-requests')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Мои заявки <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
             </div>
@@ -941,16 +954,27 @@
     ];
     document.getElementById('todayTasks').innerHTML = todayTasks.map(renderTodayRow).join('');
 
-    // Tasks user is involved in
-    const involvedTasks = [
+    // Block 1: My active tasks
+    const myActiveTasks = [
       { title: 'Внедрение электронного документооборота', subtitle: 'IT · Исполнитель · до 18 апр', status: 'В работе' },
-      { title: 'Подготовка к аудиту Q1', subtitle: 'Бухгалтерия · Наблюдатель · до 20 апр', status: 'В работе' },
+      { title: 'Подготовка к аудиту Q1', subtitle: 'Бухгалтерия · до 20 апр', status: 'В работе' },
       { title: 'Обновление штатного расписания', subtitle: 'HR · Согласующий · до 15 апр', status: 'На согласовании' },
-      { title: 'Закупка серверного оборудования', subtitle: 'IT · Инициатор', status: 'Одобрена' },
     ];
-    document.getElementById('involvedTasks').innerHTML = involvedTasks.map(renderCompactRow).join('');
+    document.getElementById('myActiveTasks').innerHTML = myActiveTasks.map(renderCompactRow).join('');
+    document.getElementById('myActiveCount').textContent = myActiveTasks.length;
 
-    // Tasks created by user
+    // Block 2: All tasks (preview)
+    const allTasksPreview = [
+      { title: 'Подписать договор поставки № 2026-0415', subtitle: 'ТОО «Альфа» · Требуется ЭЦП', status: 'Ожидает' },
+      { title: 'Согласовать заявку на отпуск', subtitle: 'Сидорова Е.В. · HR отдел', status: 'На согласовании' },
+      { title: 'Проверить квартальный отчёт', subtitle: 'Финансовый отдел · Q1 2026', status: 'На проверке' },
+      { title: 'Закупка серверного оборудования', subtitle: 'IT · Инициатор', status: 'Одобрена' },
+      { title: 'Ответить на запрос НПП «Сигма»', subtitle: 'Канцелярия · Входящий № 312', status: 'Новая' },
+    ];
+    document.getElementById('allTasksList').innerHTML = allTasksPreview.map(renderCompactRow).join('');
+    document.getElementById('allTasksCount').textContent = 66;
+
+    // Block 3: Created by me
     const createdTasks = [
       { title: 'Заявка на закупку оборудования', subtitle: 'Снабжение · 3 согласующих', status: 'На согласовании' },
       { title: 'Запрос на доступ к ИС «Бухгалтерия»', subtitle: 'IT отдел', status: 'Одобрена' },
@@ -958,6 +982,7 @@
       { title: 'Заявление на отпуск', subtitle: 'Кадровая · 01-14 мая', status: 'Новая' },
     ];
     document.getElementById('createdTasks').innerHTML = createdTasks.map(renderCompactRow).join('');
+    document.getElementById('createdByMeCount').textContent = createdTasks.length;
 
     // ── Charts ──
     // Weekly activity bar chart
