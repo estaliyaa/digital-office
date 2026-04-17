@@ -133,6 +133,54 @@
       width: 18px; height: 18px; background: #4f46e5; color: white;
       font-size: 10px; font-weight: 700; border-radius: 50%;
     }
+
+    /* ── Create flow modal ── */
+    #createFlowModal { opacity: 0; transition: opacity 180ms ease; }
+    #createFlowModal.open { opacity: 1; }
+    #createFlowModal .cf-panel { transform: translateY(14px) scale(.98); transition: transform 220ms cubic-bezier(.2,.8,.2,1); }
+    #createFlowModal.open .cf-panel { transform: translateY(0) scale(1); }
+    .cf-step { display: none; }
+    .cf-step.active { display: block; }
+
+    /* Signing method radio cards */
+    .sign-card { cursor: pointer; transition: all 180ms ease; }
+    .sign-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -12px rgba(79,70,229,.25); border-color: #818cf8; }
+
+    /* Success check bounce */
+    @keyframes cfCheckPop { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    .cf-check-icon { animation: cfCheckPop 480ms cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes cfShake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+    .cf-shake { animation: cfShake 380ms ease; }
+
+    /* Dual ring spinner */
+    .cf-spinner { width: 96px; height: 96px; border-radius: 50%;
+      border: 6px solid #e0e7ff; border-top-color: #4f46e5;
+      animation: cfSpin 900ms linear infinite; }
+    @keyframes cfSpin { to { transform: rotate(360deg); } }
+
+    /* QR scanning line */
+    .cf-qr-wrap { position: relative; overflow: hidden; border-radius: 16px; }
+    .cf-qr-wrap::after {
+      content: ''; position: absolute; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+      box-shadow: 0 0 12px #6366f1; animation: cfScan 2.2s ease-in-out infinite;
+    }
+    @keyframes cfScan { 0% { top: 8%; opacity: .2 } 50% { top: 92%; opacity: 1 } 100% { top: 8%; opacity: .2 } }
+
+    /* Floating label inputs */
+    .cf-field { position: relative; }
+    .cf-field input, .cf-field select, .cf-field textarea {
+      width: 100%; padding: 18px 14px 8px; border: 1.5px solid #e2e8f0;
+      border-radius: 12px; font-size: 14px; background: white; color: #0f172a;
+      transition: border-color 160ms ease, box-shadow 160ms ease; appearance: none;
+    }
+    .cf-field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 36px; }
+    .cf-field input:focus, .cf-field select:focus, .cf-field textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79,70,229,.12); }
+    .cf-field label { position: absolute; left: 14px; top: 12px; font-size: 11px; font-weight: 600;
+      color: #64748b; text-transform: uppercase; letter-spacing: .04em; pointer-events: none; }
+    .cf-field-file { border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px; text-align: center;
+      background: #f8fafc; cursor: pointer; transition: all 160ms ease; }
+    .cf-field-file:hover { border-color: #4f46e5; background: #eef2ff; }
   </style>
 </head>
 <body class="font-sans bg-slate-50 min-h-screen flex">
@@ -443,7 +491,7 @@
           </div>
 
           <!-- Create -->
-          <button class="toolbar-btn toolbar-btn-primary ml-auto">
+          <button class="toolbar-btn toolbar-btn-primary ml-auto" onclick="openCreateFlow('Создать задачу')">
             <i data-lucide="plus" class="w-4 h-4"></i>Создать задачу
           </button>
         </div>
@@ -517,7 +565,7 @@
             <input id="reqSearch" type="text" placeholder="Поиск заявок..."
               class="pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-60 transition-all">
           </div>
-          <button class="toolbar-btn toolbar-btn-primary ml-auto">
+          <button class="toolbar-btn toolbar-btn-primary ml-auto" onclick="openCreateFlow('Создать заявку')">
             <i data-lucide="plus" class="w-4 h-4"></i>Создать заявку
           </button>
         </div>
@@ -628,7 +676,7 @@
             <input id="docSearch" type="text" placeholder="Поиск документов..."
               class="pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-60 transition-all">
           </div>
-          <button class="toolbar-btn toolbar-btn-primary ml-auto">
+          <button class="toolbar-btn toolbar-btn-primary ml-auto" onclick="openCreateFlow('Создать документ')">
             <i data-lucide="plus" class="w-4 h-4"></i>Создать документ
           </button>
         </div>
@@ -2111,7 +2159,285 @@
     initScrollArrows('reqScroll',   'rArrowL', 'rArrowR');
     initScrollArrows('docScroll',   'dArrowL', 'dArrowR');
 
+    // ══════════════════════════════════════════
+    // ── CREATE FLOW MODAL ──
+    // ══════════════════════════════════════════
+    function openCreateFlow(title) {
+      document.getElementById('cfTitle').textContent = title || 'Создать заявку';
+      cfGoto('form');
+      const m = document.getElementById('createFlowModal');
+      m.classList.remove('hidden');
+      requestAnimationFrame(() => m.classList.add('open'));
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+    function closeCreateFlow() {
+      const m = document.getElementById('createFlowModal');
+      m.classList.remove('open');
+      setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = ''; }, 200);
+    }
+    function cfGoto(stepId) {
+      document.querySelectorAll('.cf-step').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById('cf-step-' + stepId);
+      if (el) el.classList.add('active');
+      lucide.createIcons();
+    }
+    function cfChooseSign(method) {
+      if (method === 'ecp') {
+        cfGoto('ecp-picker');
+      } else {
+        cfGoto('qr');
+        // Simulate pending → loading → success
+        setTimeout(() => cfGoto('qr-loading'), 2400);
+        setTimeout(() => cfGoto('success'), 4800);
+      }
+    }
+    function cfPickEcpFile(ok) {
+      // ok=true → success, false → error
+      cfGoto(ok ? 'success' : 'error');
+    }
+    document.addEventListener('keydown', e => {
+      const m = document.getElementById('createFlowModal');
+      if (m && !m.classList.contains('hidden') && e.key === 'Escape') closeCreateFlow();
+    });
+
     lucide.createIcons();
+  </script>
+
+  <!-- ══ CREATE FLOW MODAL ══ -->
+  <div id="createFlowModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="cf-panel bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-hidden flex flex-col">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-sm shadow-indigo-400/40"><i data-lucide="sparkles" class="w-4 h-4"></i></div>
+          <div>
+            <h3 id="cfTitle" class="text-base font-bold text-slate-900 leading-tight">Создать заявку</h3>
+            <p id="cfSubtitle" class="text-xs text-slate-500">Заполните данные и подпишите заявку</p>
+          </div>
+        </div>
+        <button onclick="closeCreateFlow()" class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <!-- Steps indicator -->
+      <div class="px-6 py-3 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2 text-xs font-medium">
+        <span class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-600 text-white"><span class="w-4 h-4 rounded-full bg-white text-indigo-600 text-[10px] font-bold flex items-center justify-center">1</span>Данные</span>
+        <span class="w-5 h-px bg-slate-300"></span>
+        <span class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500"><span class="w-4 h-4 rounded-full bg-slate-300 text-white text-[10px] font-bold flex items-center justify-center">2</span>Подписание</span>
+        <span class="w-5 h-px bg-slate-300"></span>
+        <span class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500"><span class="w-4 h-4 rounded-full bg-slate-300 text-white text-[10px] font-bold flex items-center justify-center">3</span>Готово</span>
+      </div>
+
+      <!-- ── STEP 1: Form ── -->
+      <div id="cf-step-form" class="cf-step active overflow-y-auto">
+        <div class="p-6 space-y-6">
+          <!-- Section 1: Personal -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>
+              <h4 class="text-sm font-semibold text-slate-900">Личные данные</h4>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="cf-field"><label>ФИО</label><input type="text" value="Қойшыбай Темірлан"></div>
+              <div class="cf-field"><label>ИИН</label><input type="text" value="980408245846"></div>
+              <div class="cf-field"><label>Номер телефона</label><input type="tel" value="+7 (777) 897-98-89"></div>
+              <div class="cf-field"><label>E-mail</label><input type="email" value="temirlan@adata.kz"></div>
+            </div>
+          </div>
+
+          <!-- Section 2: Работа -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="briefcase" class="w-3.5 h-3.5"></i></div>
+              <h4 class="text-sm font-semibold text-slate-900">Место работы</h4>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="cf-field"><label>Компания</label>
+                <select><option>Adata</option><option>TOO "Alldata"</option><option>Wisk telecom</option><option>Avrora 77</option><option>Avrora Holding</option></select>
+              </div>
+              <div class="cf-field"><label>Отдел</label>
+                <select><option>Разработка</option><option>HR</option><option>Финансы</option></select>
+              </div>
+              <div class="cf-field"><label>Подразделение</label>
+                <select><option>Разработка ПО</option><option>QA</option><option>DevOps</option></select>
+              </div>
+              <div class="cf-field"><label>Должность</label>
+                <select><option>CPO</option><option>Разработчик</option><option>Менеджер проекта</option></select>
+              </div>
+              <div class="cf-field"><label>Прямой руководитель</label>
+                <select><option>Бекнур Есенгелди</option><option>Нурлыбек Тажибаев</option></select>
+              </div>
+              <div class="cf-field"><label>Регион</label>
+                <select><option>г. Алматы</option><option>г. Астана</option><option>г. Шымкент</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Conditions -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="banknote" class="w-3.5 h-3.5"></i></div>
+              <h4 class="text-sm font-semibold text-slate-900">Условия</h4>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="cf-field"><label>Заработная плата</label><input type="text" value="800 000 тг"></div>
+              <div class="cf-field"><label>Вид трудоустройства</label>
+                <select><option>ГПХ</option><option>Трудовой договор</option><option>Внешнее совмещение</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between gap-3">
+          <button onclick="closeCreateFlow()" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Отменить</button>
+          <button onclick="cfGoto('sign')" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-colors">Далее <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Sign method ── -->
+      <div id="cf-step-sign" class="cf-step overflow-y-auto">
+        <div class="px-6 py-8">
+          <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 mb-3"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
+            <h3 class="text-lg font-bold text-slate-900">Подтвердите заявку</h3>
+            <p class="text-sm text-slate-500 mt-1">Выберите способ подписания документа</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto">
+            <button onclick="cfChooseSign('ecp')" class="sign-card text-left bg-white border-2 border-slate-200 rounded-2xl p-5 relative">
+              <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl text-white flex items-center justify-center shadow-sm shadow-indigo-400/30 mb-4"><i data-lucide="key-round" class="w-5 h-5"></i></div>
+              <p class="text-sm font-bold text-slate-900">Через ЭЦП</p>
+              <p class="text-xs text-slate-500 mt-1">Загрузите файл ключа .p12 с вашего устройства</p>
+              <span class="absolute top-4 right-4 text-slate-300"><i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+            </button>
+            <button onclick="cfChooseSign('qr')" class="sign-card text-left bg-white border-2 border-slate-200 rounded-2xl p-5 relative">
+              <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-white flex items-center justify-center shadow-sm shadow-emerald-400/30 mb-4"><i data-lucide="qr-code" class="w-5 h-5"></i></div>
+              <p class="text-sm font-bold text-slate-900">Через Egov QR</p>
+              <p class="text-xs text-slate-500 mt-1">Отсканируйте QR-код приложением Egov</p>
+              <span class="absolute top-4 right-4 text-slate-300"><i data-lucide="arrow-right" class="w-4 h-4"></i></span>
+            </button>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between gap-3">
+          <button onclick="cfGoto('form')" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i>Назад</button>
+          <button onclick="closeCreateFlow()" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Отменить</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3a: ECP file picker ── -->
+      <div id="cf-step-ecp-picker" class="cf-step">
+        <div class="px-6 py-8">
+          <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 mb-3"><i data-lucide="folder-key" class="w-6 h-6"></i></div>
+            <h3 class="text-lg font-bold text-slate-900">Выберите файл ЭЦП</h3>
+            <p class="text-sm text-slate-500 mt-1">Формат: .p12 · Максимум 5 MB</p>
+          </div>
+          <label class="cf-field-file block max-w-md mx-auto">
+            <div class="flex flex-col items-center gap-2 py-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="upload-cloud" class="w-5 h-5"></i></div>
+              <p class="text-sm font-semibold text-slate-900">Перетащите файл сюда</p>
+              <p class="text-xs text-slate-500">или <span class="text-indigo-600 font-medium">нажмите, чтобы выбрать</span></p>
+            </div>
+            <input type="file" class="hidden" accept=".p12">
+          </label>
+
+          <!-- Demo: simulate success or error -->
+          <div class="flex items-center justify-center gap-3 mt-6">
+            <button onclick="cfPickEcpFile(true)" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"><i data-lucide="file-check" class="w-4 h-4"></i>Подписать (demo)</button>
+            <button onclick="cfPickEcpFile(false)" class="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-semibold px-4 py-2 rounded-xl transition-colors"><i data-lucide="alert-triangle" class="w-4 h-4"></i>Ошибка (demo)</button>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between gap-3">
+          <button onclick="cfGoto('sign')" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i>Назад</button>
+          <button onclick="closeCreateFlow()" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Отменить</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3b: QR ── -->
+      <div id="cf-step-qr" class="cf-step">
+        <div class="px-6 py-8">
+          <div class="text-center mb-5">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-3"><i data-lucide="qr-code" class="w-6 h-6"></i></div>
+            <h3 class="text-lg font-bold text-slate-900">Подписание через Egov QR</h3>
+          </div>
+          <div class="cf-qr-wrap mx-auto bg-white border border-slate-200 p-4 max-w-[240px]">
+            <!-- Simple SVG QR -->
+            <svg viewBox="0 0 33 33" class="w-full h-auto" shape-rendering="crispEdges">
+              <rect width="33" height="33" fill="#fff"/>
+              <g fill="#0f172a">
+                <rect x="0" y="0" width="7" height="7"/><rect x="1" y="1" width="5" height="5" fill="#fff"/><rect x="2" y="2" width="3" height="3"/>
+                <rect x="26" y="0" width="7" height="7"/><rect x="27" y="1" width="5" height="5" fill="#fff"/><rect x="28" y="2" width="3" height="3"/>
+                <rect x="0" y="26" width="7" height="7"/><rect x="1" y="27" width="5" height="5" fill="#fff"/><rect x="2" y="28" width="3" height="3"/>
+                <rect x="9" y="1" width="1" height="1"/><rect x="11" y="0" width="2" height="2"/><rect x="14" y="2" width="2" height="1"/><rect x="17" y="1" width="1" height="2"/><rect x="20" y="0" width="1" height="1"/><rect x="22" y="2" width="2" height="1"/>
+                <rect x="8" y="4" width="2" height="1"/><rect x="12" y="5" width="1" height="2"/><rect x="15" y="4" width="2" height="2"/><rect x="19" y="5" width="1" height="1"/><rect x="22" y="4" width="1" height="2"/><rect x="24" y="5" width="1" height="1"/>
+                <rect x="0" y="8" width="1" height="2"/><rect x="2" y="9" width="2" height="1"/><rect x="5" y="8" width="1" height="1"/><rect x="7" y="10" width="3" height="1"/><rect x="11" y="8" width="2" height="2"/><rect x="14" y="11" width="1" height="1"/><rect x="16" y="9" width="1" height="2"/><rect x="18" y="10" width="2" height="1"/><rect x="21" y="8" width="1" height="3"/><rect x="23" y="9" width="2" height="1"/><rect x="26" y="10" width="1" height="1"/><rect x="28" y="8" width="2" height="2"/><rect x="31" y="9" width="1" height="1"/>
+                <rect x="1" y="12" width="1" height="2"/><rect x="3" y="13" width="2" height="1"/><rect x="6" y="12" width="1" height="2"/><rect x="9" y="13" width="3" height="1"/><rect x="13" y="14" width="2" height="1"/><rect x="16" y="12" width="1" height="3"/><rect x="19" y="13" width="2" height="1"/><rect x="22" y="14" width="2" height="1"/><rect x="25" y="13" width="1" height="2"/><rect x="27" y="14" width="3" height="1"/>
+                <rect x="0" y="16" width="2" height="1"/><rect x="4" y="15" width="1" height="2"/><rect x="6" y="17" width="2" height="1"/><rect x="9" y="16" width="1" height="2"/><rect x="11" y="17" width="3" height="1"/><rect x="15" y="16" width="1" height="2"/><rect x="17" y="17" width="2" height="1"/><rect x="20" y="16" width="1" height="2"/><rect x="22" y="17" width="2" height="1"/><rect x="25" y="16" width="2" height="1"/><rect x="28" y="17" width="1" height="2"/><rect x="30" y="16" width="2" height="1"/>
+                <rect x="1" y="19" width="2" height="1"/><rect x="5" y="20" width="1" height="1"/><rect x="7" y="19" width="2" height="1"/><rect x="10" y="20" width="2" height="1"/><rect x="13" y="19" width="1" height="2"/><rect x="15" y="20" width="2" height="1"/><rect x="18" y="19" width="2" height="2"/><rect x="21" y="20" width="1" height="1"/><rect x="23" y="19" width="2" height="1"/><rect x="26" y="20" width="1" height="1"/><rect x="28" y="19" width="1" height="2"/><rect x="30" y="20" width="2" height="1"/>
+                <rect x="0" y="22" width="1" height="2"/><rect x="2" y="23" width="2" height="1"/><rect x="5" y="22" width="1" height="2"/><rect x="8" y="23" width="1" height="1"/><rect x="10" y="22" width="2" height="1"/><rect x="14" y="23" width="1" height="2"/><rect x="17" y="22" width="2" height="1"/><rect x="20" y="23" width="3" height="1"/><rect x="24" y="22" width="1" height="2"/><rect x="27" y="23" width="2" height="1"/><rect x="30" y="22" width="1" height="2"/>
+                <rect x="9" y="26" width="2" height="1"/><rect x="12" y="27" width="1" height="2"/><rect x="14" y="26" width="3" height="1"/><rect x="18" y="27" width="2" height="1"/><rect x="21" y="26" width="1" height="2"/><rect x="23" y="27" width="2" height="1"/><rect x="26" y="28" width="1" height="1"/><rect x="28" y="26" width="2" height="2"/><rect x="31" y="27" width="1" height="1"/>
+                <rect x="8" y="29" width="1" height="2"/><rect x="10" y="30" width="3" height="1"/><rect x="14" y="29" width="1" height="2"/><rect x="16" y="30" width="2" height="1"/><rect x="19" y="29" width="2" height="2"/><rect x="22" y="30" width="1" height="1"/><rect x="24" y="29" width="2" height="2"/><rect x="27" y="30" width="1" height="1"/><rect x="29" y="29" width="1" height="2"/><rect x="31" y="30" width="1" height="1"/>
+              </g>
+            </svg>
+          </div>
+          <ol class="mt-5 text-sm text-slate-600 space-y-1.5 max-w-sm mx-auto list-decimal list-inside">
+            <li>Откройте Egov на вашем устройстве</li>
+            <li>Откройте сканер QR в приложении</li>
+            <li>Наведите телефон на QR код для скана</li>
+          </ol>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between gap-3">
+          <button onclick="cfGoto('sign')" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i>Назад</button>
+          <span class="text-xs text-slate-400">Ожидание сканирования…</span>
+        </div>
+      </div>
+
+      <!-- ── STEP 3c: QR loading ── -->
+      <div id="cf-step-qr-loading" class="cf-step">
+        <div class="px-6 py-12 flex flex-col items-center">
+          <h3 class="text-lg font-bold text-slate-900 mb-8">Подписание через Egov QR</h3>
+          <div class="cf-spinner mb-8"></div>
+          <p class="text-sm text-slate-500 text-center max-w-xs leading-relaxed">Документ сейчас подписывается другим участником, пожалуйста, подождите немного…</p>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: Success ── -->
+      <div id="cf-step-success" class="cf-step">
+        <div class="px-6 py-12 flex flex-col items-center">
+          <h3 class="text-lg font-bold text-slate-900 mb-6">Подписание завершено</h3>
+          <div class="cf-check-icon w-28 h-28 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-6">
+            <i data-lucide="check" class="w-14 h-14 text-white" stroke-width="3"></i>
+          </div>
+          <p class="text-sm text-slate-600 text-center">Документ подписан успешно!</p>
+          <div class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+            <i data-lucide="clock" class="w-3 h-3"></i>Дата: <span id="cfSuccessDate"></span>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/40 flex items-center justify-end gap-3">
+          <button onclick="closeCreateFlow()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">Готово <i data-lucide="check" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+
+      <!-- ── STEP 5: Error ── -->
+      <div id="cf-step-error" class="cf-step">
+        <div class="px-6 py-12 flex flex-col items-center">
+          <h3 class="text-lg font-bold text-slate-900 mb-6">Проблема с ЭЦП</h3>
+          <div class="cf-shake w-28 h-28 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/30 mb-6">
+            <i data-lucide="alert-triangle" class="w-14 h-14 text-white" stroke-width="2.5"></i>
+          </div>
+          <p class="text-sm text-slate-600 text-center max-w-xs">ЭЦП не принадлежит вам или вашей организации, проверьте, что выбрана правильная ЭЦП.</p>
+        </div>
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between gap-3">
+          <button onclick="closeCreateFlow()" class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">Закрыть</button>
+          <button onclick="cfGoto('ecp-picker')" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"><i data-lucide="refresh-cw" class="w-4 h-4"></i>Попробовать снова</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Set success date on mount
+    document.getElementById('cfSuccessDate').textContent = new Date().toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' });
   </script>
 </body>
 </html>
