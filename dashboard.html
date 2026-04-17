@@ -58,6 +58,81 @@
     .sidebar:hover .sidebar-toggle-float,
     .sidebar-toggle-float:hover { opacity: 1; }
     .sidebar-toggle-float:hover { background: #f1f5f9; transform: scale(1.1); }
+
+    /* ── Unified table ── */
+    .uni-table { border-collapse: collapse; width: 100%; }
+    .uni-table thead th {
+      padding: 11px 20px; text-align: left; font-size: 11px; font-weight: 600;
+      color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em;
+      background: #f8fafc; border-bottom: 1px solid #f1f5f9; white-space: nowrap;
+    }
+    .uni-table tbody td { padding: 14px 20px; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+    .uni-table tbody tr:last-child td { border-bottom: none; }
+    .uni-table tbody tr { transition: background 0.12s; cursor: pointer; }
+    .uni-table tbody tr:hover { background: #f8fafc; }
+
+    /* ── Scroll arrows (Bitrix24 style) ── */
+    .table-scroll-wrapper { position: relative; }
+    .scroll-edge-arrow {
+      position: absolute; top: 0; bottom: 0; width: 72px;
+      display: flex; align-items: center; z-index: 10;
+      opacity: 0; transition: opacity 0.18s ease; pointer-events: none;
+    }
+    .scroll-edge-arrow.show { opacity: 1; pointer-events: all; }
+    .scroll-edge-arrow.arrow-left {
+      left: 0;
+      background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
+      justify-content: flex-start; padding-left: 10px;
+    }
+    .scroll-edge-arrow.arrow-right {
+      right: 0;
+      background: linear-gradient(to left, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
+      justify-content: flex-end; padding-right: 10px;
+    }
+    .scroll-edge-arrow .arrow-btn {
+      width: 32px; height: 32px; background: white;
+      border: 1px solid #e2e8f0; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .scroll-edge-arrow .arrow-btn:hover { background: #f1f5f9; transform: scale(1.1); }
+
+    /* ── Filter dropdown ── */
+    .filter-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; width: 320px;
+      background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      z-index: 200;
+    }
+    .filter-dropdown.hidden { display: none; }
+    .filter-section { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; }
+    .filter-section:last-child { border-bottom: none; }
+    .filter-section-title { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .filter-checkbox { display: flex; align-items: center; gap: 10px; padding: 4px 0; cursor: pointer; }
+    .filter-checkbox input { width: 15px; height: 15px; accent-color: #4f46e5; cursor: pointer; border-radius: 4px; }
+    .filter-checkbox span { font-size: 13px; color: #475569; }
+    .filter-checkbox:hover span { color: #0f172a; }
+
+    /* ── Page toolbar ── */
+    .page-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .toolbar-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 16px; border-radius: 12px; font-size: 13.5px; font-weight: 500;
+      border: 1px solid #e2e8f0; background: white; color: #475569;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    }
+    .toolbar-btn:hover { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+    .toolbar-btn-primary {
+      background: #4f46e5; border-color: #4f46e5; color: white;
+      box-shadow: 0 1px 8px rgba(79,70,229,0.2);
+    }
+    .toolbar-btn-primary:hover { background: #4338ca; border-color: #4338ca; }
+    .filter-active-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; background: #4f46e5; color: white;
+      font-size: 10px; font-weight: 700; border-radius: 50%;
+    }
   </style>
 </head>
 <body class="font-sans bg-slate-50 min-h-screen flex">
@@ -157,18 +232,35 @@
   <!-- ═══ MAIN AREA ═══ -->
   <div id="mainArea" class="flex-1 ml-64 transition-all duration-250">
     <!-- Top Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 h-16 flex items-center px-6 justify-between">
-      <div class="flex items-center gap-4">
-        <button id="mobileMenuBtn" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500">
-          <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
-        <div>
-          <h1 id="pageTitle" class="text-lg font-semibold text-slate-900"></h1>
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 h-16 flex items-center px-6 gap-4">
+      <!-- Mobile menu -->
+      <button id="mobileMenuBtn" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 shrink-0">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Company badge + page title -->
+      <div class="flex items-center gap-3 shrink-0">
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/70">
+          <i data-lucide="building-2" class="w-3 h-3"></i>Adata
+        </span>
+        <h1 id="pageTitle" class="text-base font-semibold text-slate-900"></h1>
+      </div>
+
+      <!-- Global search -->
+      <div class="flex-1 max-w-sm hidden sm:block">
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+          <input id="globalSearch" type="text" placeholder="Поиск по системе..."
+            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 placeholder:text-slate-400
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all">
         </div>
       </div>
-      <div class="flex items-center gap-3">
+
+      <!-- Right controls -->
+      <div class="flex items-center gap-2 ml-auto">
         <span id="roleBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"></span>
-        <button id="headerNotifBtn" data-page="notifications" class="nav-item-header w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 relative transition-colors">
+        <button id="headerNotifBtn" data-page="notifications"
+          class="nav-item-header w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 relative transition-colors">
           <i data-lucide="bell" class="w-5 h-5"></i>
           <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
         </button>
@@ -302,34 +394,77 @@
 
       <!-- ══ PAGE: Задачи ══ -->
       <div id="page-tasks" class="page-content">
-        <div class="flex items-center justify-between mb-6">
-          <div><p class="text-slate-500 text-sm">Управление задачами и поручениями</p></div>
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Новая задача</button>
-        </div>
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div class="grid grid-cols-3 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            <span>Задача</span><span>Статус</span><span>Срок</span>
+
+        <!-- Toolbar -->
+        <div class="page-toolbar">
+
+          <!-- Filter button -->
+          <div class="relative" id="tasksFilterWrap">
+            <button id="tasksFilterBtn" class="toolbar-btn">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+              Фильтр
+              <span id="tasksFilterCount" class="filter-active-count hidden">0</span>
+            </button>
+            <!-- Dropdown -->
+            <div id="tasksFilterDropdown" class="filter-dropdown hidden">
+              <div class="filter-section">
+                <p class="filter-section-title">Статус</p>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-status" value="Новая"><span>Новая задача</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-status" value="Завершена"><span>Завершена</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-status" value="В работе"><span>В работе</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-status" value="Отклонена"><span>Отклонена</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-status" value="В разработке"><span>В разработке</span></label>
+              </div>
+              <div class="filter-section">
+                <p class="filter-section-title">Тип процесса</p>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-type" value="Трудоустройство"><span>Трудоустройство</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="tf-type" value="Юридическая консультация"><span>Юридическая консультация</span></label>
+              </div>
+              <div class="filter-section">
+                <p class="filter-section-title">Дата создания</p>
+                <div class="flex gap-2">
+                  <input type="date" id="tfDateFrom" class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                  <input type="date" id="tfDateTo"   class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                </div>
+              </div>
+              <div class="px-5 py-3 bg-slate-50 rounded-b-2xl flex items-center justify-between">
+                <button id="tfClear" class="text-xs text-slate-400 hover:text-slate-700 transition-colors">Сбросить</button>
+                <button id="tfApply" class="toolbar-btn toolbar-btn-primary py-1.5 px-4 text-xs">Применить</button>
+              </div>
+            </div>
           </div>
-          <div class="divide-y divide-slate-100">
-            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
-              <div><p class="text-sm font-medium text-slate-900">Подготовить квартальный отчёт</p><p class="text-xs text-slate-500">Финансовый отдел</p></div>
-              <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>В работе</span>
-              <span class="text-sm text-slate-500">18 апр 2026</span>
-            </div>
-            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
-              <div><p class="text-sm font-medium text-slate-900">Согласовать договор с ТОО "Бета"</p><p class="text-xs text-slate-500">Юридический отдел</p></div>
-              <span class="inline-flex items-center gap-1 text-xs font-medium text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>На проверке</span>
-              <span class="text-sm text-slate-500">15 апр 2026</span>
-            </div>
-            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
-              <div><p class="text-sm font-medium text-slate-900">Обновить штатное расписание</p><p class="text-xs text-slate-500">HR отдел</p></div>
-              <span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Завершена</span>
-              <span class="text-sm text-slate-500">12 апр 2026</span>
-            </div>
-            <div class="grid grid-cols-3 gap-4 p-4 items-center hover:bg-slate-50 transition-colors">
-              <div><p class="text-sm font-medium text-slate-900">Провести инвентаризацию</p><p class="text-xs text-slate-500">Бухгалтерия</p></div>
-              <span class="inline-flex items-center gap-1 text-xs font-medium text-red-700 bg-red-50 px-2.5 py-1 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Просрочена</span>
-              <span class="text-sm text-slate-500">10 апр 2026</span>
+
+          <!-- Search -->
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            <input id="tasksSearch" type="text" placeholder="Поиск задач..."
+              class="pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-60 transition-all">
+          </div>
+
+          <!-- Create -->
+          <button class="toolbar-btn toolbar-btn-primary ml-auto">
+            <i data-lucide="plus" class="w-4 h-4"></i>Создать задачу
+          </button>
+        </div>
+
+        <!-- Table card -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="table-scroll-wrapper">
+            <div class="scroll-edge-arrow arrow-left"  id="tArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
+            <div class="scroll-edge-arrow arrow-right" id="tArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
+            <div class="overflow-x-auto" id="tasksScroll" style="scrollbar-width:none">
+              <table class="uni-table" style="min-width:900px">
+                <thead>
+                  <tr>
+                    <th style="min-width:280px">Задача</th>
+                    <th style="min-width:155px">Статус</th>
+                    <th style="min-width:145px">Дата создания</th>
+                    <th style="min-width:145px">Дата исполнения</th>
+                    <th style="min-width:130px">Время в работе</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTableBody"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -337,16 +472,70 @@
 
       <!-- ══ PAGE: Мои заявки ══ -->
       <div id="page-my-requests" class="page-content">
-        <div class="flex items-center justify-between mb-6">
-          <p class="text-slate-500 text-sm">Заявки, созданные вами</p>
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать заявку</button>
+
+        <!-- Toolbar -->
+        <div class="page-toolbar">
+          <div class="relative" id="reqFilterWrap">
+            <button id="reqFilterBtn" class="toolbar-btn">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+              Фильтр
+              <span id="reqFilterCount" class="filter-active-count hidden">0</span>
+            </button>
+            <div id="reqFilterDropdown" class="filter-dropdown hidden">
+              <div class="filter-section">
+                <p class="filter-section-title">Статус</p>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-status" value="Новая"><span>Новая задача</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-status" value="На согласовании"><span>На согласовании</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-status" value="Одобрена"><span>Завершена</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-status" value="Отклонена"><span>Отклонена</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-status" value="В разработке"><span>В разработке</span></label>
+              </div>
+              <div class="filter-section">
+                <p class="filter-section-title">Тип процесса</p>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-type" value="Трудоустройство"><span>Трудоустройство</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="rf-type" value="Юридическая консультация"><span>Юридическая консультация</span></label>
+              </div>
+              <div class="filter-section">
+                <p class="filter-section-title">Дата создания</p>
+                <div class="flex gap-2">
+                  <input type="date" id="rfDateFrom" class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                  <input type="date" id="rfDateTo"   class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                </div>
+              </div>
+              <div class="px-5 py-3 bg-slate-50 rounded-b-2xl flex items-center justify-between">
+                <button id="rfClear" class="text-xs text-slate-400 hover:text-slate-700 transition-colors">Сбросить</button>
+                <button id="rfApply" class="toolbar-btn toolbar-btn-primary py-1.5 px-4 text-xs">Применить</button>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            <input id="reqSearch" type="text" placeholder="Поиск заявок..."
+              class="pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-60 transition-all">
+          </div>
+          <button class="toolbar-btn toolbar-btn-primary ml-auto">
+            <i data-lucide="plus" class="w-4 h-4"></i>Создать заявку
+          </button>
         </div>
+
         <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div class="grid grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>Заявка</span><span>Тип</span><span>Статус</span><span>Дата</span></div>
-          <div class="divide-y divide-slate-100">
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Заявка на отпуск</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Кадровая</span><span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>На согласовании</span><span class="text-sm text-slate-500">14 апр 2026</span></div>
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Запрос на оборудование</p><span class="text-xs text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full w-fit">Снабжение</span><span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Одобрена</span><span class="text-sm text-slate-500">11 апр 2026</span></div>
-            <div class="grid grid-cols-4 gap-4 p-4 items-center hover:bg-slate-50 transition-colors"><p class="text-sm font-medium text-slate-900">Заявка на командировку</p><span class="text-xs text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full w-fit">Командировки</span><span class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Одобрена</span><span class="text-sm text-slate-500">8 апр 2026</span></div>
+          <div class="table-scroll-wrapper">
+            <div class="scroll-edge-arrow arrow-left"  id="rArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
+            <div class="scroll-edge-arrow arrow-right" id="rArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
+            <div class="overflow-x-auto" id="reqScroll" style="scrollbar-width:none">
+              <table class="uni-table" style="min-width:900px">
+                <thead>
+                  <tr>
+                    <th style="min-width:280px">Задача</th>
+                    <th style="min-width:155px">Статус</th>
+                    <th style="min-width:145px">Дата создания</th>
+                    <th style="min-width:145px">Дата исполнения</th>
+                    <th style="min-width:130px">Время в работе</th>
+                  </tr>
+                </thead>
+                <tbody id="reqTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -390,19 +579,72 @@
 
       <!-- ══ PAGE: Реестр документов ══ -->
       <div id="page-registry" class="page-content">
-        <div class="flex items-center justify-between mb-6">
-          <p class="text-slate-500 text-sm">Единый реестр всех документов организации</p>
-          <div class="flex items-center gap-2">
-            <div class="relative"><i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i><input type="text" placeholder="Поиск документов..." class="pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-64"></div>
+
+        <!-- Toolbar -->
+        <div class="page-toolbar">
+          <div class="relative" id="docFilterWrap">
+            <button id="docFilterBtn" class="toolbar-btn">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+              Фильтр
+              <span id="docFilterCount" class="filter-active-count hidden">0</span>
+            </button>
+            <div id="docFilterDropdown" class="filter-dropdown hidden">
+              <div class="filter-section">
+                <p class="filter-section-title">Статус</p>
+                <label class="filter-checkbox"><input type="checkbox" class="df-status" value="Подписан"><span>Подписан</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="df-status" value="На подписи"><span>На подписи</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="df-status" value="Отклонён"><span>Отклонён</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="df-status" value="Черновик"><span>Черновик</span></label>
+              </div>
+              <div class="filter-section">
+                <p class="filter-section-title">Тип документа</p>
+                <label class="filter-checkbox"><input type="checkbox" class="df-type" value="Договор"><span>Договор</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="df-type" value="Акт"><span>Акт</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="df-type" value="Приказ"><span>Приказ</span></label>
+                <label class="filter-checkbox"><input type="checkbox" class="df-type" value="Служебная записка"><span>Служебная записка</span></label>
+              </div>
+              <div class="filter-section">
+                <p class="filter-section-title">Дата создания</p>
+                <div class="flex gap-2">
+                  <input type="date" id="dfDateFrom" class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                  <input type="date" id="dfDateTo"   class="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                </div>
+              </div>
+              <div class="px-5 py-3 bg-slate-50 rounded-b-2xl flex items-center justify-between">
+                <button id="dfClear" class="text-xs text-slate-400 hover:text-slate-700 transition-colors">Сбросить</button>
+                <button id="dfApply" class="toolbar-btn toolbar-btn-primary py-1.5 px-4 text-xs">Применить</button>
+              </div>
+            </div>
           </div>
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            <input id="docSearch" type="text" placeholder="Поиск документов..."
+              class="pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 w-60 transition-all">
+          </div>
+          <button class="toolbar-btn toolbar-btn-primary ml-auto">
+            <i data-lucide="plus" class="w-4 h-4"></i>Создать документ
+          </button>
         </div>
+
         <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div class="grid grid-cols-5 gap-4 p-4 border-b border-slate-100 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider"><span>№</span><span>Название</span><span>Тип</span><span>Статус</span><span>Дата</span></div>
-          <div class="divide-y divide-slate-100">
-            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0415</span><p class="text-sm font-medium text-slate-900">Договор поставки</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Договор</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">14 апр</span></div>
-            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0414</span><p class="text-sm font-medium text-slate-900">Акт сверки за март</p><span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full w-fit">Акт</span><span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full w-fit">На подписи</span><span class="text-sm text-slate-500">13 апр</span></div>
-            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0412</span><p class="text-sm font-medium text-slate-900">Договор с ТОО «Альфа»</p><span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full w-fit">Договор</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">12 апр</span></div>
-            <div class="grid grid-cols-5 gap-4 p-4 items-center hover:bg-slate-50"><span class="text-sm text-slate-500">DOC-0398</span><p class="text-sm font-medium text-slate-900">Приказ о приёме</p><span class="text-xs text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full w-fit">Приказ</span><span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full w-fit">Подписан</span><span class="text-sm text-slate-500">10 апр</span></div>
+          <div class="table-scroll-wrapper">
+            <div class="scroll-edge-arrow arrow-left"  id="dArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
+            <div class="scroll-edge-arrow arrow-right" id="dArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
+            <div class="overflow-x-auto" id="docScroll" style="scrollbar-width:none">
+              <table class="uni-table" style="min-width:900px">
+                <thead>
+                  <tr>
+                    <th style="min-width:280px">Документ</th>
+                    <th style="min-width:130px">Тип</th>
+                    <th style="min-width:145px">Статус</th>
+                    <th style="min-width:145px">Дата создания</th>
+                    <th style="min-width:145px">Дата исполнения</th>
+                    <th style="min-width:130px">Время в работе</th>
+                  </tr>
+                </thead>
+                <tbody id="docTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -610,17 +852,37 @@
     // Status badge helper
     function statusBadge(status) {
       const map = {
-        'В работе':      { color: 'text-amber-700', bg: 'bg-amber-50', dot: 'bg-amber-500' },
-        'На согласовании':{ color: 'text-amber-700', bg: 'bg-amber-50', dot: 'bg-amber-500' },
-        'На проверке':   { color: 'text-sky-700', bg: 'bg-sky-50', dot: 'bg-sky-500' },
-        'Ожидает':       { color: 'text-violet-700', bg: 'bg-violet-50', dot: 'bg-violet-500' },
-        'Завершена':     { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
-        'Одобрена':      { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
-        'Просрочена':    { color: 'text-red-700', bg: 'bg-red-50', dot: 'bg-red-500' },
-        'Новая':         { color: 'text-indigo-700', bg: 'bg-indigo-50', dot: 'bg-indigo-500' },
+        'В работе':        { color: 'text-amber-700',   bg: 'bg-amber-50',   dot: 'bg-amber-500' },
+        'На согласовании': { color: 'text-amber-700',   bg: 'bg-amber-50',   dot: 'bg-amber-500' },
+        'На проверке':     { color: 'text-sky-700',     bg: 'bg-sky-50',     dot: 'bg-sky-500' },
+        'На подписи':      { color: 'text-amber-700',   bg: 'bg-amber-50',   dot: 'bg-amber-500' },
+        'Ожидает':         { color: 'text-violet-700',  bg: 'bg-violet-50',  dot: 'bg-violet-500' },
+        'Завершена':       { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
+        'Одобрена':        { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
+        'Подписан':        { color: 'text-emerald-700', bg: 'bg-emerald-50', dot: 'bg-emerald-500' },
+        'Просрочена':      { color: 'text-red-700',     bg: 'bg-red-50',     dot: 'bg-red-500' },
+        'Новая':           { color: 'text-indigo-700',  bg: 'bg-indigo-50',  dot: 'bg-indigo-500' },
+        'Отклонена':       { color: 'text-rose-700',    bg: 'bg-rose-50',    dot: 'bg-rose-500' },
+        'Отклонён':        { color: 'text-rose-700',    bg: 'bg-rose-50',    dot: 'bg-rose-500' },
+        'В разработке':    { color: 'text-sky-700',     bg: 'bg-sky-50',     dot: 'bg-sky-500' },
+        'Черновик':        { color: 'text-slate-600',   bg: 'bg-slate-100',  dot: 'bg-slate-400' },
       };
-      const s = map[status] || map['В работе'];
-      return `<span class="inline-flex items-center gap-1.5 text-xs font-medium ${s.color} ${s.bg} px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full ${s.dot}"></span>${status}</span>`;
+      const s = map[status] || { color: 'text-slate-600', bg: 'bg-slate-100', dot: 'bg-slate-400' };
+      return `<span class="inline-flex items-center gap-1.5 text-xs font-medium ${s.color} ${s.bg} px-2.5 py-1 rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}"></span>${status}</span>`;
+    }
+
+    // Doc type badge
+    function typeBadge(type) {
+      const map = {
+        'Договор':           { color: 'text-indigo-600', bg: 'bg-indigo-50' },
+        'Акт':               { color: 'text-amber-600',  bg: 'bg-amber-50' },
+        'Приказ':            { color: 'text-violet-600', bg: 'bg-violet-50' },
+        'Служебная записка': { color: 'text-slate-600',  bg: 'bg-slate-100' },
+        'Трудоустройство':   { color: 'text-emerald-600',bg: 'bg-emerald-50' },
+        'Юридическая консультация': { color: 'text-indigo-600', bg: 'bg-indigo-50' },
+      };
+      const t = map[type] || { color: 'text-slate-600', bg: 'bg-slate-100' };
+      return `<span class="text-xs font-medium ${t.color} ${t.bg} px-2.5 py-1 rounded-full whitespace-nowrap">${type}</span>`;
     }
 
     // Priority badge helper
@@ -1283,6 +1545,212 @@
         setTimeout(() => alert.remove(), 300);
       }, 3000);
     }
+
+    // ══════════════════════════════════════════
+    // ── TABLE DATA
+    // ══════════════════════════════════════════
+    const TASKS_DATA = [
+      { title: 'Подписать договор поставки № 2026-0415', from: 'Юридический', fromSub: 'Консультация', type: 'Юридическая консультация', status: 'В работе',     created: '12.04.2026', due: '18.04.2026', time: '5д 14ч' },
+      { title: 'Согласовать заявку на отпуск (Сидорова Е.В.)',  from: 'HR',          fromSub: 'Кадровые',      type: 'Трудоустройство',           status: 'На согласовании', created: '14.04.2026', due: '15.04.2026', time: '1д 8ч' },
+      { title: 'Проверить квартальный отчёт Q1 2026',           from: 'Финансы',     fromSub: 'Отчётность',    type: 'Юридическая консультация', status: 'На проверке',     created: '10.04.2026', due: '18.04.2026', time: '7д 2ч' },
+      { title: 'Оформить приём сотрудника Жумабаева А.Т.',      from: 'HR',          fromSub: 'Трудоустройство',type: 'Трудоустройство',          status: 'Новая',           created: '16.04.2026', due: '20.04.2026', time: '3ч' },
+      { title: 'Утвердить акт сверки за март',                  from: 'Бухгалтерия', fromSub: 'Финансы',       type: 'Юридическая консультация', status: 'Завершена',       created: '05.04.2026', due: '12.04.2026', time: '7д 0ч' },
+      { title: 'Выдать пропуск сотруднику Касымов Д.Р.',        from: 'СБ',          fromSub: 'Безопасность',  type: 'Трудоустройство',           status: 'Завершена',       created: '08.04.2026', due: '09.04.2026', time: '1д 0ч' },
+      { title: 'Провести инвентаризацию склада',                from: 'Бухгалтерия', fromSub: 'Учёт',          type: 'Юридическая консультация', status: 'Отклонена',       created: '01.04.2026', due: '10.04.2026', time: '9д 2ч' },
+      { title: 'Согласовать NDA с партнёром ТОО «Альфа»',       from: 'Юридический', fromSub: 'Консультация',  type: 'Юридическая консультация', status: 'В разработке',    created: '13.04.2026', due: '22.04.2026', time: '4д 0ч' },
+      { title: 'Установить ПО на рабочие станции отдела IT',    from: 'IT',          fromSub: 'Техподдержка',  type: 'Трудоустройство',           status: 'В работе',        created: '15.04.2026', due: '17.04.2026', time: '2д 6ч' },
+      { title: 'Подготовить кадровые документы для Петрова К.', from: 'HR',          fromSub: 'Трудоустройство',type: 'Трудоустройство',          status: 'Новая',           created: '16.04.2026', due: '23.04.2026', time: '1ч 20м' },
+    ];
+
+    const REQ_DATA = [
+      { title: 'Заявка на ежегодный отпуск', from: 'HR', fromSub: 'Кадровые', type: 'Трудоустройство', status: 'На согласовании', created: '14.04.2026', due: '01.05.2026', time: '3д 2ч' },
+      { title: 'Запрос на оборудование — ноутбук Lenovo', from: 'IT', fromSub: 'Снабжение', type: 'Трудоустройство', status: 'Одобрена', created: '11.04.2026', due: '16.04.2026', time: '5д 0ч' },
+      { title: 'Заявка на командировку в Астану 20–22 апр', from: 'Администрация', fromSub: 'Командировки', type: 'Трудоустройство', status: 'Одобрена', created: '08.04.2026', due: '20.04.2026', time: '8д 4ч' },
+      { title: 'Юридическая консультация по договору № 44', from: 'Юридический', fromSub: 'Консультация', type: 'Юридическая консультация', status: 'В разработке', created: '13.04.2026', due: '19.04.2026', time: '3д 11ч' },
+      { title: 'Запрос доступа к системе «Бухгалтерия»', from: 'IT', fromSub: 'Доступы', type: 'Трудоустройство', status: 'Новая', created: '16.04.2026', due: '18.04.2026', time: '0д 5ч' },
+      { title: 'Оформить справку о доходах', from: 'HR', fromSub: 'Кадровые', type: 'Трудоустройство', status: 'Завершена', created: '03.04.2026', due: '05.04.2026', time: '2д 1ч' },
+    ];
+
+    const DOC_DATA = [
+      { title: 'Договор поставки',          num: 'DOC-0415', type: 'Договор',            status: 'Подписан',   created: '14.04.2026', due: '30.04.2026', time: '2д 3ч' },
+      { title: 'Акт сверки за март',        num: 'DOC-0414', type: 'Акт',                status: 'На подписи', created: '13.04.2026', due: '17.04.2026', time: '4д 0ч' },
+      { title: 'Договор с ТОО «Альфа»',     num: 'DOC-0412', type: 'Договор',            status: 'Подписан',   created: '12.04.2026', due: '25.04.2026', time: '5д 1ч' },
+      { title: 'Приказ о приёме на работу', num: 'DOC-0398', type: 'Приказ',             status: 'Подписан',   created: '10.04.2026', due: '10.04.2026', time: '0д 4ч' },
+      { title: 'Служебная записка об IT',   num: 'DOC-0391', type: 'Служебная записка',  status: 'Черновик',   created: '07.04.2026', due: '14.04.2026', time: '3д 8ч' },
+      { title: 'Договор аренды офиса',      num: 'DOC-0385', type: 'Договор',            status: 'Отклонён',   created: '05.04.2026', due: '12.04.2026', time: '7д 0ч' },
+      { title: 'Акт приёма-передачи',       num: 'DOC-0374', type: 'Акт',                status: 'На подписи', created: '01.04.2026', due: '18.04.2026', time: '6д 5ч' },
+    ];
+
+    // ── Render helpers ──
+    function emptyRow(cols, msg) {
+      return `<tr><td colspan="${cols}" class="text-center py-14 text-slate-400 text-sm">${msg}</td></tr>`;
+    }
+
+    function renderTaskRow(t) {
+      return `<tr>
+        <td>
+          <p class="text-sm font-medium text-slate-900 leading-snug">${t.title}</p>
+          <p class="text-xs text-slate-400 mt-0.5">${t.from} — ${t.fromSub}</p>
+        </td>
+        <td>${statusBadge(t.status)}</td>
+        <td><span class="text-sm text-slate-600">${t.created}</span></td>
+        <td><span class="text-sm text-slate-600">${t.due}</span></td>
+        <td><span class="text-sm font-medium text-slate-700">${t.time}</span></td>
+      </tr>`;
+    }
+
+    function renderDocRow(d) {
+      return `<tr>
+        <td>
+          <p class="text-sm font-medium text-slate-900 leading-snug">${d.title}</p>
+          <p class="text-xs text-slate-400 mt-0.5">${d.num}</p>
+        </td>
+        <td>${typeBadge(d.type)}</td>
+        <td>${statusBadge(d.status)}</td>
+        <td><span class="text-sm text-slate-600">${d.created}</span></td>
+        <td><span class="text-sm text-slate-600">${d.due}</span></td>
+        <td><span class="text-sm font-medium text-slate-700">${d.time}</span></td>
+      </tr>`;
+    }
+
+    // ── Render tables ──
+    function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map(renderTaskRow).join('') : emptyRow(5, 'Задачи не найдены'); }
+    function renderRequests(data){ document.getElementById('reqTableBody').innerHTML   = data.length ? data.map(renderTaskRow).join('') : emptyRow(5, 'Заявки не найдены'); }
+    function renderDocs(data)    { document.getElementById('docTableBody').innerHTML   = data.length ? data.map(renderDocRow).join('')  : emptyRow(6, 'Документы не найдены'); }
+
+    renderTasks(TASKS_DATA);
+    renderRequests(REQ_DATA);
+    renderDocs(DOC_DATA);
+
+    // ══════════════════════════════════════════
+    // ── FILTER LOGIC (generic factory)
+    // ══════════════════════════════════════════
+    function makeFilter({ btnId, dropdownId, wrapId, clearId, applyId,
+                          statusSel, typeSel, dateFromId, dateToId, countId,
+                          data, renderFn }) {
+      const btn      = document.getElementById(btnId);
+      const dropdown = document.getElementById(dropdownId);
+      const countEl  = document.getElementById(countId);
+      let searchQ    = '';
+
+      // Toggle open/close
+      btn.addEventListener('click', e => { e.stopPropagation(); dropdown.classList.toggle('hidden'); });
+
+      // Close on outside click
+      document.addEventListener('click', e => {
+        if (!document.getElementById(wrapId).contains(e.target)) dropdown.classList.add('hidden');
+      });
+
+      function getChecked(sel)  { return [...document.querySelectorAll(sel)].filter(c=>c.checked).map(c=>c.value); }
+
+      function apply() {
+        const statuses = getChecked(statusSel);
+        const types    = typeSel ? getChecked(typeSel) : [];
+        const from     = dateFromId ? document.getElementById(dateFromId).value : '';
+        const to       = dateToId   ? document.getElementById(dateToId).value   : '';
+
+        const count = statuses.length + types.length + (from||to ? 1 : 0);
+        countEl.textContent = count;
+        count > 0 ? countEl.classList.remove('hidden') : countEl.classList.add('hidden');
+
+        let filtered = data.filter(item => {
+          if (statuses.length && !statuses.includes(item.status)) return false;
+          if (types.length    && !types.includes(item.type))      return false;
+          if (searchQ && !item.title.toLowerCase().includes(searchQ) &&
+              !(item.from||'').toLowerCase().includes(searchQ))   return false;
+          return true;
+        });
+        renderFn(filtered);
+        dropdown.classList.add('hidden');
+        lucide.createIcons();
+      }
+
+      document.getElementById(applyId).addEventListener('click', apply);
+
+      document.getElementById(clearId).addEventListener('click', () => {
+        document.querySelectorAll(statusSel).forEach(c => c.checked = false);
+        if (typeSel) document.querySelectorAll(typeSel).forEach(c => c.checked = false);
+        if (dateFromId) document.getElementById(dateFromId).value = '';
+        if (dateToId)   document.getElementById(dateToId).value   = '';
+        countEl.classList.add('hidden');
+        renderFn(data);
+        dropdown.classList.add('hidden');
+        lucide.createIcons();
+      });
+
+      // Wire search
+      return (q) => { searchQ = q; apply(); };
+    }
+
+    const setTasksSearch = makeFilter({
+      btnId:'tasksFilterBtn', dropdownId:'tasksFilterDropdown', wrapId:'tasksFilterWrap',
+      clearId:'tfClear', applyId:'tfApply',
+      statusSel:'.tf-status', typeSel:'.tf-type',
+      dateFromId:'tfDateFrom', dateToId:'tfDateTo', countId:'tasksFilterCount',
+      data: TASKS_DATA, renderFn: renderTasks
+    });
+    document.getElementById('tasksSearch').addEventListener('input', e => setTasksSearch(e.target.value.toLowerCase()));
+
+    const setReqSearch = makeFilter({
+      btnId:'reqFilterBtn', dropdownId:'reqFilterDropdown', wrapId:'reqFilterWrap',
+      clearId:'rfClear', applyId:'rfApply',
+      statusSel:'.rf-status', typeSel:'.rf-type',
+      dateFromId:'rfDateFrom', dateToId:'rfDateTo', countId:'reqFilterCount',
+      data: REQ_DATA, renderFn: renderRequests
+    });
+    document.getElementById('reqSearch').addEventListener('input', e => setReqSearch(e.target.value.toLowerCase()));
+
+    const setDocSearch = makeFilter({
+      btnId:'docFilterBtn', dropdownId:'docFilterDropdown', wrapId:'docFilterWrap',
+      clearId:'dfClear', applyId:'dfApply',
+      statusSel:'.df-status', typeSel:'.df-type',
+      dateFromId:'dfDateFrom', dateToId:'dfDateTo', countId:'docFilterCount',
+      data: DOC_DATA, renderFn: renderDocs
+    });
+    document.getElementById('docSearch').addEventListener('input', e => setDocSearch(e.target.value.toLowerCase()));
+
+    // ══════════════════════════════════════════
+    // ── SCROLL ARROWS (Bitrix24 style)
+    // ══════════════════════════════════════════
+    function initScrollArrows(scrollId, leftId, rightId) {
+      const scrollEl = document.getElementById(scrollId);
+      const leftArrow  = document.getElementById(leftId);
+      const rightArrow = document.getElementById(rightId);
+      if (!scrollEl || !leftArrow || !rightArrow) return;
+
+      const wrapper = scrollEl.closest('.table-scroll-wrapper');
+      let ival = null;
+      let hoveringWrapper = false;
+
+      function canLeft()  { return scrollEl.scrollLeft > 2; }
+      function canRight() { return scrollEl.scrollLeft + scrollEl.clientWidth < scrollEl.scrollWidth - 2; }
+
+      function refresh() {
+        leftArrow.classList.toggle('show',  canLeft()  && hoveringWrapper);
+        rightArrow.classList.toggle('show', canRight() && hoveringWrapper);
+      }
+
+      wrapper.addEventListener('mouseenter', () => { hoveringWrapper = true;  refresh(); });
+      wrapper.addEventListener('mouseleave', () => { hoveringWrapper = false; refresh(); });
+      scrollEl.addEventListener('scroll', refresh);
+
+      function startScroll(dir) {
+        clearInterval(ival);
+        ival = setInterval(() => { scrollEl.scrollLeft += dir * 9; refresh(); }, 16);
+      }
+      function stopScroll() { clearInterval(ival); ival = null; }
+
+      leftArrow.addEventListener('mouseenter',  () => startScroll(-1));
+      leftArrow.addEventListener('mouseleave',  stopScroll);
+      rightArrow.addEventListener('mouseenter', () => startScroll(1));
+      rightArrow.addEventListener('mouseleave', stopScroll);
+
+      setTimeout(refresh, 120);
+    }
+
+    initScrollArrows('tasksScroll', 'tArrowL', 'tArrowR');
+    initScrollArrows('reqScroll',   'rArrowL', 'rArrowR');
+    initScrollArrows('docScroll',   'dArrowL', 'dArrowR');
 
     lucide.createIcons();
   </script>
