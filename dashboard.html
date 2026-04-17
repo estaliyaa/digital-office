@@ -2176,10 +2176,46 @@
       m.classList.remove('open');
       setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = ''; }, 200);
     }
+    // Map of step id → stepper stage (1=Данные, 2=Подписание, 3=Готово)
+    const CF_STAGE = {
+      form: 1,
+      sign: 2, 'ecp-picker': 2, qr: 2, 'qr-loading': 2,
+      success: 3, error: 3
+    };
+    function cfUpdateStepper(stage) {
+      [1, 2, 3].forEach(n => {
+        const chip = document.getElementById('cfChip' + n);
+        const num  = chip.querySelector('.cf-chip-num');
+        chip.classList.remove('bg-indigo-600','text-white','bg-indigo-100','text-indigo-700','bg-slate-100','text-slate-500');
+        num.classList.remove('bg-white','text-indigo-600','bg-indigo-600','text-white','bg-slate-300');
+        num.innerHTML = '';
+        if (n < stage) {
+          chip.classList.add('bg-indigo-100','text-indigo-700');
+          num.classList.add('bg-indigo-600','text-white');
+          num.innerHTML = '<i data-lucide="check" class="w-2.5 h-2.5"></i>';
+        } else if (n === stage) {
+          chip.classList.add('bg-indigo-600','text-white');
+          num.classList.add('bg-white','text-indigo-600');
+          num.textContent = n;
+        } else {
+          chip.classList.add('bg-slate-100','text-slate-500');
+          num.classList.add('bg-slate-300','text-white');
+          num.textContent = n;
+        }
+      });
+      // Connector lines
+      const l1 = document.getElementById('cfLine1');
+      const l2 = document.getElementById('cfLine2');
+      l1.classList.toggle('bg-indigo-400', stage >= 2);
+      l1.classList.toggle('bg-slate-300', stage < 2);
+      l2.classList.toggle('bg-indigo-400', stage >= 3);
+      l2.classList.toggle('bg-slate-300', stage < 3);
+    }
     function cfGoto(stepId) {
       document.querySelectorAll('.cf-step').forEach(s => s.classList.remove('active'));
       const el = document.getElementById('cf-step-' + stepId);
       if (el) el.classList.add('active');
+      cfUpdateStepper(CF_STAGE[stepId] || 1);
       lucide.createIcons();
     }
     function cfChooseSign(method) {
@@ -2222,11 +2258,11 @@
 
       <!-- Steps indicator -->
       <div class="px-6 py-3 bg-slate-50/60 border-b border-slate-100 flex items-center gap-2 text-xs font-medium overflow-x-auto">
-        <span class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-600 text-white flex-shrink-0"><span class="w-4 h-4 rounded-full bg-white text-indigo-600 text-[10px] font-bold flex items-center justify-center">1</span>Данные</span>
-        <span class="w-4 h-px bg-slate-300 flex-shrink-0"></span>
-        <span class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 flex-shrink-0"><span class="w-4 h-4 rounded-full bg-slate-300 text-white text-[10px] font-bold flex items-center justify-center">2</span>Подписание</span>
-        <span class="w-4 h-px bg-slate-300 flex-shrink-0"></span>
-        <span class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 flex-shrink-0"><span class="w-4 h-4 rounded-full bg-slate-300 text-white text-[10px] font-bold flex items-center justify-center">3</span>Готово</span>
+        <span id="cfChip1" data-stage="1" class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full flex-shrink-0"><span class="cf-chip-num w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"></span><span>Данные</span></span>
+        <span id="cfLine1" class="w-4 h-px flex-shrink-0 bg-slate-300"></span>
+        <span id="cfChip2" data-stage="2" class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full flex-shrink-0"><span class="cf-chip-num w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"></span><span>Подписание</span></span>
+        <span id="cfLine2" class="w-4 h-px flex-shrink-0 bg-slate-300"></span>
+        <span id="cfChip3" data-stage="3" class="cf-chip inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full flex-shrink-0"><span class="cf-chip-num w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center"></span><span>Готово</span></span>
       </div>
 
       <!-- ── STEP 1: Form ── -->
