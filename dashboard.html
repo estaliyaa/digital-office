@@ -396,7 +396,6 @@
         <!-- Page heading -->
         <div class="mb-5">
           <h2 class="text-xl font-bold text-slate-900">Все задачи</h2>
-          <p class="text-sm text-slate-500 mt-0.5">Управление задачами и поручениями</p>
         </div>
 
         <!-- Toolbar -->
@@ -478,7 +477,6 @@
         <!-- Page heading -->
         <div class="mb-5">
           <h2 class="text-xl font-bold text-slate-900">Мои заявки</h2>
-          <p class="text-sm text-slate-500 mt-0.5">Заявки, созданные вами</p>
         </div>
 
         <!-- Toolbar -->
@@ -589,7 +587,6 @@
         <!-- Page heading -->
         <div class="mb-5">
           <h2 class="text-xl font-bold text-slate-900">Реестр документов</h2>
-          <p class="text-sm text-slate-500 mt-0.5">Единый реестр всех документов организации</p>
         </div>
 
         <!-- Toolbar -->
@@ -654,6 +651,335 @@
                 </thead>
                 <tbody id="docTableBody"></tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PAGE: Детали задачи / заявки ══ -->
+      <div id="page-task-detail" class="page-content">
+
+        <!-- Back link + header -->
+        <div class="flex items-center gap-2 mb-4">
+          <button onclick="navigateTo('tasks')" class="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Назад к списку
+          </button>
+        </div>
+
+        <!-- Title + status banner -->
+        <div class="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-6 mb-5 text-white shadow-sm shadow-indigo-200">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xs font-semibold tracking-wider uppercase text-indigo-100/90 bg-white/10 px-2.5 py-1 rounded-full">№23596</span>
+                <span class="text-xs font-medium text-indigo-100/90 bg-white/10 px-2.5 py-1 rounded-full">Трудоустройство</span>
+              </div>
+              <h2 class="text-xl font-bold leading-tight">Приём на работу Рамиль Арманович Серкебаев</h2>
+            </div>
+            <div class="flex flex-col gap-2 min-w-[260px]">
+              <div class="bg-white/10 backdrop-blur rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
+                <span class="text-xs text-indigo-100/90">Статус процесса</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold bg-amber-400 text-amber-900 px-2.5 py-1 rounded-full"><i data-lucide="loader" class="w-3 h-3"></i>В работе</span>
+              </div>
+              <div class="bg-white/10 backdrop-blur rounded-xl px-3.5 py-2.5 flex items-center justify-between gap-3">
+                <span class="text-xs text-indigo-100/90">Ваш этап</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-slate-700 px-2.5 py-1 rounded-full"><i data-lucide="hourglass" class="w-3 h-3"></i>Ожидает выполнения</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-column layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <!-- LEFT COLUMN -->
+          <div class="lg:col-span-2 space-y-5">
+
+            <!-- Applicant info -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="user" class="w-3.5 h-3.5 text-indigo-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Данные кандидата</h3>
+              </div>
+              <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-x-5 gap-y-4 text-sm">
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">ФИО</p>
+                  <p class="font-medium text-slate-900">Рамиль Арманович Серкебаев</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">ИИН</p>
+                  <p class="font-medium text-slate-900">980408245846</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">Номер телефона</p>
+                  <p class="font-medium text-slate-900">+7 (777) 897-98-89</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">E-mail</p>
+                  <p class="font-medium text-slate-900">ramilarman@gmail.com</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">Компания</p>
+                  <p class="font-medium text-slate-900">Adata</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">Отдел</p>
+                  <p class="font-medium text-slate-900">Разработка</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">Подразделение</p>
+                  <p class="font-medium text-slate-900">Разработка ПО</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">Должность</p>
+                  <p class="font-medium text-slate-900">CPO</p>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-400 mb-1">Заявление</p>
+                  <a href="#" class="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 text-sm font-medium group">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span class="truncate">Заявление на отпуск.pdf</span>
+                    <i data-lucide="download" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                  </a>
+                </div>
+              </div>
+              <!-- Attached docs -->
+              <div class="px-5 pb-5">
+                <p class="text-xs text-slate-400 mb-2">Удостоверение личности</p>
+                <div class="flex flex-wrap gap-2">
+                  <a href="#" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-sm text-slate-700 transition-colors border border-slate-200">
+                    <i data-lucide="image" class="w-4 h-4 text-slate-500"></i>Документ.jpg
+                  </a>
+                  <a href="#" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-sm text-slate-700 transition-colors border border-slate-200">
+                    <i data-lucide="file-text" class="w-4 h-4 text-slate-500"></i>Удостоверение личности.pdf
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-violet-50 rounded-lg flex items-center justify-center"><i data-lucide="align-left" class="w-3.5 h-3.5 text-violet-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Описание задачи</h3>
+              </div>
+              <div class="p-5 text-sm text-slate-600 leading-relaxed space-y-3">
+                <p>Необходимо завершить процесс подписания трудового договора с кандидатом. Система автоматически сформировала договор на основе данных о должности и условиях найма.</p>
+                <p class="text-slate-700 font-medium">Требуется отправить ссылки на подписание договора двум сторонам:</p>
+                <ul class="space-y-1.5 pl-1">
+                  <li class="flex gap-2"><span class="text-indigo-500 mt-1">•</span><span><span class="font-medium text-slate-700">Первая сторона (кандидат)</span> — получит ссылку для подписания со своей стороны</span></li>
+                  <li class="flex gap-2"><span class="text-indigo-500 mt-1">•</span><span><span class="font-medium text-slate-700">Вторая сторона (представитель компании)</span> — получит ссылку для подписания от компании</span></li>
+                  <li class="flex gap-2"><span class="text-indigo-500 mt-1">•</span><span>После получения обеих подписей договор будет автоматически заархивирован в системе документооборота.</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Data items -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-sky-50 rounded-lg flex items-center justify-center"><i data-lucide="database" class="w-3.5 h-3.5 text-sky-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Данные</h3>
+              </div>
+              <div class="divide-y divide-slate-100">
+                <a href="#" class="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors group">
+                  <span class="flex items-center gap-2.5 text-sm font-medium text-indigo-600">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> Анкета
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                    <i data-lucide="alert-circle" class="w-3 h-3"></i> Не заполнено
+                  </span>
+                </a>
+                <a href="#" class="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors group">
+                  <span class="flex items-center gap-2.5 text-sm font-medium text-indigo-600">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> Персональные данные
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                    <i data-lucide="alert-circle" class="w-3 h-3"></i> Не предоставлено
+                  </span>
+                </a>
+                <a href="#" class="flex items-center justify-between gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors group">
+                  <span class="flex items-center gap-2.5 text-sm font-medium text-indigo-600">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> Заключение по проверке сотрудника (Adata)
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">
+                    <i data-lucide="clock" class="w-3 h-3"></i> В процессе у Adata
+                  </span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Start CTA -->
+            <div class="bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-200 rounded-2xl p-5 flex items-center justify-between gap-4 flex-wrap">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center"><i data-lucide="play" class="w-5 h-5 text-indigo-600"></i></div>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">Начать выполнение</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Нажмите кнопку, чтобы начать выполнение задачи</p>
+                </div>
+              </div>
+              <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-sm">
+                Начать выполнение <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Comments / Protocol -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-1.5 px-5 pt-4 border-b border-slate-100">
+                <button id="td-tab-comments" class="td-tab-btn active inline-flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-semibold text-indigo-700 bg-indigo-50 border-b-2 border-indigo-600 -mb-px">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i> Комментарии
+                  <span class="text-xs bg-indigo-600 text-white px-1.5 rounded-full">4</span>
+                </button>
+                <button id="td-tab-protocol" class="td-tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent -mb-px">
+                  <i data-lucide="clipboard-list" class="w-4 h-4"></i> Протокол
+                </button>
+              </div>
+
+              <!-- Comments list -->
+              <div id="td-comments" class="p-5">
+                <div class="flex gap-3">
+                  <div class="w-9 h-9 rounded-full bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">Т</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-baseline gap-2 mb-1 flex-wrap">
+                      <p class="text-sm font-semibold text-slate-900">Қойшыбай Темірлан</p>
+                      <p class="text-xs text-slate-400">13 ноября, 15:08</p>
+                    </div>
+                    <p class="text-sm text-slate-700">Нужно заполнить анкету</p>
+                    <button class="text-xs text-indigo-600 hover:text-indigo-700 font-medium mt-1.5 transition-colors">Ответить</button>
+                  </div>
+                </div>
+              </div>
+              <div id="td-protocol" class="p-5 hidden">
+                <p class="text-sm text-slate-500">История изменений задачи пока пуста.</p>
+              </div>
+
+              <!-- Comment input -->
+              <div class="border-t border-slate-100 p-4 bg-slate-50/40">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">Т</div>
+                  <div class="flex-1 flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3.5 py-2 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
+                    <input type="text" placeholder="Оставьте комментарий..." class="flex-1 bg-transparent text-sm text-slate-700 placeholder:text-slate-400 outline-none">
+                    <button class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
+                    <button class="text-white bg-indigo-600 hover:bg-indigo-700 w-8 h-8 rounded-lg flex items-center justify-center transition-colors"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="space-y-5">
+
+            <!-- Process stages -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Этапы процесса</h3>
+              </div>
+              <ol class="p-5 relative">
+                <div class="absolute left-[26px] top-7 bottom-7 w-px bg-slate-200"></div>
+
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0 relative z-10"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>
+                  <div class="pt-0.5"><p class="text-sm font-medium text-slate-900">Создание заявки</p><p class="text-xs text-slate-400 mt-0.5">Завершено</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-white border-2 border-indigo-600 flex items-center justify-center flex-shrink-0 relative z-10"><div class="w-2 h-2 rounded-full bg-indigo-600"></div></div>
+                  <div class="pt-0.5"><p class="text-sm font-semibold text-indigo-700">Заполнение анкеты</p><p class="text-xs text-indigo-500 mt-0.5">Текущий этап</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">Проверка СБ 1</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">Проверка СБ 2</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">Согласование с руководителем</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">Подготовка места работы</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">Подписание документов</p></div>
+                </li>
+                <li class="relative flex items-start gap-3 pb-4">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">СБ инструктаж</p></div>
+                </li>
+                <li class="relative flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex-shrink-0 relative z-10"></div>
+                  <div class="pt-0.5"><p class="text-sm text-slate-400">Закрытие заявки</p></div>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Dates -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center"><i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Дата</h3>
+              </div>
+              <div class="p-5">
+                <p class="text-xs text-slate-400 mb-1">Дата создания заявки</p>
+                <p class="text-sm font-medium text-slate-900">10 ноября 2025</p>
+              </div>
+            </div>
+
+            <!-- Author -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center"><i data-lucide="user-circle" class="w-3.5 h-3.5 text-emerald-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Автор задачи</h3>
+              </div>
+              <div class="p-5 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center">Т</div>
+                <div>
+                  <p class="text-sm font-medium text-slate-900">Қойшыбай Темірлан</p>
+                  <p class="text-xs text-slate-500">CPO</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assignees -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div class="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 bg-slate-50/50">
+                <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-3.5 h-3.5 text-indigo-600"></i></div>
+                <h3 class="text-sm font-semibold text-slate-900">Исполнители</h3>
+              </div>
+              <div class="p-5 space-y-4">
+                <div>
+                  <p class="text-xs text-slate-400 mb-2">Заполнение анкеты</p>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-500 text-white text-sm font-semibold flex items-center justify-center">Н</div>
+                    <div>
+                      <p class="text-sm font-medium text-slate-900">Тажибаев Нурлыбек</p>
+                      <p class="text-xs text-slate-500">Руководитель проекта</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 grid grid-cols-1 gap-3 text-sm">
+                  <div class="flex items-start justify-between gap-3">
+                    <span class="text-xs text-slate-400">Дата назначения</span>
+                    <span class="text-sm font-medium text-slate-900 text-right">13 ноября 2025, 18:45</span>
+                  </div>
+                  <div class="flex items-start justify-between gap-3">
+                    <span class="text-xs text-slate-400">Срок исполнения</span>
+                    <span class="text-sm font-medium text-rose-600 text-right">13 ноября 2025, 18:45</span>
+                  </div>
+                  <div class="flex items-start justify-between gap-3">
+                    <span class="text-xs text-slate-400">Начало выполнения</span>
+                    <span class="text-sm text-slate-400 text-right">—</span>
+                  </div>
+                  <div class="flex items-start justify-between gap-3">
+                    <span class="text-xs text-slate-400">Потрачено времени</span>
+                    <span class="text-sm text-slate-400 text-right">—</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -838,7 +1164,8 @@
     const PAGE_TITLES = {
       statistics: 'Статистика', tasks: 'Все задачи', 'my-requests': 'Мои заявки',
       notifications: 'Уведомления', structure: 'Структура предприятия',
-      registry: 'Реестр документов', processes: 'Все процессы', profile: 'Личный профиль'
+      registry: 'Реестр документов', processes: 'Все процессы', profile: 'Личный профиль',
+      'task-detail': 'Детали задачи'
     };
 
     // ── Render header/user info ──
@@ -1239,6 +1566,25 @@
     // Init on statistics
     navigateTo('statistics');
 
+    // ── Task detail: tab switch (Комментарии / Протокол) ──
+    (function () {
+      const tabC = document.getElementById('td-tab-comments');
+      const tabP = document.getElementById('td-tab-protocol');
+      const panC = document.getElementById('td-comments');
+      const panP = document.getElementById('td-protocol');
+      if (!tabC) return;
+      const activate = (on, off, show, hide) => {
+        on.classList.add('text-indigo-700','bg-indigo-50','border-indigo-600','font-semibold');
+        on.classList.remove('text-slate-500','font-medium','border-transparent');
+        off.classList.remove('text-indigo-700','bg-indigo-50','border-indigo-600','font-semibold');
+        off.classList.add('text-slate-500','font-medium','border-transparent');
+        show.classList.remove('hidden');
+        hide.classList.add('hidden');
+      };
+      tabC.addEventListener('click', () => activate(tabC, tabP, panC, panP));
+      tabP.addEventListener('click', () => activate(tabP, tabC, panP, panC));
+    })();
+
     // ── Sidebar toggle ──
     const sidebar = document.getElementById('sidebar');
     const mainArea = document.getElementById('mainArea');
@@ -1600,7 +1946,7 @@
     }
 
     function renderTaskRow(t) {
-      return `<tr>
+      return `<tr onclick="navigateTo('task-detail')" class="cursor-pointer hover:bg-slate-50 transition-colors">
         <td>
           <p class="text-sm font-medium text-slate-900 leading-snug">${t.title}</p>
           <p class="text-xs text-slate-400 mt-0.5">${t.from} — ${t.fromSub}</p>
@@ -1613,7 +1959,7 @@
     }
 
     function renderDocRow(d) {
-      return `<tr>
+      return `<tr onclick="navigateTo('task-detail')" class="cursor-pointer hover:bg-slate-50 transition-colors">
         <td>
           <p class="text-sm font-medium text-slate-900 leading-snug">${d.title}</p>
           <p class="text-xs text-slate-400 mt-0.5">${d.num}</p>
