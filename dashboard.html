@@ -910,15 +910,15 @@
             <div class="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" style="width:0%"></div></div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <a href="#" class="relative p-4 rounded-xl border border-amber-200 bg-amber-50/40 hover:bg-amber-50 hover:border-amber-300 transition-all group">
+            <button onclick="openAnketa()" class="text-left relative p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50 hover:border-emerald-300 transition-all group">
               <div class="flex items-start justify-between mb-2">
-                <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center"><i data-lucide="file-edit" class="w-4 h-4"></i></div>
-                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-full uppercase">Пусто</span>
+                <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center"><i data-lucide="file-check-2" class="w-4 h-4"></i></div>
+                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-200/60 px-2 py-0.5 rounded-full uppercase"><i data-lucide="check" class="w-2.5 h-2.5"></i>Заполнено</span>
               </div>
               <p class="text-sm font-bold text-slate-900 mb-0.5">Анкета</p>
-              <p class="text-xs text-slate-500">Заполните форму кандидата</p>
+              <p class="text-xs text-slate-500">Посмотреть анкету кандидата</p>
               <i data-lucide="arrow-up-right" class="absolute bottom-3 right-3 w-4 h-4 text-slate-300 group-hover:text-indigo-600"></i>
-            </a>
+            </button>
             <a href="#" class="relative p-4 rounded-xl border border-amber-200 bg-amber-50/40 hover:bg-amber-50 hover:border-amber-300 transition-all group">
               <div class="flex items-start justify-between mb-2">
                 <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center"><i data-lucide="shield" class="w-4 h-4"></i></div>
@@ -1065,6 +1065,31 @@
             <p class="text-xs text-slate-500">После завершения задача перейдёт на следующий этап.</p>
             <button class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check" class="w-4 h-4"></i>Завершить выполнение</button>
           </div>
+        </div>
+
+        <!-- ── Task completed variant ── -->
+        <div class="relative bg-gradient-to-br from-indigo-50 to-slate-50 border border-indigo-100 rounded-2xl p-6 mb-5">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm shadow-emerald-400/40 flex-shrink-0"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Задача выполнена</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Все действия выполнены, результаты зафиксированы</p>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <p class="text-sm font-semibold text-slate-900 mb-2">Анкета</p>
+            <button onclick="openAnketa()" class="inline-flex items-center gap-2 w-full sm:w-auto bg-white border-2 border-indigo-300 hover:border-indigo-500 hover:bg-indigo-50 text-indigo-600 text-sm font-semibold px-4 py-2.5 rounded-xl transition-all">
+              <i data-lucide="external-link" class="w-4 h-4"></i>Посмотреть анкету
+            </button>
+          </div>
+
+          <div class="mb-5">
+            <p class="text-sm font-semibold text-slate-900 mb-2">Комментарии ответственного за анкету</p>
+            <div class="bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 min-h-[80px]">Анкета проверена. Данные заполнены корректно, замечаний не выявлено.</div>
+          </div>
+
+          <button class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="edit-3" class="w-4 h-4"></i>Внести изменения</button>
         </div>
 
         <!-- ── ROW 4: Activity feed (Комментарии + Протокол as filter) ── -->
@@ -2360,8 +2385,205 @@
       if (m && !m.classList.contains('hidden') && e.key === 'Escape') closeCreateFlow();
     });
 
+    // ── Анкета modal ──
+    function openAnketa() {
+      const m = document.getElementById('anketaModal');
+      m.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => m.classList.add('open'));
+      lucide.createIcons();
+    }
+    function closeAnketa() {
+      const m = document.getElementById('anketaModal');
+      m.classList.remove('open');
+      setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = ''; }, 200);
+    }
+    document.addEventListener('keydown', e => {
+      const m = document.getElementById('anketaModal');
+      if (m && !m.classList.contains('hidden') && e.key === 'Escape') closeAnketa();
+    });
+
     lucide.createIcons();
   </script>
+
+  <!-- ══ АНКЕТА MODAL ══ -->
+  <div id="anketaModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto" style="opacity:0;transition:opacity 200ms">
+    <style>#anketaModal.open{opacity:1}#anketaModal .am-panel{transform:translateY(20px);transition:transform 260ms cubic-bezier(.2,.8,.2,1);opacity:0}#anketaModal.open .am-panel{transform:translateY(0);opacity:1}</style>
+    <div class="am-panel relative w-full max-w-5xl bg-slate-50 rounded-2xl shadow-2xl my-4 overflow-hidden">
+
+      <!-- Close bar -->
+      <div class="flex items-center gap-3 px-5 py-3.5 bg-white border-b border-slate-100 sticky top-0 z-10">
+        <button onclick="closeAnketa()" class="w-7 h-7 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <h2 class="text-base font-bold text-slate-900">Анкета</h2>
+      </div>
+
+      <div class="p-5">
+        <!-- Main card -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-7 space-y-8">
+
+          <!-- Top row -->
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="min-w-0">
+              <h1 class="text-2xl font-bold text-slate-900 leading-tight">Рамиль Арманович Серкебаев</h1>
+              <p class="text-sm text-slate-500 mt-1.5">Мужчина, 27 лет, родился 8 апреля 1998 года</p>
+            </div>
+            <button class="inline-flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+              <i data-lucide="download" class="w-4 h-4"></i>Скачать анкету
+            </button>
+          </div>
+
+          <!-- Basic fields -->
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm font-semibold text-slate-900 mb-1">ИИН</p>
+              <p class="text-sm text-slate-700">980408245846</p>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-900 mb-1">Гражданство</p>
+              <p class="text-sm text-slate-700">Республика Казахстан</p>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-900 mb-2">Контакты</p>
+              <div class="space-y-1.5">
+                <p class="inline-flex items-center gap-2 text-sm text-slate-700"><i data-lucide="phone" class="w-4 h-4 text-slate-500"></i>+7 (777) 897-98-89</p>
+                <p class="inline-flex items-center gap-2 text-sm text-slate-700"><i data-lucide="mail" class="w-4 h-4 text-slate-500"></i>ramilarman@gmail.com</p>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100">
+
+          <!-- ID -->
+          <div>
+            <p class="text-sm font-semibold text-slate-900 mb-3">Удостоверение личности</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              <div><p class="text-slate-500 mb-1">Номер</p><p class="text-slate-900 font-medium">0078563</p></div>
+              <div><p class="text-slate-500 mb-1">Дата выдачи</p><p class="text-slate-900 font-medium">25.05.2018</p></div>
+              <div><p class="text-slate-500 mb-1">Орган выдачи</p><p class="text-slate-900 font-medium">МВД РК</p></div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100">
+
+          <!-- Addresses -->
+          <div>
+            <p class="text-sm font-semibold text-slate-900 mb-3">Адреса</p>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm font-semibold text-slate-900 mb-1">Адрес прописки</p>
+                <p class="text-sm text-slate-700">г. Алматы, ул. Ходжанова 79</p>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-900 mb-1">Фактический адрес</p>
+                <p class="text-sm text-slate-700">г. Алматы, ул. Ходжанова 79</p>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-slate-900 mb-1">Место рождения</p>
+                <p class="text-sm text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79</p>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100">
+
+          <!-- Work experience -->
+          <div>
+            <p class="text-sm font-semibold text-slate-900 mb-4">Опыт работы</p>
+            <div class="space-y-4">
+              <div class="grid grid-cols-[160px_1fr] gap-4">
+                <div class="text-sm text-slate-500 leading-relaxed">
+                  <p>Май 2023 —</p><p>Апрель 2024</p><p class="text-xs mt-0.5 text-slate-400">11 месяцев</p>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">ТОО "Alldata"</p>
+                  <p class="text-sm text-slate-600 mt-0.5">Менеджер по продажам</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-[160px_1fr] gap-4">
+                <div class="text-sm text-slate-500 leading-relaxed">
+                  <p>Сентябрь 2021 —</p><p>Июнь 2022</p><p class="text-xs mt-0.5 text-slate-400">10 месяцев</p>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">АО "Kaspi Bank"</p>
+                  <p class="text-sm text-slate-600 mt-0.5">Директор по развитию</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="border-slate-100">
+
+          <!-- Relatives -->
+          <div>
+            <p class="text-sm font-semibold text-slate-900 mb-3">Родственники</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm min-w-[720px]">
+                <thead>
+                  <tr class="bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    <th class="px-3 py-2 text-left">ФИО</th>
+                    <th class="px-3 py-2 text-left">ИИН</th>
+                    <th class="px-3 py-2 text-left">Родство</th>
+                    <th class="px-3 py-2 text-left">Место рождения</th>
+                    <th class="px-3 py-2 text-left">Место работы, должность</th>
+                    <th class="px-3 py-2 text-left">Адрес и номер телефона</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr>
+                    <td class="px-3 py-3 text-slate-900 font-medium">Аяна Мухтаровна Сейтханова</td>
+                    <td class="px-3 py-3 text-slate-700 font-mono text-xs">750708245843</td>
+                    <td class="px-3 py-3 text-slate-700">Мать</td>
+                    <td class="px-3 py-3 text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79</td>
+                    <td class="px-3 py-3 text-slate-700">ТОО "Adata", РОП</td>
+                    <td class="px-3 py-3 text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79, +7 777 888 76 56</td>
+                  </tr>
+                  <tr class="bg-slate-50/60">
+                    <td class="px-3 py-3 text-slate-900 font-medium">Арман Ерланович Нугманов</td>
+                    <td class="px-3 py-3 text-slate-700 font-mono text-xs">750708245843</td>
+                    <td class="px-3 py-3 text-slate-700">Отец</td>
+                    <td class="px-3 py-3 text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79</td>
+                    <td class="px-3 py-3 text-slate-700">АО "Kaspi Bank", руководитель IT отдела</td>
+                    <td class="px-3 py-3 text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79, +7 777 888 76 56</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-3 text-slate-900 font-medium">Марат Арманович Серкебаев</td>
+                    <td class="px-3 py-3 text-slate-700 font-mono text-xs">991223456245</td>
+                    <td class="px-3 py-3 text-slate-700">Брат</td>
+                    <td class="px-3 py-3 text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79</td>
+                    <td class="px-3 py-3 text-slate-700">АО "BCC", продуктовый дизайнер</td>
+                    <td class="px-3 py-3 text-slate-700">Алматинская область, г. Алматы, ул. Ходжанова 79, +7 777 888 76 56</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <hr class="border-slate-100">
+
+          <!-- Education -->
+          <div>
+            <p class="text-sm font-semibold text-slate-900 mb-4">Образование</p>
+            <div class="space-y-3">
+              <div class="grid grid-cols-[80px_1fr] gap-4">
+                <p class="text-sm text-slate-500">2022</p>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">Creative Hub Academy</p>
+                  <p class="text-sm text-slate-600 mt-0.5">UX/UI дизайнер</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-[80px_1fr] gap-4">
+                <p class="text-sm text-slate-500">2017</p>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">КазНУ им. Аль-Фараби</p>
+                  <p class="text-sm text-slate-600 mt-0.5">Журналистика</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ CREATE FLOW PANEL (right-slide) ══ -->
   <div id="createFlowModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex justify-end">
