@@ -940,6 +940,133 @@
           </div>
         </div>
 
+        <!-- ── ROW 3b: TASK EXECUTION block ── -->
+        <div class="relative bg-gradient-to-br from-indigo-50 to-slate-50 border border-indigo-100 rounded-2xl p-6 mb-5">
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-4 mb-5 flex-wrap">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-sm shadow-indigo-400/30 flex-shrink-0"><i data-lucide="play-circle" class="w-5 h-5"></i></div>
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Выполнение задачи</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Выполните необходимые действия для завершения задачи</p>
+              </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>3 из 5 подписано</span>
+          </div>
+
+          <!-- File to sign -->
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Файл для подписания</p>
+            <div class="bg-white border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-4 mb-5">
+              <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-900 truncate">Договор.docx</p>
+                <p class="text-[11px] text-slate-400">DOCX · 1.4 MB</p>
+              </div>
+              <!-- Download dropdown -->
+              <div class="relative" id="tdSignDlWrap">
+                <button id="tdSignDlBtn" class="w-9 h-9 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="download" class="w-4 h-4"></i></button>
+                <div id="tdSignDlMenu" class="hidden absolute right-0 top-11 z-20 w-56 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
+                  <button class="w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">Подписанный документ</button>
+                  <button class="w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">Оригинал документ</button>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex-shrink-0"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Подписано</span>
+            </div>
+          </div>
+
+          <!-- Signers table -->
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Подписанты</p>
+            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <!-- Header -->
+              <div class="grid grid-cols-[1fr_160px_120px] gap-3 px-4 py-2.5 bg-slate-50/60 border-b border-slate-100 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <span>ФИО подписанта</span>
+                <span>Статус</span>
+                <span class="text-right">Действия</span>
+              </div>
+
+              <div class="divide-y divide-slate-100">
+                <!-- Signer 1 -->
+                <div class="grid grid-cols-[1fr_160px_120px] gap-3 items-center px-4 py-3">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <p class="text-sm font-semibold text-slate-900 truncate">Анатолий Сергеевич Кузнецов</p>
+                      <span class="inline-flex items-center text-[10px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded-md">+ещё 5</span>
+                    </div>
+                    <p class="text-xs text-slate-400">ТОО "Alldata"</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Подписано</span>
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button title="Копировать ссылку" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                    <button title="Отправить" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+                <!-- Signer 2 -->
+                <div class="grid grid-cols-[1fr_160px_120px] gap-3 items-center px-4 py-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Сергей Владимирович Иванов</p>
+                    <p class="text-xs text-slate-400">ТОО "Alldata"</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>Ожидание</span>
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button title="Копировать ссылку" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                    <button title="Отправить" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+                <!-- Signer 3 -->
+                <div class="grid grid-cols-[1fr_160px_120px] gap-3 items-center px-4 py-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Анна Петровна Смирнова</p>
+                    <p class="text-xs text-slate-400">ИП "ТехноМир"</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Подписано</span>
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button title="Копировать ссылку" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                    <button title="Отправить" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+                <!-- Signer 4 -->
+                <div class="grid grid-cols-[1fr_160px_120px] gap-3 items-center px-4 py-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Дмитрий Александрович Кузнецов</p>
+                    <p class="text-xs text-slate-400">ООО "ГлобалТек"</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>Ожидание</span>
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button title="Копировать ссылку" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                    <button title="Отправить" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+                <!-- Signer 5 -->
+                <div class="grid grid-cols-[1fr_160px_120px] gap-3 items-center px-4 py-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Анатолий Сергеевич Кузнецов</p>
+                    <p class="text-xs text-slate-400">ТОО "Alldata"</p>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Подписано</span>
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button title="Копировать ссылку" class="w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                    <button title="Отправить" class="w-8 h-8 rounded-lg bg-slate-100 text-slate-300 flex items-center justify-center cursor-not-allowed"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comment -->
+          <div class="mt-5">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Комментарий исполнителя</p>
+            <textarea rows="3" placeholder="Введите текст…" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none"></textarea>
+          </div>
+
+          <!-- CTA -->
+          <div class="mt-5 flex items-center justify-between gap-3 flex-wrap">
+            <p class="text-xs text-slate-500">После завершения задача перейдёт на следующий этап.</p>
+            <button class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check" class="w-4 h-4"></i>Завершить выполнение</button>
+          </div>
+        </div>
+
         <!-- ── ROW 4: Activity feed (Комментарии + Протокол as filter) ── -->
         <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
@@ -1590,6 +1717,16 @@
 
     // Init on statistics
     navigateTo('statistics');
+
+    // ── Task execution: download dropdown ──
+    (function () {
+      const btn = document.getElementById('tdSignDlBtn');
+      const menu = document.getElementById('tdSignDlMenu');
+      const wrap = document.getElementById('tdSignDlWrap');
+      if (!btn) return;
+      btn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('hidden'); });
+      document.addEventListener('click', e => { if (!wrap.contains(e.target)) menu.classList.add('hidden'); });
+    })();
 
     // ── Task detail: 3-tab switch (Обзор / Комментарии / Протокол) ──
     (function () {
