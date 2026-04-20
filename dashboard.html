@@ -886,20 +886,19 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex flex-col items-end gap-3">
+            <div class="flex flex-col items-end gap-2">
+              <!-- Start state: single CTA -->
               <button id="startTaskBtn" onclick="startTask()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Начать выполнение</button>
-              <button id="stopTaskBtn" onclick="stopTask()" class="hidden inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i>Вернуться к деталям</button>
-            </div>
-          </div>
 
-          <!-- Global task actions (shown after Начать выполнение) -->
-          <div id="globalActions" class="hidden pl-7 pr-6 py-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3 flex-wrap">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Действия по задаче</p>
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <button class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>Завершить</button>
-              <button class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="user-plus" class="w-3.5 h-3.5 text-violet-600"></i>Делегировать</button>
-              <button class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-600"></i>Отменить</button>
-              <button class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-600"></i>Вернуть на доработку</button>
+              <!-- Running state: 4 global actions, same visual weight as Start -->
+              <div id="globalActions" class="hidden items-center gap-2 flex-wrap justify-end">
+                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Завершить</button>
+                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-indigo-50 text-indigo-600 border border-indigo-200 hover:border-indigo-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="user-plus" class="w-4 h-4"></i>Делегировать</button>
+                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-amber-50 text-amber-700 border border-amber-200 hover:border-amber-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Вернуть на доработку</button>
+                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 hover:border-rose-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="x-circle" class="w-4 h-4"></i>Отменить</button>
+              </div>
+
+              <button id="stopTaskBtn" onclick="stopTask()" class="hidden text-xs font-medium text-slate-500 hover:text-slate-900 inline-flex items-center gap-1 transition-colors"><i data-lucide="arrow-left" class="w-3 h-3"></i>Вернуться к деталям</button>
             </div>
           </div>
         </div>
@@ -3047,6 +3046,7 @@
       stopBtn?.classList.remove('hidden');
       actions?.classList.remove('hidden');
       actions?.classList.add('flex');
+      stopBtn?.classList.add('inline-flex');
       switchTaskTab('execution');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -3056,6 +3056,7 @@
       const actions = document.getElementById('globalActions');
       startBtn?.classList.remove('hidden');
       stopBtn?.classList.add('hidden');
+      stopBtn?.classList.remove('inline-flex');
       actions?.classList.add('hidden');
       actions?.classList.remove('flex');
       document.getElementById('sendAnketaMenu')?.classList.add('hidden');
