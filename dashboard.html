@@ -868,9 +868,9 @@
         <div id="taskInfoContent">
 
         <!-- ── ROW 1: Candidate card (wide) + People card (narrow) ── -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5 items-start">
           <!-- Candidate -->
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 self-start">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-4">Личные данные</p>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-4 text-sm">
               <div><p class="text-[11px] text-slate-400 mb-0.5">ИИН</p><p class="font-mono text-slate-900">980408245846</p></div>
@@ -993,28 +993,48 @@
         </div>
 
         <!-- ── ROW 3: Data sheet ── -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
-          <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-sm shadow-indigo-400/30"><i data-lucide="clipboard-list" class="w-5 h-5"></i></div>
-              <div>
-                <p class="text-sm font-bold text-slate-900">Лист данных</p>
-                <p class="text-xs text-slate-500">Сведения, привязанные к процессу</p>
-              </div>
+        <div class="bg-white rounded-2xl border border-slate-200 mb-5 overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div>
+              <p class="text-sm font-bold text-slate-900">Лист данных</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Документы и данные, собранные в рамках процесса</p>
             </div>
-            <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Данные актуальны</span>
+            <span class="text-[11px] font-mono font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-md">1 / 3</span>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm border-t border-slate-100 pt-4">
-            <div class="flex justify-between items-center gap-3"><span class="text-xs text-slate-500">Должность</span><span class="font-medium text-slate-900">CPO · Разработка ПО</span></div>
-            <div class="flex justify-between items-center gap-3"><span class="text-xs text-slate-500">Тип договора</span><span class="font-medium text-slate-900">Трудовой · бессрочный</span></div>
-            <div class="flex justify-between items-center gap-3"><span class="text-xs text-slate-500">Оклад</span><span class="font-medium text-slate-900">1 200 000 ₸ / мес</span></div>
-            <div class="flex justify-between items-center gap-3"><span class="text-xs text-slate-500">Дата выхода</span><span class="font-medium text-slate-900">20 апреля 2026</span></div>
-            <div class="flex justify-between items-center gap-3"><span class="text-xs text-slate-500">Место работы</span><span class="font-medium text-slate-900">Алматы, офис 12</span></div>
-            <div class="flex justify-between items-center gap-3"><span class="text-xs text-slate-500">Подразделение</span><span class="font-medium text-slate-900">Разработка ПО</span></div>
-          </div>
-          <div class="mt-5 flex items-center justify-end gap-2">
-            <button class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i>Редактировать</button>
-            <button onclick="openAnketa()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Открыть лист данных</button>
+
+          <div class="divide-y divide-slate-100">
+            <!-- Анкета: filled -->
+            <button onclick="openAnketa()" type="button" class="w-full text-left flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-check-2" class="w-5 h-5"></i></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-900">Анкета</p>
+                <p class="text-[12px] text-slate-500 mt-0.5">Анкета кандидата · заполнена 13 ноя 2025</p>
+              </div>
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3" stroke-width="3"></i>Заполнено</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all flex-shrink-0"></i>
+            </button>
+
+            <!-- Персональные данные: missing -->
+            <button type="button" class="w-full text-left flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group">
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0"><i data-lucide="shield" class="w-5 h-5"></i></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-900">Персональные данные</p>
+                <p class="text-[12px] text-slate-500 mt-0.5">Согласие на обработку персональных данных</p>
+              </div>
+              <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full"><i data-lucide="alert-circle" class="w-3 h-3"></i>Требуется</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all flex-shrink-0"></i>
+            </button>
+
+            <!-- Заключение Adata: in progress -->
+            <button type="button" class="w-full text-left flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group">
+              <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0"><i data-lucide="search-check" class="w-5 h-5"></i></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-900">Заключение Adata</p>
+                <p class="text-[12px] text-slate-500 mt-0.5">Результат проверки службы безопасности</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>В процессе</span>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all flex-shrink-0"></i>
+            </button>
           </div>
         </div>
 
