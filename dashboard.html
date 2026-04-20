@@ -709,85 +709,27 @@
       <!-- ══ PAGE: Детали задачи / заявки ══ -->
       <div id="page-task-detail" class="page-content">
 
-        <!-- Process member drawer (right-side panel) -->
+        <!-- Process participants drawer (right-side panel) -->
         <div id="memberOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeMemberDrawer()"></div>
         <aside id="memberDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[440px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
           <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-white">
-            <div class="flex items-center gap-3 min-w-0">
-              <div id="memberAvatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-base font-bold flex items-center justify-center flex-shrink-0">ТН</div>
-              <div class="min-w-0">
-                <h3 id="memberName" class="text-base font-bold text-slate-900 truncate">Тажибаев Нурлыбек</h3>
-                <p id="memberPosition" class="text-xs text-slate-500 truncate">Главный специалист · HR</p>
-              </div>
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 mb-1">Участники процесса</p>
+              <h3 class="text-base font-bold text-slate-900">Процесс №23596</h3>
+              <p id="memberDrawerSub" class="text-xs text-slate-500 mt-0.5">7 участников</p>
             </div>
             <button onclick="closeMemberDrawer()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition-colors flex-shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
           </div>
 
-          <div class="px-6 py-4 border-b border-slate-100">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Текущий статус</p>
-            <div id="memberStatus" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>Анкета · заполнение</div>
-          </div>
-
-          <div class="flex-1 overflow-y-auto">
-            <!-- Per-member dates -->
-            <div class="px-6 py-5 border-b border-slate-100">
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Сроки исполнителя</p>
-              <dl class="grid grid-cols-1 gap-0 text-sm divide-y divide-slate-100">
-                <div class="flex items-center justify-between gap-4 py-2.5">
-                  <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="user-plus" class="w-3.5 h-3.5 text-slate-400"></i>Дата назначения</dt>
-                  <dd id="memberAssigned" class="font-medium text-slate-900">—</dd>
-                </div>
-                <div class="flex items-center justify-between gap-4 py-2.5">
-                  <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="alarm-clock" class="w-3.5 h-3.5 text-slate-400"></i>Срок исполнения</dt>
-                  <dd id="memberDeadline" class="font-semibold text-rose-600">—</dd>
-                </div>
-                <div class="flex items-center justify-between gap-4 py-2.5">
-                  <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="play-circle" class="w-3.5 h-3.5 text-slate-400"></i>Начало работы</dt>
-                  <dd id="memberStart" class="font-medium text-slate-900">—</dd>
-                </div>
-                <div class="flex items-center justify-between gap-4 py-2.5">
-                  <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="hourglass" class="w-3.5 h-3.5 text-slate-400"></i>Потрачено</dt>
-                  <dd id="memberSpent" class="font-medium text-slate-900">—</dd>
-                </div>
-              </dl>
-            </div>
-
-            <!-- Stages timeline -->
-            <div class="px-6 py-5">
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Этапы процесса</p>
-              <ol class="relative border-l-2 border-slate-100 ml-2 space-y-5 pl-6">
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-white ring-1 ring-emerald-200 flex items-center justify-center"><i data-lucide="check" class="w-2.5 h-2.5 text-white" stroke-width="4"></i></span>
-                  <p class="text-sm font-semibold text-slate-900">Создание</p>
-                  <p class="text-[11px] text-emerald-600 mt-0.5">Завершено · 10 ноя 2025</p>
-                </li>
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-indigo-600 border-4 border-white ring-1 ring-indigo-200 flex items-center justify-center"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span></span>
-                  <p class="text-sm font-bold text-indigo-700">Анкета</p>
-                  <p class="text-[11px] text-indigo-500 mt-0.5">В процессе</p>
-                </li>
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-white border-2 border-slate-200"></span>
-                  <p class="text-sm text-slate-600">СБ 1</p>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Ожидание</p>
-                </li>
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-white border-2 border-slate-200"></span>
-                  <p class="text-sm text-slate-600">Подписание</p>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Ожидание</p>
-                </li>
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-white border-2 border-slate-200"></span>
-                  <p class="text-sm text-slate-600">Закрытие</p>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Ожидание</p>
-                </li>
-              </ol>
-            </div>
+          <div class="flex-1 overflow-y-auto px-6 py-5">
+            <ol id="memberDrawerList" class="relative border-l-2 border-slate-100 ml-2 space-y-4 pl-6">
+              <!-- Populated by renderMemberDrawer() -->
+            </ol>
           </div>
 
           <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs">
-            <span class="text-slate-500">Прогресс участника</span>
-            <span class="font-semibold text-slate-900">2 / 9</span>
+            <span class="text-slate-500">Всего участников</span>
+            <span id="memberDrawerTotal" class="font-semibold text-slate-900">7</span>
           </div>
         </aside>
 
@@ -2960,29 +2902,7 @@
       'perf-5':  { initials:'КД', name:'Дмитрий Кузнецов',     position:'Администратор · Офис',        status:'Место работы · подготовка',     gradient:'from-indigo-500 to-blue-600',     assigned:'17 ноя, 12:00',     deadline:'23 апр, 18:00',     start:'—',                    spent:'—' },
       'perf-6':  { initials:'ОЛ', name:'Лейла Оспанова',       position:'HR Business Partner',         status:'Закрытие · онбординг',          gradient:'from-emerald-500 to-green-600',   assigned:'18 ноя, 14:00',     deadline:'25 апр, 18:00',     start:'—',                    spent:'—' },
     };
-    function openMemberDrawer(idOrObj) {
-      const m = typeof idOrObj === 'string' ? MEMBERS[idOrObj] : idOrObj;
-      if (!m) return;
-      const drawer = document.getElementById('memberDrawer');
-      const overlay = document.getElementById('memberOverlay');
-      if (!drawer || !overlay) return;
-      const av = document.getElementById('memberAvatar');
-      av.textContent = m.initials;
-      av.className = `w-14 h-14 rounded-full bg-gradient-to-br ${m.gradient} text-white text-base font-bold flex items-center justify-center flex-shrink-0`;
-      document.getElementById('memberName').textContent = m.name;
-      document.getElementById('memberPosition').textContent = m.position;
-      document.getElementById('memberStatus').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>${m.status}`;
-      document.getElementById('memberAssigned').textContent = m.assigned;
-      document.getElementById('memberDeadline').textContent = m.deadline;
-      document.getElementById('memberStart').textContent = m.start;
-      document.getElementById('memberSpent').textContent = m.spent;
-      overlay.classList.remove('hidden');
-      requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
-      document.body.style.overflow = 'hidden';
-      lucide.createIcons();
-    }
-
-    // Resolve a participant by name string (from process table) → drawer entry
+    // Resolve a participant by name string (from process table) → member entry
     function memberFromName(name) {
       const found = Object.values(MEMBERS).find(m => m.name === name);
       if (found) return found;
@@ -2992,9 +2912,90 @@
       const g = gradients[[...name].reduce((a,c)=>a+c.charCodeAt(0),0) % gradients.length];
       return { initials, name, position:'Участник процесса', status:'Назначен на процесс', gradient:g, assigned:'—', deadline:'—', start:'—', spent:'—' };
     }
+
+    function renderMemberDrawerList(members, highlightName) {
+      const list = document.getElementById('memberDrawerList');
+      if (!list) return;
+      list.innerHTML = members.map(m => {
+        const isActive = highlightName && m.name === highlightName;
+        const dotClass = isActive
+          ? 'bg-indigo-600 border-4 border-white ring-2 ring-indigo-200'
+          : 'bg-white border-2 border-slate-200';
+        const dotInner = isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>' : '';
+        const wrapClass = isActive
+          ? 'relative rounded-xl border border-indigo-200 bg-indigo-50/50 px-3 py-2.5 -ml-2'
+          : 'relative rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 px-3 py-2.5 -ml-2 transition-colors';
+        return `
+          <li class="relative">
+            <span class="absolute -left-[33px] top-3 w-5 h-5 rounded-full ${dotClass} flex items-center justify-center z-10">${dotInner}</span>
+            <div class="${wrapClass}">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br ${m.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${m.initials}</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold ${isActive ? 'text-indigo-700' : 'text-slate-900'}">${m.name}</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">${m.position}</p>
+                  <p class="text-[11px] font-medium ${isActive ? 'text-indigo-600' : 'text-slate-600'} mt-1 inline-flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-500 animate-pulse' : 'bg-slate-400'}"></span>${m.status}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </li>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Participants for the task-detail page (author + all perf-* in order)
+    function getTaskDetailParticipants() {
+      return ['author','perf-1','perf-2','perf-3','perf-4','perf-5','perf-6'].map(id => MEMBERS[id]).filter(Boolean);
+    }
+
+    // Called from task-detail page cards (id in MEMBERS)
+    function openMemberDrawer(idOrObj) {
+      const m = typeof idOrObj === 'string' ? MEMBERS[idOrObj] : idOrObj;
+      if (!m) return;
+      openParticipantsDrawer(getTaskDetailParticipants(), m.name);
+    }
+
+    // Called from table avatar (name string from row's members array).
+    // Fetches all members for that row so the drawer reflects THAT process.
     function openMemberByName(name, e) {
       if (e) { e.stopPropagation(); e.preventDefault(); }
-      openMemberDrawer(memberFromName(name));
+      // Find which table row owns this avatar by walking up the DOM
+      const btn = e?.currentTarget;
+      const row = btn?.closest('tr');
+      let participants = null;
+      if (row) {
+        const rowIndex = [...row.parentNode.children].indexOf(row);
+        const tbodyId = row.parentNode.id;
+        const dataset = tbodyId === 'tasksTableBody' ? TASKS_DATA
+                      : tbodyId === 'reqTableBody'   ? REQ_DATA
+                      : null;
+        if (dataset && dataset[rowIndex]?.members) {
+          participants = dataset[rowIndex].members.map(n => memberFromName(n));
+        }
+      }
+      if (!participants) participants = [memberFromName(name)];
+      openParticipantsDrawer(participants, name);
+    }
+
+    function openParticipantsDrawer(participants, highlightName) {
+      const drawer = document.getElementById('memberDrawer');
+      const overlay = document.getElementById('memberOverlay');
+      if (!drawer || !overlay) return;
+      document.getElementById('memberDrawerSub').textContent = `${participants.length} ${pluralRu(participants.length, ['участник','участника','участников'])}`;
+      document.getElementById('memberDrawerTotal').textContent = participants.length;
+      renderMemberDrawerList(participants, highlightName);
+      overlay.classList.remove('hidden');
+      requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
+      document.body.style.overflow = 'hidden';
+    }
+
+    function pluralRu(n, forms) {
+      const mod10 = n % 10, mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return forms[0];
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
+      return forms[2];
     }
     function closeMemberDrawer() {
       const drawer = document.getElementById('memberDrawer');
