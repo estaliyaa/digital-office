@@ -2660,10 +2660,12 @@
       const visible = members.slice(0, 3);
       const extra = members.length - visible.length;
       const avatars = visible.map((m, i) => {
-        const initials = m.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-        return `<div title="${m}" class="w-7 h-7 rounded-full bg-gradient-to-br ${palette[i % palette.length]} text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">${initials}</div>`;
+        const initials = m.replace(/\./g,'').split(/\s+/).filter(Boolean).map(w => w[0]).join('').slice(0,2).toUpperCase();
+        const escaped = m.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+        return `<button type="button" title="${escaped}" onclick="openMemberByName('${escaped}', event)" class="w-7 h-7 rounded-full bg-gradient-to-br ${palette[i % palette.length]} text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white hover:scale-110 hover:z-10 relative transition-transform">${initials}</button>`;
       }).join('');
-      const more = extra > 0 ? `<div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold flex items-center justify-center ring-2 ring-white">+${extra}</div>` : '';
+      const moreTitle = extra > 0 ? members.slice(3).map(n=>n.replace(/"/g,'&quot;')).join(', ') : '';
+      const more = extra > 0 ? `<button type="button" title="${moreTitle}" onclick="event.stopPropagation()" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold flex items-center justify-center ring-2 ring-white hover:bg-slate-200 relative transition-colors">+${extra}</button>` : '';
       return `<div class="flex items-center -space-x-2">${avatars}${more}</div>`;
     }
 
@@ -2941,8 +2943,9 @@
       'perf-5':  { initials:'КД', name:'Дмитрий Кузнецов',     position:'Администратор · Офис',        status:'Место работы · подготовка',     gradient:'from-indigo-500 to-blue-600',     assigned:'17 ноя, 12:00',     deadline:'23 апр, 18:00',     start:'—',                    spent:'—' },
       'perf-6':  { initials:'ОЛ', name:'Лейла Оспанова',       position:'HR Business Partner',         status:'Закрытие · онбординг',          gradient:'from-emerald-500 to-green-600',   assigned:'18 ноя, 14:00',     deadline:'25 апр, 18:00',     start:'—',                    spent:'—' },
     };
-    function openMemberDrawer(id) {
-      const m = MEMBERS[id]; if (!m) return;
+    function openMemberDrawer(idOrObj) {
+      const m = typeof idOrObj === 'string' ? MEMBERS[idOrObj] : idOrObj;
+      if (!m) return;
       const drawer = document.getElementById('memberDrawer');
       const overlay = document.getElementById('memberOverlay');
       if (!drawer || !overlay) return;
@@ -2960,6 +2963,21 @@
       requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
       document.body.style.overflow = 'hidden';
       lucide.createIcons();
+    }
+
+    // Resolve a participant by name string (from process table) → drawer entry
+    function memberFromName(name) {
+      const found = Object.values(MEMBERS).find(m => m.name === name);
+      if (found) return found;
+      const parts = name.replace(/\./g, '').split(/\s+/).filter(Boolean);
+      const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      const gradients = ['from-indigo-500 to-violet-600','from-emerald-500 to-teal-600','from-amber-500 to-orange-600','from-sky-500 to-blue-600','from-rose-500 to-pink-600','from-violet-500 to-fuchsia-600'];
+      const g = gradients[[...name].reduce((a,c)=>a+c.charCodeAt(0),0) % gradients.length];
+      return { initials, name, position:'Участник процесса', status:'Назначен на процесс', gradient:g, assigned:'—', deadline:'—', start:'—', spent:'—' };
+    }
+    function openMemberByName(name, e) {
+      if (e) { e.stopPropagation(); e.preventDefault(); }
+      openMemberDrawer(memberFromName(name));
     }
     function closeMemberDrawer() {
       const drawer = document.getElementById('memberDrawer');
