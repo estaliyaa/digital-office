@@ -491,7 +491,7 @@
           </div>
 
           <!-- Create -->
-          <button class="toolbar-btn toolbar-btn-primary ml-auto" onclick="openCreateFlow('Создать задачу')">
+          <button class="toolbar-btn toolbar-btn-primary ml-auto" onclick="navigateTo('create-task')">
             <i data-lucide="plus" class="w-4 h-4"></i>Создать задачу
           </button>
         </div>
@@ -709,6 +709,62 @@
       <!-- ══ PAGE: Детали задачи / заявки ══ -->
       <div id="page-task-detail" class="page-content">
 
+        <!-- Process member drawer (right-side panel) -->
+        <div id="memberOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeMemberDrawer()"></div>
+        <aside id="memberDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
+          <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-white">
+            <div class="flex items-center gap-3 min-w-0">
+              <div id="memberAvatar" class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-base font-bold flex items-center justify-center flex-shrink-0">Н</div>
+              <div class="min-w-0">
+                <h3 id="memberName" class="text-base font-bold text-slate-900 truncate">Тажибаев Нурлыбек</h3>
+                <p id="memberPosition" class="text-xs text-slate-500 truncate">Главный специалист · HR</p>
+              </div>
+            </div>
+            <button onclick="closeMemberDrawer()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition-colors flex-shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+
+          <div class="px-6 py-4 border-b border-slate-100">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Текущий статус</p>
+            <div id="memberStatus" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>Подписание документов · Анкета</div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto px-6 py-5">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Этапы процесса</p>
+            <ol class="relative border-l-2 border-slate-100 ml-2 space-y-5 pl-6">
+              <li class="relative">
+                <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-white ring-1 ring-emerald-200 flex items-center justify-center"><i data-lucide="check" class="w-2.5 h-2.5 text-white" stroke-width="4"></i></span>
+                <p class="text-sm font-semibold text-slate-900">Создание</p>
+                <p class="text-[11px] text-emerald-600 mt-0.5">Завершено · 10 ноя 2025</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-indigo-600 border-4 border-white ring-1 ring-indigo-200 flex items-center justify-center"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span></span>
+                <p class="text-sm font-bold text-indigo-700">Анкета</p>
+                <p class="text-[11px] text-indigo-500 mt-0.5">В процессе · подписание договора</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-white border-2 border-slate-200"></span>
+                <p class="text-sm text-slate-600">СБ 1</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Ожидание</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-white border-2 border-slate-200"></span>
+                <p class="text-sm text-slate-600">Подписание</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Ожидание</p>
+              </li>
+              <li class="relative">
+                <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-white border-2 border-slate-200"></span>
+                <p class="text-sm text-slate-600">Закрытие</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">Ожидание</p>
+              </li>
+            </ol>
+          </div>
+
+          <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs">
+            <span class="text-slate-500">Прогресс участника</span>
+            <span class="font-semibold text-slate-900">2 / 9</span>
+          </div>
+        </aside>
+
         <!-- Stages drawer (right-side panel) -->
         <div id="stagesOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeStagesDrawer()"></div>
         <aside id="stagesDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
@@ -810,8 +866,8 @@
             </div>
           </div>
 
-          <!-- Global task actions -->
-          <div class="pl-7 pr-6 py-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3 flex-wrap">
+          <!-- Global task actions (shown after Начать выполнение) -->
+          <div id="globalActions" class="hidden pl-7 pr-6 py-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3 flex-wrap">
             <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Действия по задаче</p>
             <div class="flex items-center gap-1.5 flex-wrap">
               <button class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-white hover:bg-emerald-50 border border-emerald-200 hover:border-emerald-300 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Завершить</button>
@@ -822,8 +878,25 @@
           </div>
         </div>
 
-        <!-- ═══ TASK EXECUTION block (shown after "Начать выполнение" click) ═══ -->
-        <div id="taskExecutionBlock" class="hidden relative rounded-xl border border-[#3572ef] p-5 mb-5" style="background:rgba(53,114,239,0.08)">
+        <!-- ═══ Task-level tabs ═══ -->
+        <div class="bg-white rounded-xl border border-slate-200 px-4 mb-5 flex items-center gap-1 overflow-x-auto" role="tablist">
+          <button type="button" id="taskTab-overview" onclick="switchTaskTab('overview')" class="task-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-900 border-b-2 border-indigo-600 transition-colors whitespace-nowrap">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i>Обзор
+          </button>
+          <button type="button" id="taskTab-execution" onclick="switchTaskTab('execution')" class="task-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
+            <i data-lucide="play-circle" class="w-4 h-4"></i>Выполнение
+          </button>
+          <button type="button" id="taskTab-comments" onclick="switchTaskTab('comments')" class="task-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>Комментарии
+            <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full">4</span>
+          </button>
+          <button type="button" id="taskTab-protocol" onclick="switchTaskTab('protocol')" class="task-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i>Протокол
+          </button>
+        </div>
+
+        <!-- ═══ TASK EXECUTION block (tab: Выполнение) ═══ -->
+        <div id="taskPane-execution" class="task-pane hidden"><div id="taskExecutionBlock" class="relative rounded-xl border border-[#3572ef] p-5 mb-5" style="background:rgba(53,114,239,0.08)">
           <div class="flex flex-col gap-1 mb-6">
             <h3 class="text-base font-semibold text-slate-900">Выполнение задачи</h3>
             <p class="text-sm text-slate-700">Выполните необходимые действия для завершения задачи</p>
@@ -863,15 +936,17 @@
           <!-- Submit -->
           <button onclick="stopTask()" class="inline-flex items-center justify-center h-10 px-4 rounded-lg bg-[#3572ef] hover:bg-[#2b5dcc] text-white text-sm font-semibold transition-colors">Завершить выполнение</button>
         </div>
+        </div><!-- /#taskPane-execution -->
 
-        <!-- Info content (hidden during execution) -->
+        <!-- ═══ Обзор pane ═══ -->
+        <div id="taskPane-overview" class="task-pane">
         <div id="taskInfoContent">
 
         <!-- ── ROW 1: Candidate info (full width) ── -->
         <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
           <div class="flex items-center gap-2 mb-4">
             <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Личные данные</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Основная информация</p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-5 gap-y-4 text-sm">
             <div><p class="text-[11px] text-slate-400 mb-0.5">ИИН</p><p class="font-mono text-slate-900">980408245846</p></div>
@@ -883,85 +958,95 @@
           </div>
         </div>
 
-        <!-- ── ROW 1b: Команда (full width, vertical stack) ── -->
-        <div class="bg-white rounded-2xl border border-slate-200 mb-5 p-5">
-          <!-- Автор -->
-          <div class="pb-4 mb-4 border-b border-slate-100">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Автор</p>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">Т</div>
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold text-slate-900 truncate">Қойшыбай Темірлан</p>
-                <p class="text-[11px] text-slate-500 truncate">CPO · Adata</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Исполнители -->
-          <div class="pb-4 mb-4 border-b border-slate-100">
-            <div class="flex items-center justify-between mb-3">
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Исполнители <span class="text-slate-600 ml-0.5">· 4</span></p>
-              <button title="Добавить исполнителя" class="w-6 h-6 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">Н</div>
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold text-slate-900 truncate">Тажибаев Нурлыбек</p>
-                  <p class="text-[11px] text-slate-500 truncate">Этап · Анкета</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">АК</div>
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold text-slate-900 truncate">Анатолий Кузнецов</p>
-                  <p class="text-[11px] text-slate-500 truncate">Этап · СБ 1</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">СИ</div>
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold text-slate-900 truncate">Сергей Иванов</p>
-                  <p class="text-[11px] text-slate-500 truncate">Этап · Руководитель</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">АС</div>
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold text-slate-900 truncate">Анна Смирнова</p>
-                  <p class="text-[11px] text-slate-500 truncate">Этап · Подписание</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Даты -->
-          <div>
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Даты</p>
-            <dl class="grid grid-cols-2 sm:grid-cols-4 gap-x-5 gap-y-2 text-xs">
-              <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Создано</dt><dd class="font-medium text-slate-900">10 ноя 2025</dd></div>
-              <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Назначено</dt><dd class="font-medium text-slate-900">13 ноя, 18:45</dd></div>
-              <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Срок</dt><dd class="font-semibold text-rose-600 inline-flex items-center gap-1"><i data-lucide="alarm-clock" class="w-3 h-3"></i>13 ноя, 18:45</dd></div>
-              <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Потрачено</dt><dd class="text-slate-400">—</dd></div>
-            </dl>
+        <!-- ── ROW 2: Описание задачи (full width, alone) ── -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Описание задачи</p>
+          <div class="text-sm text-slate-700 leading-relaxed space-y-3">
+            <p>Необходимо завершить процесс подписания трудового договора с кандидатом. Система автоматически сформировала договор на основе данных о должности и условиях найма.</p>
+            <p class="text-slate-900 font-medium">Требуется отправить ссылки на подписание договора двум сторонам:</p>
+            <ul class="space-y-2">
+              <li class="flex gap-3 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0"></span><span><span class="font-semibold text-slate-900">Первая сторона (кандидат)</span> — получит ссылку для подписания со своей стороны.</span></li>
+              <li class="flex gap-3 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0"></span><span><span class="font-semibold text-slate-900">Вторая сторона (представитель компании)</span> — получит ссылку для подписания от компании.</span></li>
+              <li class="flex gap-3 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0"></span><span>После получения обеих подписей договор будет автоматически заархивирован в системе документооборота.</span></li>
+            </ul>
           </div>
         </div>
 
-        <!-- ── ROW 2: Description (wide) + Files (narrow) ── -->
+        <!-- ── ROW 3: Команда (Автор + Исполнители) + Документы ── -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Описание задачи</p>
-            <div class="text-sm text-slate-700 leading-relaxed space-y-3">
-              <p>Необходимо завершить процесс подписания трудового договора с кандидатом. Система автоматически сформировала договор на основе данных о должности и условиях найма.</p>
-              <p class="text-slate-900 font-medium">Требуется отправить ссылки на подписание договора двум сторонам:</p>
-              <ul class="space-y-2">
-                <li class="flex gap-3 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0"></span><span><span class="font-semibold text-slate-900">Первая сторона (кандидат)</span> — получит ссылку для подписания со своей стороны.</span></li>
-                <li class="flex gap-3 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0"></span><span><span class="font-semibold text-slate-900">Вторая сторона (представитель компании)</span> — получит ссылку для подписания от компании.</span></li>
-                <li class="flex gap-3 items-start"><span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0"></span><span>После получения обеих подписей договор будет автоматически заархивирован в системе документооборота.</span></li>
-              </ul>
+          <!-- Команда: Автор + Исполнители -->
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5">
+            <!-- Автор -->
+            <div class="pb-4 mb-4 border-b border-slate-100">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Автор</p>
+              <button type="button" onclick="openMemberDrawer('author')" class="group flex items-center gap-3 text-left rounded-xl px-2 py-1.5 -mx-2 hover:bg-slate-50 transition-colors w-full">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">Т</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-slate-900 truncate">Қойшыбай Темірлан</p>
+                  <p class="text-[11px] text-slate-500 truncate">CPO · Adata</p>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all flex-shrink-0"></i>
+              </button>
+            </div>
+
+            <!-- Исполнители (horizontal scroll + arrows) -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Исполнители <span class="text-slate-600 ml-0.5">· 6</span></p>
+                <div class="flex items-center gap-1.5">
+                  <button id="perfArrowL" onclick="scrollPerformers(-1)" title="Прокрутить влево" class="w-7 h-7 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                  <button id="perfArrowR" onclick="scrollPerformers(1)" title="Прокрутить вправо" class="w-7 h-7 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                  <button title="Добавить исполнителя" class="w-7 h-7 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                </div>
+              </div>
+              <div id="performersScroll" class="flex gap-3 overflow-x-auto scroll-smooth" style="scrollbar-width:none">
+                <button type="button" onclick="openMemberDrawer('perf-1')" class="flex items-center gap-2.5 min-w-[220px] max-w-[240px] rounded-xl border border-slate-200 px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors text-left flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">Н</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Тажибаев Нурлыбек</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · Анкета</p>
+                  </div>
+                </button>
+                <button type="button" onclick="openMemberDrawer('perf-2')" class="flex items-center gap-2.5 min-w-[220px] max-w-[240px] rounded-xl border border-slate-200 px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors text-left flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">АК</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Анатолий Кузнецов</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · СБ 1</p>
+                  </div>
+                </button>
+                <button type="button" onclick="openMemberDrawer('perf-3')" class="flex items-center gap-2.5 min-w-[220px] max-w-[240px] rounded-xl border border-slate-200 px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors text-left flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">СИ</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Сергей Иванов</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · Руководитель</p>
+                  </div>
+                </button>
+                <button type="button" onclick="openMemberDrawer('perf-4')" class="flex items-center gap-2.5 min-w-[220px] max-w-[240px] rounded-xl border border-slate-200 px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors text-left flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">АС</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Анна Смирнова</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · Подписание</p>
+                  </div>
+                </button>
+                <button type="button" onclick="openMemberDrawer('perf-5')" class="flex items-center gap-2.5 min-w-[220px] max-w-[240px] rounded-xl border border-slate-200 px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors text-left flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">ДК</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Дмитрий Кузнецов</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · Место работы</p>
+                  </div>
+                </button>
+                <button type="button" onclick="openMemberDrawer('perf-6')" class="flex items-center gap-2.5 min-w-[220px] max-w-[240px] rounded-xl border border-slate-200 px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors text-left flex-shrink-0">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">ЛО</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Лейла Оспанова</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · Закрытие</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
+          <!-- Документы -->
           <div class="bg-white rounded-2xl border border-slate-200 p-5">
             <div class="flex items-center justify-between mb-3">
               <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Документы</p>
@@ -1330,22 +1415,12 @@
           </div>
         </div>
 
-        <!-- ── ROW 4: Activity feed (Комментарии + Протокол as filter) ── -->
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Активность</p>
-            <div class="inline-flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg">
-              <button id="td-tab-overview" class="hidden"></button>
-              <button id="td-tab-comments" class="td-tab2 td-tab2-active px-3 py-1.5 text-xs font-semibold text-slate-900 bg-white rounded-md shadow-sm border-b-2 border-indigo-600 -mb-0"><i data-lucide="message-circle" class="w-3.5 h-3.5 inline -mt-0.5 mr-1"></i>Комментарии <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full ml-1">4</span></button>
-              <button id="td-tab-protocol" class="td-tab2 px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 rounded-md border-b-2 border-transparent -mb-0"><i data-lucide="clipboard-list" class="w-3.5 h-3.5 inline -mt-0.5 mr-1"></i>Протокол</button>
-            </div>
-          </div>
+        </div><!-- /#taskInfoContent -->
+        </div><!-- /#taskPane-overview -->
 
-          <!-- Hidden overview pane (reuses existing JS; content shown elsewhere on page) -->
-          <div id="td-pane-overview" class="td-pane hidden"></div>
-
-          <!-- Comments pane -->
-          <div id="td-pane-comments" class="td-pane p-6">
+        <!-- ═══ Комментарии pane ═══ -->
+        <div id="taskPane-comments" class="task-pane hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 p-6">
             <div class="space-y-4 mb-5">
               <div class="flex gap-3">
                 <div class="w-9 h-9 rounded-full bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">Т</div>
@@ -1375,9 +1450,11 @@
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Protocol pane -->
-          <div id="td-pane-protocol" class="td-pane p-6 hidden">
+        <!-- ═══ Протокол pane ═══ -->
+        <div id="taskPane-protocol" class="task-pane hidden">
+          <div class="bg-white rounded-2xl border border-slate-200 p-6">
             <ol class="relative border-l-2 border-slate-100 ml-2 space-y-5 pl-6">
               <li class="relative">
                 <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-white ring-1 ring-emerald-200 flex items-center justify-center"><i data-lucide="plus" class="w-2.5 h-2.5 text-white" stroke-width="4"></i></span>
@@ -1398,8 +1475,128 @@
           </div>
         </div>
 
-        </div><!-- /#taskInfoContent -->
+      </div>
 
+      <!-- ══ PAGE: Создать задачу ══ -->
+      <div id="page-create-task" class="page-content">
+        <button onclick="navigateTo('tasks')" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i>Назад к процессам</button>
+
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <!-- Header -->
+          <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-sm shadow-indigo-400/40"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Создать задачу</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Заполните данные новой задачи и назначьте исполнителя</p>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form id="createTaskForm" onsubmit="submitCreateTask(event)" class="p-6 space-y-7">
+            <!-- Section 1: Basic -->
+            <div>
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="file-text" class="w-3.5 h-3.5"></i></div>
+                <h4 class="text-sm font-semibold text-slate-900">Основная информация</h4>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Название задачи <span class="text-rose-500">*</span></label>
+                  <input type="text" required placeholder="Введите название задачи" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all placeholder:text-slate-400">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Описание</label>
+                  <textarea rows="4" placeholder="Опишите, что нужно сделать..." class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all placeholder:text-slate-400 resize-none"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Тип процесса <span class="text-rose-500">*</span></label>
+                  <select required class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
+                    <option value="">Выберите тип</option>
+                    <option>Трудоустройство</option>
+                    <option>Юридическая консультация</option>
+                    <option>Согласование документов</option>
+                    <option>Приём / увольнение</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Приоритет</label>
+                  <select class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
+                    <option>Обычный</option>
+                    <option>Высокий</option>
+                    <option>Срочный</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Assignees -->
+            <div class="pt-6 border-t border-slate-100">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="users" class="w-3.5 h-3.5"></i></div>
+                <h4 class="text-sm font-semibold text-slate-900">Участники</h4>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Автор</label>
+                  <select class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
+                    <option>Қойшыбай Темірлан</option>
+                    <option>Нурланов С.М.</option>
+                    <option>Жумабаева А.Т.</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Исполнители <span class="text-rose-500">*</span></label>
+                  <select required multiple class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all h-24">
+                    <option>Тажибаев Нурлыбек</option>
+                    <option>Анатолий Кузнецов</option>
+                    <option>Сергей Иванов</option>
+                    <option>Анна Смирнова</option>
+                    <option>Лейла Оспанова</option>
+                  </select>
+                  <p class="text-[11px] text-slate-400 mt-1">Удерживайте Cmd/Ctrl для выбора нескольких</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Schedule -->
+            <div class="pt-6 border-t border-slate-100">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="calendar" class="w-3.5 h-3.5"></i></div>
+                <h4 class="text-sm font-semibold text-slate-900">Сроки</h4>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Дата начала</label>
+                  <input type="date" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1.5">Срок исполнения <span class="text-rose-500">*</span></label>
+                  <input type="date" required class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 4: Attachments -->
+            <div class="pt-6 border-t border-slate-100">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i></div>
+                <h4 class="text-sm font-semibold text-slate-900">Вложения</h4>
+              </div>
+              <label class="flex flex-col items-center justify-center gap-2 p-5 border-2 border-dashed border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/30 transition-all cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center"><i data-lucide="upload-cloud" class="w-5 h-5"></i></div>
+                <p class="text-sm font-medium text-slate-700">Перетащите файлы или <span class="text-indigo-600">нажмите для выбора</span></p>
+                <p class="text-[11px] text-slate-400">PDF, DOCX, JPG · до 10 MB</p>
+                <input type="file" multiple class="hidden">
+              </label>
+            </div>
+          </form>
+
+          <!-- Footer: Cancel + Create -->
+          <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-end gap-3">
+            <button type="button" onclick="navigateTo('tasks')" class="text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-5 py-2.5 rounded-xl transition-colors">Отменить</button>
+            <button type="submit" form="createTaskForm" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check" class="w-4 h-4"></i>Создать задачу</button>
+          </div>
+        </div>
       </div>
 
       <!-- ══ PAGE: Все процессы ══ -->
@@ -1582,7 +1779,7 @@
       statistics: 'Статистика', tasks: 'Все процессы', 'my-requests': 'Мои заявки',
       notifications: 'Уведомления', structure: 'Структура предприятия',
       registry: 'Реестр документов', processes: 'Процессы по отделам', profile: 'Личный профиль',
-      'task-detail': 'Детали задачи'
+      'task-detail': 'Детали задачи', 'create-task': 'Создать задачу'
     };
 
     // ── Render header/user info ──
@@ -1966,9 +2163,10 @@
       // Reset task-detail view to info mode whenever we navigate
       if (typeof stopTask === 'function') stopTask();
 
-      // Highlight active nav
+      // Highlight active nav (map detail/create pages to parent sidebar item)
+      const navKey = (pageId === 'task-detail' || pageId === 'create-task') ? 'tasks' : pageId;
       document.querySelectorAll('.nav-item').forEach(btn => {
-        if (btn.dataset.page === pageId) {
+        if (btn.dataset.page === navKey) {
           btn.classList.add('bg-indigo-50', 'text-indigo-700');
           btn.classList.remove('text-slate-600', 'hover:bg-slate-50');
         } else {
@@ -2687,6 +2885,67 @@
       if (m && !m.classList.contains('hidden') && e.key === 'Escape') closeAnketa();
     });
 
+    // ── Process member drawer ──
+    const MEMBERS = {
+      'author':  { initials:'Т',  name:'Қойшыбай Темірлан',   position:'CPO · Adata',                 status:'Автор · создание заявки',            gradient:'from-emerald-500 to-teal-600' },
+      'perf-1':  { initials:'Н',  name:'Тажибаев Нурлыбек',    position:'Главный специалист · HR',     status:'Подписание документов · Анкета',     gradient:'from-amber-500 to-orange-600' },
+      'perf-2':  { initials:'АК', name:'Анатолий Кузнецов',    position:'Руководитель · СБ',            status:'Проверка кандидата · СБ 1',          gradient:'from-sky-500 to-blue-600' },
+      'perf-3':  { initials:'СИ', name:'Сергей Иванов',         position:'Руководитель отдела',          status:'Согласование · Руководитель',         gradient:'from-violet-500 to-fuchsia-600' },
+      'perf-4':  { initials:'АС', name:'Анна Смирнова',         position:'Юрист · Договоры',             status:'Подписание трудового договора',       gradient:'from-rose-500 to-pink-600' },
+      'perf-5':  { initials:'ДК', name:'Дмитрий Кузнецов',      position:'Администратор · Офис',         status:'Подготовка рабочего места',           gradient:'from-indigo-500 to-blue-600' },
+      'perf-6':  { initials:'ЛО', name:'Лейла Оспанова',        position:'HR Business Partner',          status:'Закрытие процесса онбординга',        gradient:'from-emerald-500 to-green-600' },
+    };
+    function openMemberDrawer(id) {
+      const m = MEMBERS[id]; if (!m) return;
+      const drawer = document.getElementById('memberDrawer');
+      const overlay = document.getElementById('memberOverlay');
+      if (!drawer || !overlay) return;
+      const av = document.getElementById('memberAvatar');
+      av.textContent = m.initials;
+      av.className = `w-12 h-12 rounded-full bg-gradient-to-br ${m.gradient} text-white text-base font-bold flex items-center justify-center flex-shrink-0`;
+      document.getElementById('memberName').textContent = m.name;
+      document.getElementById('memberPosition').textContent = m.position;
+      document.getElementById('memberStatus').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>${m.status}`;
+      overlay.classList.remove('hidden');
+      requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+    function closeMemberDrawer() {
+      const drawer = document.getElementById('memberDrawer');
+      const overlay = document.getElementById('memberOverlay');
+      if (!drawer || !overlay) return;
+      drawer.classList.add('translate-x-full');
+      setTimeout(() => { overlay.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
+    }
+    document.addEventListener('keydown', e => {
+      const d = document.getElementById('memberDrawer');
+      if (d && !d.classList.contains('translate-x-full') && e.key === 'Escape') closeMemberDrawer();
+    });
+
+    // ── Horizontal scroll for performers row ──
+    function scrollPerformers(dir) {
+      const el = document.getElementById('performersScroll');
+      if (!el) return;
+      el.scrollBy({ left: dir * 260, behavior: 'smooth' });
+    }
+
+    // ── Task-level tabs (Обзор / Выполнение / Комментарии / Протокол) ──
+    function switchTaskTab(which) {
+      document.querySelectorAll('.task-pane').forEach(p => p.classList.add('hidden'));
+      document.getElementById('taskPane-' + which)?.classList.remove('hidden');
+      document.querySelectorAll('.task-tab').forEach(t => {
+        t.classList.remove('text-slate-900', 'border-indigo-600');
+        t.classList.add('text-slate-500', 'border-transparent');
+      });
+      const active = document.getElementById('taskTab-' + which);
+      if (active) {
+        active.classList.add('text-slate-900', 'border-indigo-600');
+        active.classList.remove('text-slate-500', 'border-transparent');
+      }
+      lucide.createIcons();
+    }
+
     // ── Candidate tabs (Личные / Трудовая) ──
     function switchCandTab(which) {
       document.querySelectorAll('.cand-pane').forEach(p => p.classList.add('hidden'));
@@ -2703,33 +2962,36 @@
       lucide.createIcons();
     }
 
+    // ── Create task form ──
+    function submitCreateTask(e) {
+      e.preventDefault();
+      showAlert('Задача успешно создана', 'success');
+      e.target.reset();
+      navigateTo('tasks');
+    }
+
     // ── Task execution ──
     function startTask() {
-      const exec = document.getElementById('taskExecutionBlock');
-      const info = document.getElementById('taskInfoContent');
       const startBtn = document.getElementById('startTaskBtn');
       const stopBtn = document.getElementById('stopTaskBtn');
-      if (!exec || !info) return;
-      exec.classList.remove('hidden');
-      info.classList.add('hidden');
+      const actions = document.getElementById('globalActions');
       startBtn?.classList.add('hidden');
       stopBtn?.classList.remove('hidden');
-      lucide.createIcons();
+      actions?.classList.remove('hidden');
+      actions?.classList.add('flex');
+      switchTaskTab('execution');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function stopTask() {
-      const exec = document.getElementById('taskExecutionBlock');
-      const info = document.getElementById('taskInfoContent');
       const startBtn = document.getElementById('startTaskBtn');
       const stopBtn = document.getElementById('stopTaskBtn');
-      if (!exec || !info) return;
-      exec.classList.add('hidden');
-      info.classList.remove('hidden');
+      const actions = document.getElementById('globalActions');
       startBtn?.classList.remove('hidden');
       stopBtn?.classList.add('hidden');
-      const menu = document.getElementById('sendAnketaMenu');
-      menu?.classList.add('hidden');
-      lucide.createIcons();
+      actions?.classList.add('hidden');
+      actions?.classList.remove('flex');
+      document.getElementById('sendAnketaMenu')?.classList.add('hidden');
+      switchTaskTab('overview');
     }
     function toggleSendAnketaMenu(e) {
       e.stopPropagation();
