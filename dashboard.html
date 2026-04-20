@@ -867,46 +867,51 @@
         <!-- Info content (hidden during execution) -->
         <div id="taskInfoContent">
 
-        <!-- ── ROW 1: Candidate card (wide) + People card (narrow) ── -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-          <!-- Candidate: stacked dense rows — fills column height naturally -->
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 flex flex-col">
+        <!-- ── ROW 1: Candidate info (full width) ── -->
+        <div class="bg-white rounded-2xl border border-slate-200 mb-5 overflow-hidden">
+          <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
             <!-- Личные данные -->
-            <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Личные данные</p>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Личные данные</p>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-4 text-sm">
+                <div><p class="text-[11px] text-slate-400 mb-0.5">ИИН</p><p class="font-mono text-slate-900">980408245846</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Дата рождения</p><p class="text-slate-900">08.04.1998</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Гражданство</p><p class="text-slate-900">Казахстан</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Телефон</p><p class="text-slate-900">+7 (777) 897-98-89</p></div>
+                <div class="min-w-0"><p class="text-[11px] text-slate-400 mb-0.5">E-mail</p><p class="text-indigo-600 truncate">ramilarman@gmail.com</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Город</p><p class="text-slate-900">Алматы</p></div>
+              </div>
             </div>
-            <dl class="text-sm divide-y divide-slate-100">
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">ИИН</dt><dd class="font-mono text-slate-900 text-right truncate">980408245846</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Дата рождения</dt><dd class="text-slate-900 text-right truncate">08.04.1998</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Гражданство</dt><dd class="text-slate-900 text-right truncate">Казахстан</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Телефон</dt><dd class="text-slate-900 text-right truncate">+7 (777) 897-98-89</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">E-mail</dt><dd class="text-indigo-600 text-right truncate">ramilarman@gmail.com</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Город</dt><dd class="text-slate-900 text-right truncate">Алматы</dd></div>
-            </dl>
 
             <!-- Трудовая информация -->
-            <div class="flex items-center gap-2 mt-5 mb-2">
-              <i data-lucide="briefcase" class="w-3.5 h-3.5 text-slate-400"></i>
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Трудовая информация</p>
+            <div class="p-6">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="briefcase" class="w-4 h-4 text-slate-400"></i>
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Трудовая информация</p>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-4 text-sm">
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Компания</p><p class="text-slate-900 font-medium">Adata</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Отдел</p><p class="text-slate-900">Разработка</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Подразделение</p><p class="text-slate-900">Разработка ПО</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Должность</p><p class="text-slate-900 font-medium">CPO</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Тип договора</p><p class="text-slate-900">Трудовой · бессрочный</p></div>
+                <div><p class="text-[11px] text-slate-400 mb-0.5">Дата выхода</p><p class="text-slate-900">20 апреля 2026</p></div>
+              </div>
             </div>
-            <dl class="text-sm divide-y divide-slate-100">
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Компания</dt><dd class="font-medium text-slate-900 text-right truncate">Adata</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Отдел</dt><dd class="text-slate-900 text-right truncate">Разработка</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Подразделение</dt><dd class="text-slate-900 text-right truncate">Разработка ПО</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Должность</dt><dd class="font-medium text-slate-900 text-right truncate">CPO</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Тип договора</dt><dd class="text-slate-900 text-right truncate">Трудовой · бессрочный</dd></div>
-              <div class="flex justify-between items-center gap-4 py-2.5"><dt class="text-xs text-slate-500">Дата выхода</dt><dd class="text-slate-900 text-right truncate">20 апреля 2026</dd></div>
-            </dl>
           </div>
+        </div>
 
-          <!-- People + Dates -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5">
-            <!-- Author (single) -->
-            <div class="mb-4">
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Автор</p>
+        <!-- ── ROW 1b: Команда (full width, horizontal) ── -->
+        <div class="bg-white rounded-2xl border border-slate-200 mb-5 overflow-hidden">
+          <div class="grid grid-cols-1 md:grid-cols-[260px_1fr_220px] divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            <!-- Автор -->
+            <div class="p-5">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Автор</p>
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">Т</div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">Т</div>
                 <div class="min-w-0 flex-1">
                   <p class="text-sm font-semibold text-slate-900 truncate">Қойшыбай Темірлан</p>
                   <p class="text-[11px] text-slate-500 truncate">CPO · Adata</p>
@@ -914,35 +919,35 @@
               </div>
             </div>
 
-            <!-- Performers (multiple) -->
-            <div class="pt-4 border-t border-slate-100">
-              <div class="flex items-center justify-between mb-2">
+            <!-- Исполнители -->
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-3">
                 <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Исполнители <span class="text-slate-600 ml-0.5">· 4</span></p>
                 <button title="Добавить исполнителя" class="w-6 h-6 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
               </div>
-              <div class="space-y-2">
-                <div class="flex items-center gap-2.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                <div class="flex items-center gap-2.5 min-w-0">
                   <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">Н</div>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-slate-900 truncate">Тажибаев Нурлыбек</p>
-                    <p class="text-[11px] text-slate-500 truncate">Текущий этап · Анкета</p>
+                    <p class="text-[11px] text-slate-500 truncate">Этап · Анкета</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 min-w-0">
                   <div class="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">АК</div>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-slate-900 truncate">Анатолий Кузнецов</p>
                     <p class="text-[11px] text-slate-500 truncate">Этап · СБ 1</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 min-w-0">
                   <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">СИ</div>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-slate-900 truncate">Сергей Иванов</p>
                     <p class="text-[11px] text-slate-500 truncate">Этап · Руководитель</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 min-w-0">
                   <div class="w-8 h-8 rounded-full bg-gradient-to-br from-rose-500 to-pink-600 text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">АС</div>
                   <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-slate-900 truncate">Анна Смирнова</p>
@@ -952,11 +957,15 @@
               </div>
             </div>
 
-            <div class="pt-4 mt-4 border-t border-slate-100 space-y-2 text-xs">
-              <div class="flex items-center justify-between"><span class="text-slate-500">Создано</span><span class="font-medium text-slate-900">10 ноя 2025</span></div>
-              <div class="flex items-center justify-between"><span class="text-slate-500">Назначено</span><span class="font-medium text-slate-900">13 ноя, 18:45</span></div>
-              <div class="flex items-center justify-between"><span class="text-slate-500">Срок</span><span class="font-semibold text-rose-600 inline-flex items-center gap-1"><i data-lucide="alarm-clock" class="w-3 h-3"></i>13 ноя, 18:45</span></div>
-              <div class="flex items-center justify-between"><span class="text-slate-500">Потрачено</span><span class="text-slate-400">—</span></div>
+            <!-- Даты -->
+            <div class="p-5">
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Даты</p>
+              <dl class="space-y-2 text-xs">
+                <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Создано</dt><dd class="font-medium text-slate-900">10 ноя 2025</dd></div>
+                <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Назначено</dt><dd class="font-medium text-slate-900">13 ноя, 18:45</dd></div>
+                <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Срок</dt><dd class="font-semibold text-rose-600 inline-flex items-center gap-1"><i data-lucide="alarm-clock" class="w-3 h-3"></i>13 ноя, 18:45</dd></div>
+                <div class="flex items-center justify-between gap-3"><dt class="text-slate-500">Потрачено</dt><dd class="text-slate-400">—</dd></div>
+              </dl>
             </div>
           </div>
         </div>
