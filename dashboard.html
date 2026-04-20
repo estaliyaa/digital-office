@@ -869,28 +869,40 @@
 
         <!-- ── ROW 1: Candidate card (wide) + People card (narrow) ── -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5 items-start">
-          <!-- Candidate -->
-          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 self-start">
-            <!-- Личные данные -->
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-4">Личные данные</p>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-4 text-sm">
-              <div><p class="text-[11px] text-slate-400 mb-0.5">ИИН</p><p class="font-mono text-slate-900">980408245846</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Дата рождения</p><p class="text-slate-900">08.04.1998</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Гражданство</p><p class="text-slate-900">Казахстан</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Телефон</p><p class="text-slate-900">+7 (777) 897-98-89</p></div>
-              <div class="min-w-0"><p class="text-[11px] text-slate-400 mb-0.5">E-mail</p><p class="text-indigo-600 truncate">ramilarman@gmail.com</p></div>
-              <div class="min-w-0"><p class="text-[11px] text-slate-400 mb-0.5">Город</p><p class="text-slate-900 truncate">Алматы</p></div>
-            </div>
+          <!-- Candidate: compact side-by-side definition lists -->
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 self-start overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+              <!-- Личные данные -->
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-3">
+                  <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Личные данные</p>
+                </div>
+                <dl class="text-sm divide-y divide-slate-50">
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">ИИН</dt><dd class="font-mono text-slate-900 text-right truncate">980408245846</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Дата рождения</dt><dd class="text-slate-900 text-right truncate">08.04.1998</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Гражданство</dt><dd class="text-slate-900 text-right truncate">Казахстан</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Телефон</dt><dd class="text-slate-900 text-right truncate">+7 (777) 897-98-89</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">E-mail</dt><dd class="text-indigo-600 text-right truncate min-w-0" title="ramilarman@gmail.com">ramilarman@gmail.com</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Город</dt><dd class="text-slate-900 text-right truncate">Алматы</dd></div>
+                </dl>
+              </div>
 
-            <!-- Трудовая информация -->
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mt-6 mb-4 pt-5 border-t border-slate-100">Трудовая информация</p>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-4 text-sm">
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Компания</p><p class="text-slate-900 font-medium">Adata</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Отдел</p><p class="text-slate-900">Разработка</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Подразделение</p><p class="text-slate-900">Разработка ПО</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Должность</p><p class="text-slate-900 font-medium">CPO</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Тип договора</p><p class="text-slate-900">Трудовой · бессрочный</p></div>
-              <div><p class="text-[11px] text-slate-400 mb-0.5">Дата выхода</p><p class="text-slate-900">20 апреля 2026</p></div>
+              <!-- Трудовая информация -->
+              <div class="p-5">
+                <div class="flex items-center gap-2 mb-3">
+                  <i data-lucide="briefcase" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Трудовая информация</p>
+                </div>
+                <dl class="text-sm divide-y divide-slate-50">
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Компания</dt><dd class="font-medium text-slate-900 text-right truncate">Adata</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Отдел</dt><dd class="text-slate-900 text-right truncate">Разработка</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Подразделение</dt><dd class="text-slate-900 text-right truncate">Разработка ПО</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Должность</dt><dd class="font-medium text-slate-900 text-right truncate">CPO</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Тип договора</dt><dd class="text-slate-900 text-right truncate">Трудовой · бессрочный</dd></div>
+                  <div class="flex justify-between items-center gap-4 py-2"><dt class="text-xs text-slate-500 flex-shrink-0">Дата выхода</dt><dd class="text-slate-900 text-right truncate">20 апреля 2026</dd></div>
+                </dl>
+              </div>
             </div>
           </div>
 
