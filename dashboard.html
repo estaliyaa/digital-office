@@ -2234,6 +2234,15 @@
       btn.addEventListener('click', () => navigateTo(btn.dataset.page));
     });
 
+    // Move fixed-position drawers out of page-content containers so they
+    // remain functional on any page (otherwise parent display:none hides them).
+    ['memberOverlay','memberDrawer','stagesOverlay','stagesDrawer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.parentElement && el.parentElement !== document.body) {
+        document.body.appendChild(el);
+      }
+    });
+
     // Init on statistics
     navigateTo('statistics');
 
