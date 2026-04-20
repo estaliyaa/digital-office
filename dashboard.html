@@ -709,27 +709,45 @@
       <!-- ══ PAGE: Детали задачи / заявки ══ -->
       <div id="page-task-detail" class="page-content">
 
-        <!-- Process participants drawer (right-side panel) -->
+        <!-- Process member drawer (right-side panel) -->
         <div id="memberOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeMemberDrawer()"></div>
-        <aside id="memberDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[440px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
+        <aside id="memberDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
           <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-white">
-            <div>
-              <p class="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 mb-1">Участники процесса</p>
-              <h3 class="text-base font-bold text-slate-900">Процесс №23596</h3>
-              <p id="memberDrawerSub" class="text-xs text-slate-500 mt-0.5">7 участников</p>
+            <div class="flex items-center gap-3 min-w-0">
+              <div id="memberAvatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-base font-bold flex items-center justify-center flex-shrink-0">ТН</div>
+              <div class="min-w-0">
+                <h3 id="memberName" class="text-base font-bold text-slate-900 truncate">Тажибаев Нурлыбек</h3>
+                <p id="memberPosition" class="text-xs text-slate-500 truncate">Главный специалист · HR</p>
+              </div>
             </div>
             <button onclick="closeMemberDrawer()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition-colors flex-shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
           </div>
 
-          <div class="flex-1 overflow-y-auto px-6 py-5">
-            <ol id="memberDrawerList" class="relative border-l-2 border-slate-100 ml-2 space-y-4 pl-6">
-              <!-- Populated by renderMemberDrawer() -->
-            </ol>
+          <div class="px-6 py-4 border-b border-slate-100">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Текущий статус</p>
+            <div id="memberStatus" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>Анкета · заполнение</div>
           </div>
 
-          <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs">
-            <span class="text-slate-500">Всего участников</span>
-            <span id="memberDrawerTotal" class="font-semibold text-slate-900">7</span>
+          <div class="flex-1 overflow-y-auto px-6 py-5">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Сроки исполнителя</p>
+            <dl class="text-sm divide-y divide-slate-100">
+              <div class="flex items-center justify-between gap-4 py-3">
+                <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="user-plus" class="w-3.5 h-3.5 text-slate-400"></i>Дата назначения</dt>
+                <dd id="memberAssigned" class="font-medium text-slate-900">—</dd>
+              </div>
+              <div class="flex items-center justify-between gap-4 py-3">
+                <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="alarm-clock" class="w-3.5 h-3.5 text-slate-400"></i>Срок исполнения</dt>
+                <dd id="memberDeadline" class="font-semibold text-rose-600">—</dd>
+              </div>
+              <div class="flex items-center justify-between gap-4 py-3">
+                <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="play-circle" class="w-3.5 h-3.5 text-slate-400"></i>Начало работы</dt>
+                <dd id="memberStart" class="font-medium text-slate-900">—</dd>
+              </div>
+              <div class="flex items-center justify-between gap-4 py-3">
+                <dt class="inline-flex items-center gap-2 text-xs text-slate-500"><i data-lucide="hourglass" class="w-3.5 h-3.5 text-slate-400"></i>Потрачено</dt>
+                <dd id="memberSpent" class="font-medium text-slate-900">—</dd>
+              </div>
+            </dl>
           </div>
         </aside>
 
@@ -844,11 +862,17 @@
             <div class="flex items-center gap-2 flex-wrap justify-end">
               <button id="startTaskBtn" onclick="startTask()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Начать выполнение</button>
 
-              <div id="globalActions" class="hidden items-center gap-2 flex-wrap justify-end">
+              <div id="globalActions" class="hidden items-center gap-2 justify-end">
                 <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Завершить</button>
-                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-indigo-50 text-indigo-600 border border-indigo-200 hover:border-indigo-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="user-plus" class="w-4 h-4"></i>Делегировать</button>
-                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-amber-50 text-amber-700 border border-amber-200 hover:border-amber-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>Вернуть на доработку</button>
-                <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 hover:border-rose-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="x-circle" class="w-4 h-4"></i>Отменить</button>
+                <!-- More selector -->
+                <div class="relative" id="moreActionsWrap">
+                  <button id="moreActionsBtn" onclick="toggleMoreActions(event)" type="button" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i>Ещё<i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                  <div id="moreActionsMenu" class="hidden absolute right-0 top-full mt-2 z-30 w-[240px] bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.12)] p-1.5 flex flex-col gap-0.5">
+                    <button class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-800 text-left transition-colors"><i data-lucide="user-plus" class="w-4 h-4 text-indigo-600"></i>Делегировать</button>
+                    <button class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-slate-50 text-sm font-medium text-slate-800 text-left transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-600"></i>Вернуть на доработку</button>
+                    <button class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-rose-50 text-sm font-medium text-rose-700 text-left transition-colors"><i data-lucide="x-circle" class="w-4 h-4 text-rose-600"></i>Отменить задачу</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -867,12 +891,55 @@
             <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full">4</span>
           </button>
           <button type="button" id="taskTab-protocol" onclick="switchTaskTab('protocol')" class="task-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
-            <i data-lucide="clipboard-list" class="w-4 h-4"></i>Протокол
+            <i data-lucide="history" class="w-4 h-4"></i>История
           </button>
         </div>
 
         <!-- ═══ TASK EXECUTION block (tab: Выполнение) ═══ -->
-        <div id="taskPane-execution" class="task-pane hidden"><div id="taskExecutionBlock" class="relative rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5 mb-5">
+        <div id="taskPane-execution" class="task-pane hidden">
+
+          <!-- Landing (illustration + Start run) -->
+          <div id="taskExecLanding" class="bg-white rounded-2xl border border-slate-200 p-10 mb-5 flex flex-col items-center justify-center text-center">
+            <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[300px] h-auto mb-6" aria-hidden="true">
+              <defs>
+                <linearGradient id="launchBg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#eef2ff"/>
+                  <stop offset="100%" stop-color="#ede9fe"/>
+                </linearGradient>
+                <linearGradient id="launchBtn" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6366f1"/>
+                  <stop offset="100%" stop-color="#4f46e5"/>
+                </linearGradient>
+              </defs>
+              <!-- Background blob -->
+              <ellipse cx="120" cy="150" rx="90" ry="12" fill="#e2e8f0" opacity="0.6"/>
+              <!-- Circle backdrop -->
+              <circle cx="120" cy="82" r="68" fill="url(#launchBg)"/>
+              <!-- Rocket -->
+              <g transform="translate(120 82)">
+                <path d="M0 -42 C12 -32 20 -14 20 4 L-20 4 C-20 -14 -12 -32 0 -42 Z" fill="url(#launchBtn)"/>
+                <circle cx="0" cy="-16" r="8" fill="#fff"/>
+                <circle cx="0" cy="-16" r="4" fill="#6366f1"/>
+                <path d="M-20 4 L-32 18 L-20 14 Z" fill="#c7d2fe"/>
+                <path d="M20 4 L32 18 L20 14 Z" fill="#c7d2fe"/>
+                <!-- Flame -->
+                <path d="M-10 6 Q0 32 10 6 L6 6 Q3 20 0 24 Q-3 20 -6 6 Z" fill="#f59e0b" opacity="0.9"/>
+                <path d="M-5 6 Q0 22 5 6 Z" fill="#fbbf24"/>
+              </g>
+              <!-- Stars -->
+              <circle cx="40" cy="40" r="2" fill="#a5b4fc"/>
+              <circle cx="205" cy="50" r="2.5" fill="#c4b5fd"/>
+              <circle cx="200" cy="110" r="1.5" fill="#a5b4fc"/>
+              <circle cx="35" cy="100" r="1.5" fill="#c4b5fd"/>
+              <circle cx="180" cy="30" r="1" fill="#a5b4fc"/>
+            </svg>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Готовы приступить к задаче?</h3>
+            <p class="text-sm text-slate-500 max-w-sm mb-6">Нажмите «Запустить выполнение», чтобы открыть форму анкеты и приступить к работе.</p>
+            <button onclick="revealExecForm()" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Запустить выполнение</button>
+          </div>
+
+          <!-- Actual execution form (revealed after click) -->
+          <div id="taskExecForm" class="hidden"><div id="taskExecutionBlock" class="relative rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5 mb-5">
           <div class="flex flex-col gap-1 mb-6">
             <h3 class="text-base font-semibold text-slate-900">Выполнение задачи</h3>
             <p class="text-sm text-slate-700">Выполните необходимые действия для завершения задачи</p>
@@ -912,6 +979,7 @@
           <!-- Submit -->
           <button onclick="stopTask()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check" class="w-4 h-4"></i>Завершить выполнение</button>
         </div>
+          </div><!-- /#taskExecForm -->
         </div><!-- /#taskPane-execution -->
 
         <!-- ═══ Обзор pane ═══ -->
@@ -971,15 +1039,12 @@
                 <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Ваша задача</p>
                 <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded-md">Вы</span>
               </div>
-              <button type="button" onclick="openMemberDrawer('perf-1')" class="group flex items-start gap-3 text-left rounded-xl border border-indigo-100 bg-indigo-50/40 hover:bg-indigo-50/70 hover:border-indigo-200 transition-colors w-full p-3">
+              <div class="flex items-start gap-3 rounded-xl border border-indigo-100 bg-indigo-50/40 w-full p-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">ТН</div>
                 <div class="min-w-0 flex-1">
-                  <div class="flex items-start justify-between gap-2 mb-1">
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-slate-900 truncate">Тажибаев Нурлыбек</p>
-                      <p class="text-[11px] text-slate-500 truncate">Главный специалист · HR · Этап · Анкета</p>
-                    </div>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-0.5"></i>
+                  <div class="mb-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">Тажибаев Нурлыбек</p>
+                    <p class="text-[11px] text-slate-500 truncate">Главный специалист · HR · Этап · Анкета</p>
                   </div>
                   <dl class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1.5 mt-3 pt-3 border-t border-indigo-100 text-[11px]">
                     <div><dt class="text-slate-500 mb-0.5">Назначено</dt><dd class="font-medium text-slate-900">13 ноя, 18:45</dd></div>
@@ -988,7 +1053,7 @@
                     <div><dt class="text-slate-500 mb-0.5">Потрачено</dt><dd class="font-medium text-slate-900">2ч 14м</dd></div>
                   </dl>
                 </div>
-              </button>
+              </div>
             </div>
 
             <!-- Other performers (horizontal scroll + arrows) -->
@@ -998,7 +1063,6 @@
                 <div class="flex items-center gap-1.5">
                   <button id="perfArrowL" onclick="scrollPerformers(-1)" title="Прокрутить влево" class="w-7 h-7 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
                   <button id="perfArrowR" onclick="scrollPerformers(1)" title="Прокрутить вправо" class="w-7 h-7 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
-                  <button title="Добавить исполнителя" class="w-7 h-7 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition-colors"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
                 </div>
               </div>
               <div id="performersScroll" class="flex gap-3 overflow-x-auto scroll-smooth" style="scrollbar-width:none">
@@ -2913,89 +2977,31 @@
       return { initials, name, position:'Участник процесса', status:'Назначен на процесс', gradient:g, assigned:'—', deadline:'—', start:'—', spent:'—' };
     }
 
-    function renderMemberDrawerList(members, highlightName) {
-      const list = document.getElementById('memberDrawerList');
-      if (!list) return;
-      list.innerHTML = members.map(m => {
-        const isActive = highlightName && m.name === highlightName;
-        const dotClass = isActive
-          ? 'bg-indigo-600 border-4 border-white ring-2 ring-indigo-200'
-          : 'bg-white border-2 border-slate-200';
-        const dotInner = isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>' : '';
-        const wrapClass = isActive
-          ? 'relative rounded-xl border border-indigo-200 bg-indigo-50/50 px-3 py-2.5 -ml-2'
-          : 'relative rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 px-3 py-2.5 -ml-2 transition-colors';
-        return `
-          <li class="relative">
-            <span class="absolute -left-[33px] top-3 w-5 h-5 rounded-full ${dotClass} flex items-center justify-center z-10">${dotInner}</span>
-            <div class="${wrapClass}">
-              <div class="flex items-start gap-3">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br ${m.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${m.initials}</div>
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold ${isActive ? 'text-indigo-700' : 'text-slate-900'}">${m.name}</p>
-                  <p class="text-[11px] text-slate-500 mt-0.5">${m.position}</p>
-                  <p class="text-[11px] font-medium ${isActive ? 'text-indigo-600' : 'text-slate-600'} mt-1 inline-flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-500 animate-pulse' : 'bg-slate-400'}"></span>${m.status}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </li>`;
-      }).join('');
-      lucide.createIcons();
-    }
-
-    // Participants for the task-detail page (author + all perf-* in order)
-    function getTaskDetailParticipants() {
-      return ['author','perf-1','perf-2','perf-3','perf-4','perf-5','perf-6'].map(id => MEMBERS[id]).filter(Boolean);
-    }
-
-    // Called from task-detail page cards (id in MEMBERS)
     function openMemberDrawer(idOrObj) {
       const m = typeof idOrObj === 'string' ? MEMBERS[idOrObj] : idOrObj;
       if (!m) return;
-      openParticipantsDrawer(getTaskDetailParticipants(), m.name);
-    }
-
-    // Called from table avatar (name string from row's members array).
-    // Fetches all members for that row so the drawer reflects THAT process.
-    function openMemberByName(name, e) {
-      if (e) { e.stopPropagation(); e.preventDefault(); }
-      // Find which table row owns this avatar by walking up the DOM
-      const btn = e?.currentTarget;
-      const row = btn?.closest('tr');
-      let participants = null;
-      if (row) {
-        const rowIndex = [...row.parentNode.children].indexOf(row);
-        const tbodyId = row.parentNode.id;
-        const dataset = tbodyId === 'tasksTableBody' ? TASKS_DATA
-                      : tbodyId === 'reqTableBody'   ? REQ_DATA
-                      : null;
-        if (dataset && dataset[rowIndex]?.members) {
-          participants = dataset[rowIndex].members.map(n => memberFromName(n));
-        }
-      }
-      if (!participants) participants = [memberFromName(name)];
-      openParticipantsDrawer(participants, name);
-    }
-
-    function openParticipantsDrawer(participants, highlightName) {
       const drawer = document.getElementById('memberDrawer');
       const overlay = document.getElementById('memberOverlay');
       if (!drawer || !overlay) return;
-      document.getElementById('memberDrawerSub').textContent = `${participants.length} ${pluralRu(participants.length, ['участник','участника','участников'])}`;
-      document.getElementById('memberDrawerTotal').textContent = participants.length;
-      renderMemberDrawerList(participants, highlightName);
+      const av = document.getElementById('memberAvatar');
+      av.textContent = m.initials;
+      av.className = `w-14 h-14 rounded-full bg-gradient-to-br ${m.gradient} text-white text-base font-bold flex items-center justify-center flex-shrink-0`;
+      document.getElementById('memberName').textContent = m.name;
+      document.getElementById('memberPosition').textContent = m.position;
+      document.getElementById('memberStatus').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>${m.status}`;
+      document.getElementById('memberAssigned').textContent = m.assigned;
+      document.getElementById('memberDeadline').textContent = m.deadline;
+      document.getElementById('memberStart').textContent = m.start;
+      document.getElementById('memberSpent').textContent = m.spent;
       overlay.classList.remove('hidden');
       requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
       document.body.style.overflow = 'hidden';
+      lucide.createIcons();
     }
 
-    function pluralRu(n, forms) {
-      const mod10 = n % 10, mod100 = n % 100;
-      if (mod10 === 1 && mod100 !== 11) return forms[0];
-      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
-      return forms[2];
+    function openMemberByName(name, e) {
+      if (e) { e.stopPropagation(); e.preventDefault(); }
+      openMemberDrawer(memberFromName(name));
     }
     function closeMemberDrawer() {
       const drawer = document.getElementById('memberDrawer');
@@ -3093,6 +3099,8 @@
       actions?.classList.add('hidden');
       actions?.classList.remove('flex');
       document.getElementById('sendAnketaMenu')?.classList.add('hidden');
+      document.getElementById('moreActionsMenu')?.classList.add('hidden');
+      resetExecLanding();
       setTaskState(false);
       switchTaskTab('overview');
     }
@@ -3105,7 +3113,28 @@
       if (wrap && !wrap.contains(e.target)) {
         document.getElementById('sendAnketaMenu')?.classList.add('hidden');
       }
+      const mwrap = document.getElementById('moreActionsWrap');
+      if (mwrap && !mwrap.contains(e.target)) {
+        document.getElementById('moreActionsMenu')?.classList.add('hidden');
+      }
     });
+
+    // Reveal the actual execution form (from the landing state)
+    function revealExecForm() {
+      document.getElementById('taskExecLanding')?.classList.add('hidden');
+      document.getElementById('taskExecForm')?.classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function resetExecLanding() {
+      document.getElementById('taskExecLanding')?.classList.remove('hidden');
+      document.getElementById('taskExecForm')?.classList.add('hidden');
+    }
+
+    // More-actions dropdown (Делегировать / Вернуть / Отменить)
+    function toggleMoreActions(e) {
+      e.stopPropagation();
+      document.getElementById('moreActionsMenu')?.classList.toggle('hidden');
+    }
 
     // ── Stages drawer ──
     function openStagesDrawer() {
