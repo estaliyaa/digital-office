@@ -989,11 +989,11 @@
           <!-- Комментарии -->
           <div class="flex flex-col gap-2 mb-6">
             <label class="text-sm font-medium text-slate-900">Комментарии ответственного за анкету</label>
-            <textarea rows="3" placeholder="Введите текст..." class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none"></textarea>
+            <textarea rows="3" placeholder="Введите текст..." oninput="saveDraftComment()" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none"></textarea>
           </div>
 
           <!-- Submit -->
-          <button onclick="stopTask()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check" class="w-4 h-4"></i>Завершить выполнение</button>
+          <button onclick="submitTask()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check" class="w-4 h-4"></i>Завершить выполнение</button>
         </div>
           </div><!-- /#taskExecForm -->
         </div><!-- /#taskPane-execution -->
@@ -2235,8 +2235,11 @@
         renderProcesses();
       }
 
-      // Reset task-detail view to info mode whenever we navigate
-      if (typeof stopTask === 'function') stopTask();
+      // Task-detail draft handling: save on leave, restore on enter.
+      if (typeof saveDraftComment === 'function') saveDraftComment();
+      if (pageId === 'task-detail' && typeof applyDraftState === 'function') {
+        applyDraftState();
+      }
 
       // Highlight active nav (map detail/create pages to parent sidebar item)
       const navKey = (pageId === 'task-detail' || pageId === 'create-task') ? 'tasks' : pageId;
@@ -2709,9 +2712,12 @@
     }
 
     function renderTaskRow(t) {
-      return `<tr onclick="navigateTo('task-detail')" class="cursor-pointer hover:bg-slate-50 transition-colors">
+      const draftMarker = t.hasDraft
+        ? `<span title="У задачи есть несохранённый черновик" class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-md ml-1.5 align-middle"><i data-lucide="pencil-line" class="w-2.5 h-2.5"></i>Черновик</span>`
+        : '';
+      return `<tr onclick="navigateTo('task-detail')" class="cursor-pointer hover:bg-slate-50 transition-colors ${t.hasDraft ? 'bg-amber-50/30' : ''}">
         <td>
-          <p class="text-sm font-medium text-slate-900 leading-snug">${t.title}</p>
+          <p class="text-sm font-medium text-slate-900 leading-snug">${t.title}${draftMarker}</p>
           <p class="text-xs text-slate-400 mt-0.5">${t.from} — ${t.fromSub}</p>
         </td>
         <td>${membersStack(t.members)}</td>
@@ -3159,7 +3165,12 @@
       navigateTo('tasks');
     }
 
-    // ── Task execution ──
+    // ── Task execution (with draft persistence) ──
+    // The task-detail page represents TASKS_DATA[TASK_DRAFT.taskIndex].
+    // A draft is created once "Начать выполнение" is clicked; it survives
+    // navigation away and the form/textarea state is restored on return.
+    const TASK_DRAFT = { taskIndex: 0, started: false, formRevealed: false, comment: '' };
+
     function setTaskState(running) {
       const badge = document.getElementById('taskStateBadge');
       const label = document.getElementById('taskStateLabel');
@@ -3174,33 +3185,84 @@
         badge.querySelector('span:first-child').className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
       }
     }
-    function startTask() {
+
+    function applyDraftState() {
       const startBtn = document.getElementById('startTaskBtn');
       const stopBtn = document.getElementById('stopTaskBtn');
       const actions = document.getElementById('globalActions');
-      startBtn?.classList.add('hidden');
-      stopBtn?.classList.remove('hidden');
-      stopBtn?.classList.add('inline-flex');
-      actions?.classList.remove('hidden');
-      actions?.classList.add('inline-flex');
-      setTaskState(true);
-      switchTaskTab('execution');
-      if (window.lucide) lucide.createIcons();
-    }
-    function stopTask() {
-      const startBtn = document.getElementById('startTaskBtn');
-      const stopBtn = document.getElementById('stopTaskBtn');
-      const actions = document.getElementById('globalActions');
-      startBtn?.classList.remove('hidden');
-      stopBtn?.classList.add('hidden');
-      stopBtn?.classList.remove('inline-flex');
-      actions?.classList.add('hidden');
-      actions?.classList.remove('inline-flex');
+      const landing = document.getElementById('taskExecLanding');
+      const form = document.getElementById('taskExecForm');
+      const textarea = document.querySelector('#taskExecForm textarea');
       document.getElementById('sendAnketaMenu')?.classList.add('hidden');
       document.getElementById('moreActionsMenu')?.classList.add('hidden');
-      resetExecLanding();
-      setTaskState(false);
-      switchTaskTab('overview');
+      if (TASK_DRAFT.started) {
+        startBtn?.classList.add('hidden');
+        stopBtn?.classList.remove('hidden');
+        stopBtn?.classList.add('inline-flex');
+        actions?.classList.remove('hidden');
+        actions?.classList.add('inline-flex');
+        setTaskState(true);
+        if (TASK_DRAFT.formRevealed) {
+          landing?.classList.add('hidden');
+          form?.classList.remove('hidden');
+        } else {
+          landing?.classList.remove('hidden');
+          form?.classList.add('hidden');
+        }
+        if (textarea) textarea.value = TASK_DRAFT.comment || '';
+        switchTaskTab('execution');
+      } else {
+        startBtn?.classList.remove('hidden');
+        stopBtn?.classList.add('hidden');
+        stopBtn?.classList.remove('inline-flex');
+        actions?.classList.add('hidden');
+        actions?.classList.remove('inline-flex');
+        landing?.classList.remove('hidden');
+        form?.classList.add('hidden');
+        if (textarea) textarea.value = '';
+        setTaskState(false);
+        switchTaskTab('overview');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function saveDraftComment() {
+      const ta = document.querySelector('#taskExecForm textarea');
+      if (ta) TASK_DRAFT.comment = ta.value;
+    }
+
+    function markTaskDraft(flag) {
+      const t = TASKS_DATA[TASK_DRAFT.taskIndex];
+      if (t) t.hasDraft = !!flag;
+      if (typeof renderTasks === 'function') renderTasks(TASKS_DATA);
+    }
+
+    function startTask() {
+      TASK_DRAFT.started = true;
+      markTaskDraft(true);
+      applyDraftState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Called by the small 'Отменить запуск' ghost link — cancels the run,
+    // wipes the draft, returns the task to idle.
+    function stopTask() {
+      TASK_DRAFT.started = false;
+      TASK_DRAFT.formRevealed = false;
+      TASK_DRAFT.comment = '';
+      markTaskDraft(false);
+      applyDraftState();
+    }
+
+    // Called by the primary submit button inside the execution form.
+    function submitTask() {
+      saveDraftComment();
+      TASK_DRAFT.started = false;
+      TASK_DRAFT.formRevealed = false;
+      TASK_DRAFT.comment = '';
+      markTaskDraft(false);
+      applyDraftState();
+      if (typeof showAlert === 'function') showAlert('Задача успешно завершена', 'success');
     }
     function toggleSendAnketaMenu(e) {
       e.stopPropagation();
@@ -3219,9 +3281,10 @@
 
     // Reveal the actual execution form (from the landing state)
     function revealExecForm() {
+      TASK_DRAFT.formRevealed = true;
       document.getElementById('taskExecLanding')?.classList.add('hidden');
       document.getElementById('taskExecForm')?.classList.remove('hidden');
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
     function resetExecLanding() {
       document.getElementById('taskExecLanding')?.classList.remove('hidden');
