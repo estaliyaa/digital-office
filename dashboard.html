@@ -2915,53 +2915,119 @@
       renderStructTable();
     }
 
-    // Interactive scheme: each company card can be expanded in-place
-    // to drop down its children (and those can expand in turn).
-    function renderSchemeNode(c, depth) {
-      const hasChildren = (c.children || []).length > 0;
-      const expanded = SCHEME_EXPANDED.has(c.id);
-      const badgeCls = depth === 0
-        ? 'bg-indigo-50 border-indigo-200'
-        : 'bg-white border-slate-200';
-      const chev = hasChildren ? `<i data-lucide="${expanded ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5 text-slate-400"></i>` : '';
+    // Build a reporting tree for a company: root employees (no manager
+    // inside this company) → their direct reports → so on.
+    function buildEmpTree(ids) {
+      const set = new Set(ids);
+      const kids = id => ids.filter(cid => (EMPLOYEES[cid].managerIds || []).some(m => set.has(m) && m === id));
+      const roots = ids.filter(id => !(EMPLOYEES[id].managerIds || []).some(m => set.has(m)));
+      const build = id => ({ id, children: kids(id).map(build) });
+      return roots.map(build);
+    }
+
+    function renderEmpNode(node, accent) {
+      const e = EMPLOYEES[node.id];
+      if (!e) return '';
+      const initials = e.short.split(' ').map(x => x[0]).slice(0,2).join('').toUpperCase();
       const card = `
-        <div class="inline-flex">
-          <button type="button" onclick="${hasChildren ? `toggleSchemeNode('${c.id}')` : `goToCompany('${c.id}'); setStructView('table');`}" class="group flex items-center gap-3 ${badgeCls} border rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-all min-w-[220px]">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${c.color} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
-            <div class="min-w-0 flex-1 text-left">
-              <p class="text-sm font-semibold text-slate-900 truncate">${c.name}</p>
-              <p class="text-[11px] text-slate-500">${companyEmployeeCount(c)} сотрудников${hasChildren ? ' · ' + c.children.length + ' дочерних' : ''}</p>
-            </div>
-            ${chev}
-          </button>
-        </div>
+        <button type="button" onclick="openEmployeeDrawer('${e.id}')" class="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40 px-2.5 py-1.5 transition-all text-left min-w-[170px] max-w-[220px]">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${initials}</div>
+          <div class="min-w-0 flex-1">
+            <p class="text-[12px] font-semibold text-slate-900 truncate leading-tight">${e.short}</p>
+            <p class="text-[10px] ${accent} truncate leading-tight">${e.position}</p>
+          </div>
+        </button>
       `;
-      const kids = (expanded && hasChildren) ? `
-        <div class="relative pt-6 flex items-start gap-4 flex-wrap justify-center">
-          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-px h-6 bg-slate-300"></div>
-          ${c.children.map(ch => `<div class="flex flex-col items-center gap-0 relative">
-            <div class="absolute -top-6 w-px h-6 bg-slate-300"></div>
-            ${renderSchemeNode(ch, depth + 1)}
+      const kids = node.children.length ? `
+        <div class="relative pt-5 flex items-start gap-3 flex-wrap justify-center">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-px h-5 bg-slate-300"></div>
+          ${node.children.map(ch => `<div class="flex flex-col items-center relative">
+            <div class="absolute -top-5 w-px h-5 bg-slate-300"></div>
+            ${renderEmpNode(ch, accent)}
           </div>`).join('')}
         </div>
       ` : '';
       return `<div class="flex flex-col items-center">${card}${kids}</div>`;
     }
 
-    function toggleSchemeNode(id) {
-      if (SCHEME_EXPANDED.has(id)) SCHEME_EXPANDED.delete(id);
-      else SCHEME_EXPANDED.add(id);
+    // One connected company hierarchy with an employees sub-box
+    // underneath each company (matching the old reference layout).
+    function renderSchemeCompany(c, depth) {
+      const hasChildren = (c.children || []).length > 0;
+      const isHead = depth === 0;
+      const cardCls = isHead
+        ? 'bg-indigo-50 border-indigo-200'
+        : 'bg-violet-50 border-violet-200';
+      const badge = isHead
+        ? `<span class="text-[10px] font-semibold text-indigo-600">Головная компания</span>`
+        : `<span class="text-[10px] font-semibold text-violet-600">Дочерняя компания</span>`;
+      const card = `
+        <button type="button" onclick="openCompanyDetail('${c.id}')" class="group inline-flex flex-col items-center gap-0.5 ${cardCls} border rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition-all min-w-[220px]">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full bg-gradient-to-br ${c.color} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
+            <p class="text-sm font-semibold text-slate-900">${c.name}</p>
+          </div>
+          ${badge}
+        </button>
+      `;
+
+      const tree = buildEmpTree(c.employeeIds || []);
+      const accent = isHead ? 'text-indigo-600' : 'text-violet-600';
+      const bgTint = isHead ? 'bg-indigo-50/30' : 'bg-violet-50/30';
+      const empsBlock = (SCHEME_SHOW_EMPS && tree.length) ? `
+        <div class="relative mt-5">
+          <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-px h-5 bg-slate-300"></div>
+          <div class="relative rounded-2xl border border-dashed ${isHead ? 'border-indigo-300' : 'border-violet-300'} ${bgTint} px-5 py-4">
+            <p class="text-[10px] font-semibold uppercase tracking-wider ${accent} text-center mb-3">Сотрудники</p>
+            <div class="flex flex-wrap items-start justify-center gap-6">
+              ${tree.map(n => renderEmpNode(n, accent)).join('')}
+            </div>
+          </div>
+        </div>
+      ` : '';
+
+      const childrenBlock = hasChildren ? `
+        <div class="relative mt-6">
+          <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-px h-6 bg-slate-300"></div>
+          <div class="relative pt-2 flex items-start gap-6 flex-wrap justify-center">
+            ${c.children.map(ch => `<div class="flex flex-col items-center relative">
+              <div class="absolute -top-2 w-px h-2 bg-slate-300"></div>
+              ${renderSchemeCompany(ch, depth + 1)}
+            </div>`).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      return `<div class="flex flex-col items-center">${card}${empsBlock}${childrenBlock}</div>`;
+    }
+
+    let SCHEME_SHOW_EMPS = true;
+    function toggleSchemeEmps() {
+      SCHEME_SHOW_EMPS = !SCHEME_SHOW_EMPS;
       renderStructSchema();
+    }
+
+    // Company detail drawer — reuse employee drawer mount for a quick
+    // overview when clicking a company in the scheme.
+    function openCompanyDetail(id) {
+      const c = COMPANY_MAP[id]; if (!c) return;
+      goToCompany(id);
+      setStructView('table');
     }
 
     function renderStructSchema() {
       const root = document.getElementById('structSchemaView');
       if (!root) return;
+      const toggleLabel = SCHEME_SHOW_EMPS ? 'Скрыть сотрудников' : 'Показать сотрудников';
+      const toggleIcon = SCHEME_SHOW_EMPS ? 'eye-off' : 'eye';
       root.innerHTML = `
-        <div class="flex flex-col items-center gap-6 min-w-[900px]">
-          ${COMPANIES.map(c => renderSchemeNode(c, 0)).join('')}
+        <div class="flex items-center justify-end mb-4">
+          <button onclick="toggleSchemeEmps()" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="${toggleIcon}" class="w-3.5 h-3.5"></i>${toggleLabel}</button>
         </div>
-        <p class="text-center text-[11px] text-slate-400 mt-6">Нажмите на компанию, чтобы раскрыть её дочерние подразделения</p>
+        <div class="flex flex-col items-center gap-2 min-w-[900px]">
+          ${COMPANIES.map(c => renderSchemeCompany(c, 0)).join('')}
+        </div>
+        <p class="text-center text-[11px] text-slate-400 mt-6">Нажмите на карточку компании для подробностей, на сотрудника — чтобы открыть его профиль</p>
       `;
       if (window.lucide) lucide.createIcons();
     }
