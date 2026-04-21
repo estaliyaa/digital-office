@@ -3383,7 +3383,14 @@
       if (d && !d.classList.contains('translate-x-full') && e.key === 'Escape') closeStagesDrawer();
     });
 
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
+    // Safety: re-run after full DOM parse (including trailing modals) and
+    // on the load event, so missed icons are caught even if the initial
+    // call raced against late-loading CDN scripts.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
+    }
+    window.addEventListener('load', () => { if (window.lucide) lucide.createIcons(); });
   </script>
 
   <!-- ══ АНКЕТА MODAL ══ -->
