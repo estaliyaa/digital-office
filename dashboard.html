@@ -2706,11 +2706,18 @@
       'e8':  { id:'e8', name:'Сидорова Мария Викторовна',     short:'Сидорова М.В.', position:'HR специалист',          dept:'HR',          email:'sidorova@adata.kz',     phone:'+7 (700) 800-00-00', birth:'14.07.1988', iin:'880714400888', role:'Пользователь', gradient:'from-emerald-500 to-green-600',managerIds:['e1'],     subIds:[],               colleagueIds:[] },
       'e9':  { id:'e9', name:'Петров Алексей Сергеевич',      short:'Петров А.С.',   position:'Backend разработчик',    dept:'Разработка',  email:'petrov@adata.kz',       phone:'+7 (700) 900-00-00', birth:'25.11.1991', iin:'911125300009', role:'Пользователь', gradient:'from-sky-500 to-indigo-600',   managerIds:['e2'],      subIds:[],               colleagueIds:[] },
       'e10': { id:'e10',name:'Смирнов Андрей Олегович',        short:'Смирнов А.О.',  position:'Middle developer',       dept:'Разработка',  email:'a.smirnov@adata.kz',    phone:'+7 (700) 101-01-01', birth:'12.12.1993', iin:'931212300010', role:'Пользователь', gradient:'from-rose-400 to-pink-500',    managerIds:['e3'],      subIds:[],               colleagueIds:[] },
+      'e11': { id:'e11',name:'Белов Михаил Александрович',      short:'Белов М.А.',    position:'Middle developer',       dept:'Разработка',  email:'m.belov2@adata.kz',     phone:'+7 (700) 111-22-33', birth:'03.05.1994', iin:'940503300011', role:'Пользователь', gradient:'from-sky-400 to-blue-500',     managerIds:['e5'],      subIds:[],               colleagueIds:[] },
+      'e12': { id:'e12',name:'Оспанова Лейла Ерлановна',        short:'Оспанова Л.Е.', position:'QA инженер',             dept:'Разработка',  email:'l.ospanova@adata.kz',   phone:'+7 (700) 222-33-44', birth:'29.08.1996', iin:'960829400012', role:'Пользователь', gradient:'from-emerald-400 to-teal-500', managerIds:['e2'],      subIds:[],               colleagueIds:[] },
+      'e13': { id:'e13',name:'Нурланов Султан Манасович',       short:'Нурланов С.М.', position:'DevOps инженер',         dept:'Разработка',  email:'s.nurlanov@adata.kz',   phone:'+7 (700) 333-44-55', birth:'14.02.1990', iin:'900214300013', role:'Пользователь', gradient:'from-violet-400 to-fuchsia-500', managerIds:['e3'],    subIds:[],               colleagueIds:[] },
+      'e14': { id:'e14',name:'Касымов Даурен Русланович',       short:'Касымов Д.Р.',  position:'Backend разработчик',    dept:'Разработка',  email:'d.kasymov@adata.kz',    phone:'+7 (700) 444-55-66', birth:'22.06.1992', iin:'920622300014', role:'Пользователь', gradient:'from-amber-400 to-orange-500', managerIds:['e4'],      subIds:[],               colleagueIds:[] },
+      'e15': { id:'e15',name:'Бекенов Темирлан Алиевич',        short:'Бекенов Т.А.',  position:'Frontend разработчик',   dept:'Разработка',  email:'t.bekenov@adata.kz',    phone:'+7 (700) 555-66-77', birth:'09.10.1995', iin:'951009300015', role:'Пользователь', gradient:'from-rose-400 to-red-500',     managerIds:['e2'],      subIds:[],               colleagueIds:[] },
+      'e16': { id:'e16',name:'Сериков Руслан Нурланович',       short:'Сериков Р.Н.',  position:'Backend разработчик',    dept:'Разработка',  email:'r.serikov@adata.kz',    phone:'+7 (700) 666-77-88', birth:'18.04.1993', iin:'930418300016', role:'Пользователь', gradient:'from-indigo-400 to-blue-500',  managerIds:['e4'],      subIds:[],               colleagueIds:[] },
+      'e17': { id:'e17',name:'Алиев Бахытжан Касымович',        short:'Алиев Б.К.',    position:'QA инженер',             dept:'Разработка',  email:'b.aliev@adata.kz',      phone:'+7 (700) 777-88-99', birth:'25.03.1991', iin:'910325300017', role:'Пользователь', gradient:'from-teal-400 to-emerald-500', managerIds:['e2'],      subIds:[],               colleagueIds:[] },
     };
 
     const COMPANIES = [
       { id: 'avrora', name: 'ТОО "Аврора Холдинг"',  type:'head',  initials:'АХ', color:'from-indigo-500 to-violet-600',
-        employeeIds: ['e1','e2','e3','e4','e5','e6'],
+        employeeIds: ['e1','e2','e3','e4','e5','e6','e11','e12','e13','e14','e15','e16','e17'],
         children: [
           { id:'technomir', name:'ИП "ТехноМир"', type:'child', initials:'ТМ', color:'from-sky-500 to-blue-600',
             employeeIds: ['e7','e8','e9'] },
@@ -3021,21 +3028,50 @@
       const pillText = isHead ? 'text-indigo-700' : 'text-amber-700';
       const accent = isHead ? 'text-indigo-600' : 'text-amber-700';
 
+      const ownCount = (c.employeeIds || []).length;
+      // Above this threshold, switch to a compact searchable grid
+      // (flat, paginated scroll) so huge companies still fit.
+      const COMPACT_THRESHOLD = 10;
+      const compactMode = ownCount > COMPACT_THRESHOLD;
+
       const empsBlock = (open && tree.length) ? `
         <div class="flex flex-col items-center w-full">
           ${vLine(22)}
-          <div class="relative rounded-2xl border-2 border-dashed ${boxBorder} ${boxBg} px-5 pb-4 pt-7 mt-0">
-            <!-- Label + close -->
+          <div class="relative rounded-2xl border-2 border-dashed ${boxBorder} ${boxBg} px-5 pb-4 pt-7 mt-0 w-full max-w-[1100px]">
+            <!-- Label (with count) -->
             <div class="absolute -top-3 left-5 flex items-center gap-1.5 bg-white border-2 ${pillBorder} rounded-full px-2.5 py-0.5 shadow-sm">
               <span class="w-1.5 h-1.5 rounded-full ${pillDot}"></span>
-              <p class="text-[10px] font-semibold uppercase tracking-wider ${pillText}">Сотрудники · ${c.name}</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider ${pillText}">Сотрудники · ${c.name} · ${ownCount}</p>
             </div>
+            <!-- Close -->
             <button type="button" onclick="toggleCompanyEmps('${c.id}')" title="Свернуть" class="absolute -top-3 right-5 w-6 h-6 bg-white border-2 ${pillBorder} rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm transition-colors">
               <i data-lucide="x" class="w-3 h-3"></i>
             </button>
-            <div class="flex flex-wrap items-start justify-center gap-6 pt-1">
-              ${tree.map(n => renderEmpNode(n, accent)).join('')}
-            </div>
+            ${compactMode ? `
+              <div class="pt-1">
+                <div class="max-h-[360px] overflow-y-auto pr-1">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    ${(c.employeeIds || []).map(id => EMPLOYEES[id]).filter(Boolean).map(e => {
+                      const init = e.short.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+                      return `<button type="button" onclick="openEmployeeDrawer('${e.id}')" class="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40 px-2.5 py-1.5 transition-all text-left">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${init}</div>
+                        <div class="min-w-0 flex-1">
+                          <p class="text-[12px] font-semibold text-slate-900 truncate leading-tight">${e.short}</p>
+                          <p class="text-[10px] ${accent} truncate leading-tight">${e.position}</p>
+                        </div>
+                      </button>`;
+                    }).join('')}
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 text-center mt-2">Прокрутите список, чтобы увидеть всех</p>
+              </div>
+            ` : `
+              <div class="max-h-[460px] overflow-auto pt-1">
+                <div class="flex flex-wrap items-start justify-center gap-6 min-w-max">
+                  ${tree.map(n => renderEmpNode(n, accent)).join('')}
+                </div>
+              </div>
+            `}
           </div>
         </div>
       ` : '';
@@ -3173,16 +3209,18 @@
       system:{ name: 'Система',         border: 'border-slate-400',   bg: 'bg-slate-100',  text: 'text-slate-700',   dot: 'bg-slate-400',   icon: 'settings' },
     };
 
+    // taskIdx/taskSource point to a row in TASKS_DATA/REQ_DATA so
+    // clicking the notification opens that exact task detail.
     const NOTIFICATIONS = [
-      { id: 1, dept: 'legal', icon: 'file-signature', title: 'Требуется подпись ЭЦП',          body: 'Договор № 2026-0415 ожидает вашей подписи',   time: '5 минут назад',  group: 'Сегодня',    unread: true },
-      { id: 2, dept: 'fin',   icon: 'clock',          title: 'Срок задачи истекает',           body: '«Квартальный отчёт Q1 2026» — осталось 2 дня',time: '1 час назад',     group: 'Сегодня',    unread: true },
-      { id: 3, dept: 'hr',    icon: 'user-check',     title: 'Сотрудник оформлен',             body: 'Жумабаева А.Т. принята на должность инженера',time: '3 часа назад',    group: 'Сегодня',    unread: true },
-      { id: 4, dept: 'sb',    icon: 'shield-check',   title: 'Проверка СБ пройдена',           body: 'Кандидат Серкебаев Р.А. — замечаний нет',     time: '5 часов назад',   group: 'Сегодня',    unread: false },
-      { id: 5, dept: 'it',    icon: 'laptop',         title: 'Выдано оборудование',            body: 'Ноутбук Lenovo ThinkPad передан Иванову С.В.',time: 'Вчера, 18:45',    group: 'Вчера',      unread: false },
-      { id: 6, dept: 'hr',    icon: 'plane',          title: 'Заявка на командировку',         body: 'Тажибаев Н. — Астана, 20–22 апреля',           time: 'Вчера, 14:02',    group: 'Вчера',      unread: false },
-      { id: 7, dept: 'admin', icon: 'megaphone',      title: 'Новое распоряжение',             body: 'Распоряжение №47 опубликовано',                time: 'Вчера, 11:30',    group: 'Вчера',      unread: false },
-      { id: 8, dept: 'legal', icon: 'gavel',          title: 'Претензионное письмо',           body: 'Входящая претензия от ТОО «Альфа»',            time: '2 дня назад',     group: 'Ранее',      unread: false },
-      { id: 9, dept: 'system',icon: 'log-in',         title: 'Новый вход в систему',           body: 'timeke@adata.kz выполнил вход',                time: '3 дня назад',     group: 'Ранее',      unread: false },
+      { id: 1, dept: 'legal', icon: 'file-signature', title: 'Требуется подпись ЭЦП',          body: 'Договор № 2026-0415 ожидает вашей подписи',   time: '5 минут назад',  group: 'Сегодня', unread: true,  taskIdx: 0, taskSource: 'tasks' },
+      { id: 2, dept: 'fin',   icon: 'clock',          title: 'Срок задачи истекает',           body: '«Квартальный отчёт Q1 2026» — осталось 2 дня',time: '1 час назад',     group: 'Сегодня', unread: true,  taskIdx: 2, taskSource: 'tasks' },
+      { id: 3, dept: 'hr',    icon: 'user-check',     title: 'Сотрудник оформлен',             body: 'Жумабаева А.Т. принята на должность инженера',time: '3 часа назад',    group: 'Сегодня', unread: true,  taskIdx: 3, taskSource: 'tasks' },
+      { id: 4, dept: 'sb',    icon: 'shield-check',   title: 'Проверка СБ пройдена',           body: 'Кандидат Серкебаев Р.А. — замечаний нет',     time: '5 часов назад',   group: 'Сегодня', unread: false, taskIdx: 5, taskSource: 'tasks' },
+      { id: 5, dept: 'it',    icon: 'laptop',         title: 'Выдано оборудование',            body: 'Ноутбук Lenovo ThinkPad передан Иванову С.В.',time: 'Вчера, 18:45',    group: 'Вчера',   unread: false, taskIdx: 1, taskSource: 'requests' },
+      { id: 6, dept: 'hr',    icon: 'plane',          title: 'Заявка на командировку',         body: 'Тажибаев Н. — Астана, 20–22 апреля',           time: 'Вчера, 14:02',    group: 'Вчера',   unread: false, taskIdx: 2, taskSource: 'requests' },
+      { id: 7, dept: 'admin', icon: 'megaphone',      title: 'Новое распоряжение',             body: 'Распоряжение №47 опубликовано',                time: 'Вчера, 11:30',    group: 'Вчера',   unread: false, taskIdx: 7, taskSource: 'tasks' },
+      { id: 8, dept: 'legal', icon: 'gavel',          title: 'Претензионное письмо',           body: 'Входящая претензия от ТОО «Альфа»',            time: '2 дня назад',     group: 'Ранее',   unread: false, taskIdx: 3, taskSource: 'requests' },
+      { id: 9, dept: 'system',icon: 'log-in',         title: 'Новый вход в систему',           body: 'timeke@adata.kz выполнил вход',                time: '3 дня назад',     group: 'Ранее',   unread: false },
     ];
 
     let NOTIF_FILTER = 'all'; // 'all' | 'unread' | dept id
@@ -3223,6 +3261,19 @@
       </button>`;
     }
 
+    function handleNotifClick(n) {
+      if (!n) return;
+      n.unread = false;
+      closeNotifDropdown();
+      if (n.taskIdx != null && typeof openTaskDetail === 'function') {
+        openTaskDetail(n.taskIdx, n.taskSource || 'tasks');
+      } else {
+        navigateTo('notifications');
+        renderNotifPage();
+      }
+      updateNotifBadges();
+    }
+
     function renderNotifDropdown() {
       const list = document.getElementById('notifDropdownList');
       if (!list) return;
@@ -3231,12 +3282,7 @@
       list.querySelectorAll('[data-notif-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = Number(btn.dataset.notifId);
-          const n = NOTIFICATIONS.find(x => x.id === id);
-          if (n) n.unread = false;
-          closeNotifDropdown();
-          navigateTo('notifications');
-          renderNotifPage();
-          updateNotifBadges();
+          handleNotifClick(NOTIFICATIONS.find(x => x.id === id));
         });
       });
       if (window.lucide) lucide.createIcons();
@@ -3292,8 +3338,7 @@
       list.querySelectorAll('[data-notif-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = Number(btn.dataset.notifId);
-          const n = NOTIFICATIONS.find(x => x.id === id);
-          if (n) { n.unread = false; renderNotifPage(); updateNotifBadges(); }
+          handleNotifClick(NOTIFICATIONS.find(x => x.id === id));
         });
       });
       if (window.lucide) lucide.createIcons();
