@@ -838,9 +838,9 @@
         <button onclick="navigateTo('tasks')" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i>Назад к списку</button>
 
         <!-- ── HERO: clean ticket-style card ── -->
-        <div class="relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+        <div class="relative bg-white rounded-2xl border border-slate-200 shadow-sm mb-6">
           <!-- Left accent stripe -->
-          <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-500 via-violet-500 to-fuchsia-500"></div>
+          <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-500 via-violet-500 to-fuchsia-500 rounded-l-2xl"></div>
 
           <div class="pl-7 pr-6 py-6 flex items-start justify-between gap-6 flex-wrap">
             <div class="min-w-0 flex-1">
@@ -866,7 +866,7 @@
           </div>
 
           <!-- Persistent action bar (stable min-height — no layout jump) -->
-          <div class="pl-7 pr-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between gap-4 flex-wrap" style="min-height:72px">
+          <div class="pl-7 pr-6 py-4 border-t border-slate-100 bg-slate-50/60 rounded-b-2xl flex items-center justify-between gap-4 flex-wrap" style="min-height:72px">
             <div class="min-w-0 flex items-center gap-3">
               <!-- State badge flips based on run/idle state -->
               <div id="taskStateBadge" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-full">
@@ -918,41 +918,54 @@
 
           <!-- Landing (illustration + Start run) -->
           <div id="taskExecLanding" class="bg-white rounded-2xl border border-slate-200 p-10 mb-5 flex flex-col items-center justify-center text-center">
-            <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[300px] h-auto mb-6" aria-hidden="true">
+            <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[280px] h-auto mb-6" aria-hidden="true">
               <defs>
-                <linearGradient id="launchBg" x1="0" y1="0" x2="1" y2="1">
+                <linearGradient id="clipboardFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#eef2ff"/>
-                  <stop offset="100%" stop-color="#ede9fe"/>
+                  <stop offset="100%" stop-color="#e0e7ff"/>
                 </linearGradient>
-                <linearGradient id="launchBtn" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="checkFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#6366f1"/>
                   <stop offset="100%" stop-color="#4f46e5"/>
                 </linearGradient>
               </defs>
-              <!-- Background blob -->
-              <ellipse cx="120" cy="150" rx="90" ry="12" fill="#e2e8f0" opacity="0.6"/>
-              <!-- Circle backdrop -->
-              <circle cx="120" cy="82" r="68" fill="url(#launchBg)"/>
-              <!-- Rocket -->
-              <g transform="translate(120 82)">
-                <path d="M0 -42 C12 -32 20 -14 20 4 L-20 4 C-20 -14 -12 -32 0 -42 Z" fill="url(#launchBtn)"/>
-                <circle cx="0" cy="-16" r="8" fill="#fff"/>
-                <circle cx="0" cy="-16" r="4" fill="#6366f1"/>
-                <path d="M-20 4 L-32 18 L-20 14 Z" fill="#c7d2fe"/>
-                <path d="M20 4 L32 18 L20 14 Z" fill="#c7d2fe"/>
-                <!-- Flame -->
-                <path d="M-10 6 Q0 32 10 6 L6 6 Q3 20 0 24 Q-3 20 -6 6 Z" fill="#f59e0b" opacity="0.9"/>
-                <path d="M-5 6 Q0 22 5 6 Z" fill="#fbbf24"/>
+              <!-- Soft shadow under clipboard -->
+              <ellipse cx="120" cy="160" rx="72" ry="6" fill="#cbd5e1" opacity="0.4"/>
+              <!-- Back sparkle dots -->
+              <circle cx="40" cy="40" r="3" fill="#c4b5fd"/>
+              <circle cx="200" cy="45" r="2.5" fill="#a5b4fc"/>
+              <circle cx="210" cy="120" r="2" fill="#c4b5fd"/>
+              <circle cx="32" cy="110" r="2" fill="#a5b4fc"/>
+              <!-- Clipboard body -->
+              <rect x="70" y="35" width="100" height="120" rx="10" fill="url(#clipboardFill)" stroke="#a5b4fc" stroke-width="2"/>
+              <!-- Clip -->
+              <rect x="100" y="25" width="40" height="20" rx="6" fill="#6366f1"/>
+              <rect x="108" y="28" width="24" height="10" rx="3" fill="#c7d2fe"/>
+              <!-- List rows with checks -->
+              <g stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                <!-- Row 1: checked -->
+                <circle cx="90" cy="72" r="6" fill="url(#checkFill)" stroke="none"/>
+                <path d="M86 72 L89 75 L94 69" stroke="#ffffff" stroke-width="2.2"/>
+                <line x1="102" y1="72" x2="150" y2="72" stroke="#818cf8" stroke-width="2.4"/>
+                <!-- Row 2: checked -->
+                <circle cx="90" cy="95" r="6" fill="url(#checkFill)" stroke="none"/>
+                <path d="M86 95 L89 98 L94 92" stroke="#ffffff" stroke-width="2.2"/>
+                <line x1="102" y1="95" x2="155" y2="95" stroke="#818cf8" stroke-width="2.4"/>
+                <!-- Row 3: pending (empty circle) -->
+                <circle cx="90" cy="118" r="6" fill="#ffffff" stroke="#818cf8" stroke-width="2"/>
+                <line x1="102" y1="118" x2="145" y2="118" stroke="#c7d2fe" stroke-width="2.4"/>
+                <!-- Row 4: pending -->
+                <circle cx="90" cy="140" r="6" fill="#ffffff" stroke="#818cf8" stroke-width="2"/>
+                <line x1="102" y1="140" x2="140" y2="140" stroke="#c7d2fe" stroke-width="2.4"/>
               </g>
-              <!-- Stars -->
-              <circle cx="40" cy="40" r="2" fill="#a5b4fc"/>
-              <circle cx="205" cy="50" r="2.5" fill="#c4b5fd"/>
-              <circle cx="200" cy="110" r="1.5" fill="#a5b4fc"/>
-              <circle cx="35" cy="100" r="1.5" fill="#c4b5fd"/>
-              <circle cx="180" cy="30" r="1" fill="#a5b4fc"/>
+              <!-- Floating play badge -->
+              <g transform="translate(168 110)">
+                <circle cx="0" cy="0" r="20" fill="url(#checkFill)"/>
+                <path d="M-5 -7 L9 0 L-5 7 Z" fill="#ffffff"/>
+              </g>
             </svg>
-            <h3 class="text-lg font-bold text-slate-900 mb-2">Готовы приступить к задаче?</h3>
-            <p class="text-sm text-slate-500 max-w-sm mb-6">Нажмите «Запустить выполнение», чтобы открыть форму анкеты и приступить к работе.</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Задача ждёт своего часа</h3>
+            <p class="text-sm text-slate-500 max-w-sm mb-6">Запустите выполнение — откроется форма с анкетой, комментариями и кнопкой подтверждения.</p>
             <button onclick="revealExecForm()" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Запустить выполнение</button>
           </div>
 
@@ -3370,6 +3383,12 @@
       e.stopPropagation();
       document.getElementById('moreActionsMenu')?.classList.toggle('hidden');
     }
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('moreActionsWrap');
+      if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('moreActionsMenu')?.classList.add('hidden');
+      }
+    });
 
     // ── Stages drawer ──
     function openStagesDrawer() {
