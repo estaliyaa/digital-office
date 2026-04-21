@@ -332,17 +332,17 @@
     </header>
 
     <!-- Page Content Area -->
-    <main class="p-6">
+    <main class="p-3">
 
       <!-- ══ PAGE: Статистика ══ -->
       <div id="page-statistics" class="page-content active">
         <!-- Page heading -->
-        <div class="mb-6 fade-in">
+        <div class="mb-3 fade-in">
           <h2 class="text-2xl font-bold text-slate-900">Мой рабочий стол</h2>
         </div>
 
         <!-- Summary cards row -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
           <div class="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <p class="text-sm font-medium text-slate-500">Все задачи</p>
@@ -374,7 +374,7 @@
         </div>
 
         <!-- Charts row -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
           <!-- Bar chart: weekly activity -->
           <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-6">
             <div class="flex items-center justify-between mb-4">
@@ -400,7 +400,7 @@
         </div>
 
         <!-- Active tasks — full width, below charts -->
-        <div class="bg-white rounded-2xl border border-indigo-200 shadow-sm shadow-indigo-100/50 mb-6 overflow-hidden">
+        <div class="bg-white rounded-2xl border border-indigo-200 shadow-sm shadow-indigo-100/50 mb-3 overflow-hidden">
           <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-violet-50/40">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center shadow-sm shadow-indigo-500/30"><i data-lucide="zap" class="w-5 h-5 text-white"></i></div>
@@ -455,7 +455,7 @@
       <div id="page-tasks" class="page-content">
 
         <!-- Page heading -->
-        <div class="mb-5">
+        <div class="mb-3">
           <h2 class="text-2xl font-bold text-slate-900">Все задачи</h2>
         </div>
 
@@ -537,7 +537,7 @@
       <div id="page-my-requests" class="page-content">
 
         <!-- Page heading -->
-        <div class="mb-5">
+        <div class="mb-3">
           <h2 class="text-2xl font-bold text-slate-900">Мои заявки</h2>
         </div>
 
@@ -610,13 +610,13 @@
       <!-- ══ PAGE: Уведомления ══ -->
       <div id="page-notifications" class="page-content">
         <!-- Heading -->
-        <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div class="mb-3 flex items-center justify-between gap-4 flex-wrap">
           <h2 class="text-2xl font-bold text-slate-900">Уведомления</h2>
           <button onclick="markAllNotificationsRead()" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-xl transition-colors"><i data-lucide="check-check" class="w-4 h-4"></i>Прочитать все</button>
         </div>
 
         <!-- Department filter pills -->
-        <div class="flex items-center gap-2 flex-wrap mb-5" id="notifFilterRow"></div>
+        <div class="flex items-center gap-2 flex-wrap mb-3" id="notifFilterRow"></div>
 
         <!-- Notifications list, grouped by date -->
         <div id="notifList" class="space-y-6"></div>
@@ -624,7 +624,7 @@
 
       <!-- ══ PAGE: Структура предприятия ══ -->
       <div id="page-structure" class="page-content">
-        <div class="mb-6">
+        <div class="mb-3">
           <h2 class="text-2xl font-bold text-slate-900">Структура предприятия</h2>
         </div>
         <div class="bg-white rounded-2xl border border-slate-200 p-8">
@@ -654,7 +654,7 @@
       <div id="page-registry" class="page-content">
 
         <!-- Page heading -->
-        <div class="mb-5">
+        <div class="mb-3">
           <h2 class="text-2xl font-bold text-slate-900">Реестр документов</h2>
         </div>
 
@@ -860,7 +860,7 @@
         <button onclick="navigateTo('tasks')" class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i>Назад к списку</button>
 
         <!-- ── HERO: clean ticket-style card ── -->
-        <div class="relative bg-white rounded-2xl border border-slate-200 shadow-sm mb-6">
+        <div class="relative bg-white rounded-2xl border border-slate-200 shadow-sm mb-3">
           <!-- Left accent stripe -->
           <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-500 via-violet-500 to-fuchsia-500 rounded-l-2xl"></div>
 
@@ -885,16 +885,11 @@
               <p id="tdTaskFrom" class="text-sm text-slate-500 mt-1">HR · Трудоустройство</p>
             </div>
 
-          </div>
-
-          <!-- Persistent action bar (stable min-height — no layout jump) -->
-          <div class="pl-7 pr-6 py-4 border-t border-slate-100 bg-slate-50/60 rounded-b-2xl flex items-center justify-end gap-4 flex-wrap" style="min-height:72px">
-
-            <!-- Right slot: Start button OR Завершить + Ещё -->
-            <div class="flex items-center gap-2 flex-wrap justify-end">
+            <!-- Action slot: Start button OR Завершить + Ещё (same row as title) -->
+            <div class="flex items-center gap-2 flex-wrap justify-end flex-shrink-0">
               <button id="startTaskBtn" onclick="startTask()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Начать выполнение</button>
 
-              <div id="globalActions" class="hidden items-center gap-2 justify-end">
+              <div id="globalActions" class="hidden items-center gap-2 flex-wrap justify-end">
                 <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="check-circle-2" class="w-4 h-4"></i>Завершить</button>
                 <!-- More selector -->
                 <div class="relative" id="moreActionsWrap">
@@ -911,7 +906,7 @@
         </div>
 
         <!-- ═══ Task-level tabs ═══ -->
-        <div class="border-b border-slate-200 mb-5 flex items-center gap-1 overflow-x-auto" role="tablist">
+        <div class="border-b border-slate-200 mb-3 flex items-center gap-1 overflow-x-auto" role="tablist">
           <button type="button" id="taskTab-overview" onclick="switchTaskTab('overview')" class="task-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-900 border-b-2 border-indigo-600 transition-colors whitespace-nowrap">
             <i data-lucide="layout-grid" class="w-4 h-4"></i>Обзор
           </button>
@@ -931,8 +926,8 @@
         <div id="taskPane-execution" class="task-pane hidden">
 
           <!-- Landing (illustration + Start run) -->
-          <div id="taskExecLanding" class="bg-white rounded-2xl border border-slate-200 p-10 mb-5 flex flex-col items-center justify-center text-center">
-            <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[280px] h-auto mb-6" aria-hidden="true">
+          <div id="taskExecLanding" class="bg-white rounded-2xl border border-slate-200 p-10 mb-3 flex flex-col items-center justify-center text-center">
+            <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[280px] h-auto mb-3" aria-hidden="true">
               <defs>
                 <linearGradient id="clipboardFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#eef2ff"/>
@@ -979,19 +974,19 @@
               </g>
             </svg>
             <h3 class="text-lg font-bold text-slate-900 mb-2">Задача ждёт своего часа</h3>
-            <p class="text-sm text-slate-500 max-w-sm mb-6">Запустите выполнение — откроется форма с анкетой, комментариями и кнопкой подтверждения.</p>
+            <p class="text-sm text-slate-500 max-w-sm mb-3">Запустите выполнение — откроется форма с анкетой, комментариями и кнопкой подтверждения.</p>
             <button onclick="revealExecForm()" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Запустить выполнение</button>
           </div>
 
           <!-- Actual execution form (revealed after click) -->
-          <div id="taskExecForm" class="hidden"><div id="taskExecutionBlock" class="relative rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5 mb-5">
-          <div class="flex flex-col gap-1 mb-6">
+          <div id="taskExecForm" class="hidden"><div id="taskExecutionBlock" class="relative rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5 mb-3">
+          <div class="flex flex-col gap-1 mb-3">
             <h3 class="text-base font-semibold text-slate-900">Выполнение задачи</h3>
             <p class="text-sm text-slate-700">Выполните необходимые действия для завершения задачи</p>
           </div>
 
           <!-- Анкета -->
-          <div class="flex flex-col gap-2 mb-6">
+          <div class="flex flex-col gap-2 mb-3">
             <p class="text-sm font-medium text-slate-900">Анкета</p>
             <div class="relative inline-block" id="sendAnketaWrap">
               <button id="sendAnketaBtn" onclick="toggleSendAnketaMenu(event)" type="button" class="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-indigo-200 bg-white hover:bg-indigo-50 text-indigo-600 text-sm font-semibold transition-colors">
@@ -1016,7 +1011,7 @@
           </div>
 
           <!-- Комментарии -->
-          <div class="flex flex-col gap-2 mb-6">
+          <div class="flex flex-col gap-2 mb-3">
             <label class="text-sm font-medium text-slate-900">Комментарии ответственного за анкету</label>
             <textarea rows="3" placeholder="Введите текст..." oninput="saveDraftComment()" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none"></textarea>
           </div>
@@ -1032,7 +1027,7 @@
         <div id="taskInfoContent">
 
         <!-- ── ROW 1: Candidate info (full width) ── -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-3">
           <div class="flex items-center gap-2 mb-4">
             <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
             <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Основная информация</p>
@@ -1048,7 +1043,7 @@
         </div>
 
         <!-- ── ROW 2: Описание задачи (full width, alone) ── -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-3">
           <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Описание задачи</p>
           <div class="text-sm text-slate-700 leading-relaxed space-y-3">
             <p>Необходимо завершить процесс подписания трудового договора с кандидатом. Система автоматически сформировала договор на основе данных о должности и условиях найма.</p>
@@ -1062,7 +1057,7 @@
         </div>
 
         <!-- ── ROW 3: Команда (Автор + Исполнители) + Документы ── -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
           <!-- Команда: Автор + Current user + Others -->
           <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5">
             <!-- Автор -->
@@ -1186,7 +1181,7 @@
         </div>
 
         <!-- ── ROW 3: Data sheet ── -->
-        <div class="bg-white rounded-2xl border border-slate-200 mb-5 overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 mb-3 overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
             <div>
               <p class="text-sm font-bold text-slate-900">Лист данных</p>
@@ -1234,7 +1229,7 @@
         <!-- Signing block (retained, hidden) -->
         <div class="hidden" aria-hidden="true">
           <div>
-            <div class="bg-white border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-4 mb-5">
+            <div class="bg-white border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-4 mb-3">
               <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-slate-900 truncate">Договор.docx</p>
@@ -1525,7 +1520,7 @@
         <!-- ═══ Комментарии pane ═══ -->
         <div id="taskPane-comments" class="task-pane hidden">
           <div class="bg-white rounded-2xl border border-slate-200 p-6">
-            <div class="space-y-4 mb-5">
+            <div class="space-y-4 mb-3">
               <div class="flex gap-3">
                 <div class="w-9 h-9 rounded-full bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">Т</div>
                 <div class="flex-1 min-w-0 bg-slate-50 border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3">
@@ -1705,11 +1700,11 @@
 
       <!-- ══ PAGE: Все процессы ══ -->
       <div id="page-processes" class="page-content">
-        <div class="mb-6">
+        <div class="mb-3">
           <h2 class="text-2xl font-bold text-slate-900">Все процессы</h2>
         </div>
         <!-- Breadcrumbs -->
-        <div id="processesBreadcrumbs" class="flex items-center gap-1.5 text-sm text-slate-500 mb-5"></div>
+        <div id="processesBreadcrumbs" class="flex items-center gap-1.5 text-sm text-slate-500 mb-3"></div>
 
         <!-- Dynamic content -->
         <div id="processesContent"></div>
@@ -1720,11 +1715,11 @@
         <input type="file" id="photoUpload" accept="image/*" class="hidden">
 
         <div>
-          <div class="mb-6">
+          <div class="mb-3">
             <h2 class="text-2xl font-bold text-slate-900">Личный профиль</h2>
           </div>
           <!-- Profile header card -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-5">
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-3">
             <div class="flex items-center gap-5">
               <div class="relative group">
                 <div id="profilePageAvatar" class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-2xl font-bold overflow-hidden shadow-sm"></div>
@@ -1744,7 +1739,7 @@
           </div>
 
           <!-- Tabs -->
-          <div class="flex gap-6 border-b border-slate-200 mb-5">
+          <div class="flex gap-6 border-b border-slate-200 mb-3">
             <button data-profile-tab="personal" class="profile-tab pb-3 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 transition-colors">Личные данные</button>
             <button data-profile-tab="security" class="profile-tab pb-3 text-sm font-medium text-slate-400 hover:text-slate-600 border-b-2 border-transparent transition-colors">Безопасность</button>
           </div>
@@ -2150,7 +2145,7 @@
       // Content
       if (processView.level === 'departments') {
         content.innerHTML = `
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center justify-between mb-3">
             <p class="text-slate-500 text-sm">Выберите подразделение для просмотра процессов</p>
             <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Создать процесс</button>
           </div>
@@ -2178,7 +2173,7 @@
         const dept = PROCESS_DEPARTMENTS.find(d => d.id === processView.dept);
         const types = PROCESS_TYPES[processView.dept] || [];
         content.innerHTML = `
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center justify-between mb-3">
             <p class="text-slate-500 text-sm">Процессы подразделения <span class="font-medium text-slate-900">${dept.name}</span></p>
             <button class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i>Новый процесс</button>
           </div>
@@ -2207,7 +2202,7 @@
         const type = PROCESS_TYPES[processView.dept].find(t => t.id === processView.type);
         const rows = generateInstances(type.id, type.name);
         content.innerHTML = `
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center justify-between mb-3">
             <div>
               <h2 class="text-lg font-bold text-slate-900">${type.name}</h2>
               <p class="text-slate-500 text-sm mt-0.5">${type.desc} · ${rows.length} заявок</p>
@@ -3916,7 +3911,7 @@
       <!-- ── STEP 3a: ECP file picker ── -->
       <div id="cf-step-ecp-picker" class="cf-step">
         <div class="flex-1 overflow-y-auto px-6 py-8">
-          <div class="text-center mb-6">
+          <div class="text-center mb-3">
             <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 mb-3"><i data-lucide="folder-key" class="w-6 h-6"></i></div>
             <h3 class="text-lg font-bold text-slate-900">Выберите файл ЭЦП</h3>
             <p class="text-sm text-slate-500 mt-1">Формат: .p12 · Максимум 5 MB</p>
@@ -3945,7 +3940,7 @@
       <!-- ── STEP 3b: QR ── -->
       <div id="cf-step-qr" class="cf-step">
         <div class="flex-1 overflow-y-auto px-6 py-8">
-          <div class="text-center mb-5">
+          <div class="text-center mb-3">
             <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-3"><i data-lucide="qr-code" class="w-6 h-6"></i></div>
             <h3 class="text-lg font-bold text-slate-900">Подписание через Egov QR</h3>
           </div>
@@ -3993,8 +3988,8 @@
       <!-- ── STEP 4: Success ── -->
       <div id="cf-step-success" class="cf-step">
         <div class="flex-1 overflow-y-auto px-6 py-12 flex flex-col items-center justify-center">
-          <h3 class="text-lg font-bold text-slate-900 mb-6">Подписание завершено</h3>
-          <div class="cf-check-icon w-28 h-28 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-6">
+          <h3 class="text-lg font-bold text-slate-900 mb-3">Подписание завершено</h3>
+          <div class="cf-check-icon w-28 h-28 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-3">
             <i data-lucide="check" class="w-14 h-14 text-white" stroke-width="3"></i>
           </div>
           <p class="text-sm text-slate-600 text-center">Документ подписан успешно!</p>
@@ -4010,8 +4005,8 @@
       <!-- ── STEP 5: Error ── -->
       <div id="cf-step-error" class="cf-step">
         <div class="flex-1 overflow-y-auto px-6 py-12 flex flex-col items-center justify-center">
-          <h3 class="text-lg font-bold text-slate-900 mb-6">Проблема с ЭЦП</h3>
-          <div class="cf-shake w-28 h-28 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/30 mb-6">
+          <h3 class="text-lg font-bold text-slate-900 mb-3">Проблема с ЭЦП</h3>
+          <div class="cf-shake w-28 h-28 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/30 mb-3">
             <i data-lucide="alert-triangle" class="w-14 h-14 text-white" stroke-width="2.5"></i>
           </div>
           <p class="text-sm text-slate-600 text-center max-w-xs">ЭЦП не принадлежит вам или вашей организации, проверьте, что выбрана правильная ЭЦП.</p>
