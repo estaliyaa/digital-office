@@ -213,7 +213,7 @@
       </button>
       <button data-page="tasks" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
         <i data-lucide="clipboard-check" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Все процессы</span>
+        <span class="sidebar-label">Все задачи</span>
       </button>
       <button data-page="my-requests" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
         <i data-lucide="file-edit" class="w-5 h-5 shrink-0"></i>
@@ -234,7 +234,7 @@
       </button>
       <button data-page="processes" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all">
         <i data-lucide="git-branch" class="w-5 h-5 shrink-0"></i>
-        <span class="sidebar-label">Процессы по отделам</span>
+        <span class="sidebar-label">Все процессы</span>
       </button>
     </nav>
 
@@ -306,11 +306,28 @@
       <!-- Right controls -->
       <div class="flex items-center gap-2 ml-auto">
         <span id="roleBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"></span>
-        <button id="headerNotifBtn" data-page="notifications"
-          class="nav-item-header w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 relative transition-colors">
-          <i data-lucide="bell" class="w-5 h-5"></i>
-          <span class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
-        </button>
+
+        <!-- Notifications bell + dropdown -->
+        <div class="relative" id="notifDropdownWrap">
+          <button id="headerNotifBtn" onclick="toggleNotifDropdown(event)"
+            class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 relative transition-colors">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span id="headerNotifBadge" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
+          </button>
+
+          <!-- Dropdown panel -->
+          <div id="notifDropdown" class="hidden absolute right-0 top-11 z-40 w-[380px] bg-white rounded-2xl border border-slate-200 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.18)] overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <p class="text-sm font-bold text-slate-900">Уведомления</p>
+                <span id="notifDropdownCount" class="text-[10px] font-bold bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">3</span>
+              </div>
+              <button onclick="markAllNotificationsRead()" class="text-[11px] font-medium text-indigo-600 hover:text-indigo-700 transition-colors">Прочитать все</button>
+            </div>
+            <div id="notifDropdownList" class="max-h-[420px] overflow-y-auto divide-y divide-slate-100"></div>
+            <button onclick="navigateTo('notifications'); closeNotifDropdown()" class="w-full flex items-center justify-center gap-1.5 px-5 py-3 border-t border-slate-100 bg-slate-50/60 hover:bg-slate-100 text-sm font-semibold text-indigo-600 transition-colors">Смотреть все уведомления <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -393,7 +410,7 @@
                 <p class="text-xs text-slate-500 mt-0.5">Требуют вашего внимания — <span class="font-semibold text-indigo-600">5 задач</span></p>
               </div>
             </div>
-            <button onclick="navigateTo('tasks')" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">Все процессы <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+            <button onclick="navigateTo('tasks')" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">Все задачи <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
           </div>
           <div class="grid grid-cols-12 gap-4 px-6 py-2.5 border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-400 uppercase tracking-wider">
             <span class="col-span-4">Задача</span>
@@ -412,7 +429,7 @@
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center"><i data-lucide="clipboard-list" class="w-4 h-4 text-slate-600"></i></div>
-                <h3 class="text-sm font-semibold text-slate-900">Все процессы</h3>
+                <h3 class="text-sm font-semibold text-slate-900">Все задачи</h3>
                 <span class="text-xs text-slate-400 font-medium" id="allTasksCount">0</span>
               </div>
               <button onclick="navigateTo('tasks')" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">Все <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
@@ -440,7 +457,7 @@
 
         <!-- Page heading -->
         <div class="mb-5">
-          <h2 class="text-xl font-bold text-slate-900">Все процессы</h2>
+          <h2 class="text-xl font-bold text-slate-900">Все задачи</h2>
         </div>
 
         <!-- Toolbar -->
@@ -593,13 +610,20 @@
 
       <!-- ══ PAGE: Уведомления ══ -->
       <div id="page-notifications" class="page-content">
-        <p class="text-slate-500 text-sm mb-6">Системные уведомления и оповещения</p>
-        <div class="space-y-3">
-          <div class="bg-white rounded-2xl border border-indigo-200 border-l-4 border-l-indigo-500 p-5 flex items-start gap-4"><div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="file-signature" class="w-4 h-4 text-indigo-600"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Требуется подпись ЭЦП</p><p class="text-sm text-slate-500 mt-0.5">Договор № 2026-0415 ожидает вашей подписи</p><p class="text-xs text-slate-400 mt-1">5 минут назад</p></div><span class="w-2 h-2 bg-indigo-500 rounded-full mt-2 shrink-0"></span></div>
-          <div class="bg-white rounded-2xl border border-amber-200 border-l-4 border-l-amber-500 p-5 flex items-start gap-4"><div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-4 h-4 text-amber-600"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Срок задачи истекает</p><p class="text-sm text-slate-500 mt-0.5">«Квартальный отчёт» — осталось 2 дня</p><p class="text-xs text-slate-400 mt-1">1 час назад</p></div><span class="w-2 h-2 bg-amber-500 rounded-full mt-2 shrink-0"></span></div>
-          <div class="bg-white rounded-2xl border border-emerald-200 border-l-4 border-l-emerald-500 p-5 flex items-start gap-4"><div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Сотрудник оформлен</p><p class="text-sm text-slate-500 mt-0.5">Иванов А.С. принят на должность инженера</p><p class="text-xs text-slate-400 mt-1">3 часа назад</p></div><span class="w-2 h-2 bg-emerald-500 rounded-full mt-2 shrink-0"></span></div>
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-start gap-4 opacity-60"><div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="log-in" class="w-4 h-4 text-slate-500"></i></div><div class="flex-1"><p class="text-sm font-medium text-slate-900">Новый вход в систему</p><p class="text-sm text-slate-500 mt-0.5">timeke@adata.kz выполнил вход</p><p class="text-xs text-slate-400 mt-1">Вчера, 18:45</p></div></div>
+        <!-- Heading -->
+        <div class="mb-5 flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">Уведомления</h2>
+            <p class="text-sm text-slate-500">События по вашим процессам — цвет слева отражает отдел</p>
+          </div>
+          <button onclick="markAllNotificationsRead()" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-xl transition-colors"><i data-lucide="check-check" class="w-4 h-4"></i>Прочитать все</button>
         </div>
+
+        <!-- Department filter pills -->
+        <div class="flex items-center gap-2 flex-wrap mb-5" id="notifFilterRow"></div>
+
+        <!-- Notifications list, grouped by date -->
+        <div id="notifList" class="space-y-6"></div>
       </div>
 
       <!-- ══ PAGE: Структура предприятия ══ -->
@@ -1858,9 +1882,9 @@
 
     // ── Page titles ──
     const PAGE_TITLES = {
-      statistics: 'Статистика', tasks: 'Все процессы', 'my-requests': 'Мои заявки',
+      statistics: 'Статистика', tasks: 'Все задачи', 'my-requests': 'Мои заявки',
       notifications: 'Уведомления', structure: 'Структура предприятия',
-      registry: 'Реестр документов', processes: 'Процессы по отделам', profile: 'Личный профиль',
+      registry: 'Реестр документов', processes: 'Все процессы', profile: 'Личный профиль',
       'task-detail': 'Детали задачи', 'create-task': 'Создать задачу'
     };
 
@@ -2646,6 +2670,174 @@
       showAlert('Пароль успешно изменён', 'success');
     });
 
+    // ══════════════════════════════════════════
+    // ── NOTIFICATIONS
+    // ══════════════════════════════════════════
+    // Department palette mirrors "Все процессы" (page-processes) so a
+    // notification tinted indigo is understood as HR, rose as СБ, etc.
+    const DEPT_COLORS = {
+      hr:    { name: 'HR',              border: 'border-indigo-500',  bg: 'bg-indigo-50',  text: 'text-indigo-700',  dot: 'bg-indigo-500',  icon: 'users' },
+      sb:    { name: 'СБ',              border: 'border-rose-500',    bg: 'bg-rose-50',    text: 'text-rose-700',    dot: 'bg-rose-500',    icon: 'shield' },
+      fin:   { name: 'Бухгалтерия',     border: 'border-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500', icon: 'calculator' },
+      it:    { name: 'IT',              border: 'border-sky-500',     bg: 'bg-sky-50',     text: 'text-sky-700',     dot: 'bg-sky-500',     icon: 'cpu' },
+      legal: { name: 'Юридический',     border: 'border-violet-500',  bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-500',  icon: 'scale' },
+      admin: { name: 'Администрация',   border: 'border-amber-500',   bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500',   icon: 'briefcase' },
+      system:{ name: 'Система',         border: 'border-slate-400',   bg: 'bg-slate-100',  text: 'text-slate-700',   dot: 'bg-slate-400',   icon: 'settings' },
+    };
+
+    const NOTIFICATIONS = [
+      { id: 1, dept: 'legal', icon: 'file-signature', title: 'Требуется подпись ЭЦП',          body: 'Договор № 2026-0415 ожидает вашей подписи',   time: '5 минут назад',  group: 'Сегодня',    unread: true },
+      { id: 2, dept: 'fin',   icon: 'clock',          title: 'Срок задачи истекает',           body: '«Квартальный отчёт Q1 2026» — осталось 2 дня',time: '1 час назад',     group: 'Сегодня',    unread: true },
+      { id: 3, dept: 'hr',    icon: 'user-check',     title: 'Сотрудник оформлен',             body: 'Жумабаева А.Т. принята на должность инженера',time: '3 часа назад',    group: 'Сегодня',    unread: true },
+      { id: 4, dept: 'sb',    icon: 'shield-check',   title: 'Проверка СБ пройдена',           body: 'Кандидат Серкебаев Р.А. — замечаний нет',     time: '5 часов назад',   group: 'Сегодня',    unread: false },
+      { id: 5, dept: 'it',    icon: 'laptop',         title: 'Выдано оборудование',            body: 'Ноутбук Lenovo ThinkPad передан Иванову С.В.',time: 'Вчера, 18:45',    group: 'Вчера',      unread: false },
+      { id: 6, dept: 'hr',    icon: 'plane',          title: 'Заявка на командировку',         body: 'Тажибаев Н. — Астана, 20–22 апреля',           time: 'Вчера, 14:02',    group: 'Вчера',      unread: false },
+      { id: 7, dept: 'admin', icon: 'megaphone',      title: 'Новое распоряжение',             body: 'Распоряжение №47 опубликовано',                time: 'Вчера, 11:30',    group: 'Вчера',      unread: false },
+      { id: 8, dept: 'legal', icon: 'gavel',          title: 'Претензионное письмо',           body: 'Входящая претензия от ТОО «Альфа»',            time: '2 дня назад',     group: 'Ранее',      unread: false },
+      { id: 9, dept: 'system',icon: 'log-in',         title: 'Новый вход в систему',           body: 'timeke@adata.kz выполнил вход',                time: '3 дня назад',     group: 'Ранее',      unread: false },
+    ];
+
+    let NOTIF_FILTER = 'all'; // 'all' | 'unread' | dept id
+
+    function notifUnreadCount() { return NOTIFICATIONS.filter(n => n.unread).length; }
+
+    function updateNotifBadges() {
+      const n = notifUnreadCount();
+      const show = n > 0;
+      ['notifBadge', 'headerNotifBadge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = n;
+        el.style.display = show ? '' : 'none';
+      });
+      const cnt = document.getElementById('notifDropdownCount');
+      if (cnt) { cnt.textContent = n; cnt.style.display = show ? '' : 'none'; }
+    }
+
+    function renderNotifItem(n, opts = {}) {
+      const d = DEPT_COLORS[n.dept] || DEPT_COLORS.system;
+      const size = opts.compact ? 'px-4 py-3' : 'px-5 py-4';
+      const readCls = n.unread ? '' : 'opacity-70';
+      const unreadDot = n.unread
+        ? `<span class="absolute top-4 right-4 w-2 h-2 rounded-full ${d.dot}" title="Новое"></span>`
+        : '';
+      return `<button type="button" data-notif-id="${n.id}" class="relative w-full text-left flex items-start gap-3 ${size} hover:bg-slate-50 transition-colors border-l-4 ${d.border} ${readCls}">
+        <div class="w-9 h-9 rounded-lg ${d.bg} ${d.text} flex items-center justify-center flex-shrink-0"><i data-lucide="${n.icon}" class="w-4 h-4"></i></div>
+        <div class="flex-1 min-w-0 pr-4">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="text-sm font-semibold text-slate-900">${n.title}</p>
+            <span class="inline-flex items-center gap-1 text-[10px] font-semibold ${d.text} ${d.bg} px-1.5 py-0.5 rounded-md">${d.name}</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">${n.body}</p>
+          <p class="text-[11px] text-slate-400 mt-1">${n.time}</p>
+        </div>
+        ${unreadDot}
+      </button>`;
+    }
+
+    function renderNotifDropdown() {
+      const list = document.getElementById('notifDropdownList');
+      if (!list) return;
+      const top5 = NOTIFICATIONS.slice(0, 5);
+      list.innerHTML = top5.map(n => renderNotifItem(n, { compact: true })).join('');
+      list.querySelectorAll('[data-notif-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.dataset.notifId);
+          const n = NOTIFICATIONS.find(x => x.id === id);
+          if (n) n.unread = false;
+          closeNotifDropdown();
+          navigateTo('notifications');
+          renderNotifPage();
+          updateNotifBadges();
+        });
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderNotifPage() {
+      // Filter pills
+      const row = document.getElementById('notifFilterRow');
+      if (row) {
+        const counts = { all: NOTIFICATIONS.length, unread: notifUnreadCount() };
+        const deptIds = Object.keys(DEPT_COLORS);
+        deptIds.forEach(id => counts[id] = NOTIFICATIONS.filter(n => n.dept === id).length);
+        const pills = [
+          { id: 'all', name: 'Все', colorBg: 'bg-slate-900', colorText: 'text-white', dot: '' },
+          { id: 'unread', name: 'Непрочитанные', colorBg: 'bg-rose-600', colorText: 'text-white', dot: '' },
+          ...deptIds.filter(id => counts[id] > 0).map(id => ({ id, name: DEPT_COLORS[id].name, colorBg: '', colorText: '', dot: DEPT_COLORS[id].dot })),
+        ];
+        row.innerHTML = pills.map(p => {
+          const active = NOTIF_FILTER === p.id;
+          const cls = active
+            ? `${p.colorBg || 'bg-slate-900'} text-white border-transparent`
+            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50';
+          const dot = p.dot ? `<span class="w-1.5 h-1.5 rounded-full ${p.dot}"></span>` : '';
+          const cnt = counts[p.id] ?? 0;
+          return `<button data-filter="${p.id}" class="inline-flex items-center gap-1.5 text-xs font-semibold border px-3 py-1.5 rounded-full transition-colors ${cls}">${dot}${p.name}<span class="text-[10px] ${active ? 'opacity-80' : 'text-slate-400'}">${cnt}</span></button>`;
+        }).join('');
+        row.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { NOTIF_FILTER = b.dataset.filter; renderNotifPage(); }));
+      }
+
+      // List (grouped)
+      const list = document.getElementById('notifList');
+      if (!list) return;
+      const filtered = NOTIFICATIONS.filter(n => {
+        if (NOTIF_FILTER === 'all') return true;
+        if (NOTIF_FILTER === 'unread') return n.unread;
+        return n.dept === NOTIF_FILTER;
+      });
+      if (!filtered.length) {
+        list.innerHTML = `<div class="bg-white rounded-2xl border border-slate-200 p-10 text-center text-slate-400 text-sm">Нет уведомлений по выбранному фильтру</div>`;
+        return;
+      }
+      // Group by group label
+      const groups = {};
+      filtered.forEach(n => { (groups[n.group] = groups[n.group] || []).push(n); });
+      list.innerHTML = Object.entries(groups).map(([grp, items]) => `
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2 px-1">${grp}</p>
+          <div class="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100 overflow-hidden">
+            ${items.map(renderNotifItem).join('')}
+          </div>
+        </div>
+      `).join('');
+      list.querySelectorAll('[data-notif-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.dataset.notifId);
+          const n = NOTIFICATIONS.find(x => x.id === id);
+          if (n) { n.unread = false; renderNotifPage(); updateNotifBadges(); }
+        });
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function markAllNotificationsRead() {
+      NOTIFICATIONS.forEach(n => n.unread = false);
+      renderNotifDropdown();
+      renderNotifPage();
+      updateNotifBadges();
+    }
+
+    function toggleNotifDropdown(e) {
+      if (e) e.stopPropagation();
+      const d = document.getElementById('notifDropdown');
+      if (!d) return;
+      const willOpen = d.classList.contains('hidden');
+      d.classList.toggle('hidden');
+      if (willOpen) renderNotifDropdown();
+    }
+    function closeNotifDropdown() {
+      document.getElementById('notifDropdown')?.classList.add('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('notifDropdownWrap');
+      if (wrap && !wrap.contains(e.target)) closeNotifDropdown();
+    });
+
+    // Initial paint
+    updateNotifBadges();
+    renderNotifPage();
+
     // ── Alert system ──
     function showAlert(message, type) {
       const existing = document.querySelector('.alert-toast');
@@ -2757,7 +2949,7 @@
     }
 
     // ── Render tables ──
-    function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map((t,i)=>renderTaskRow(t,i,'tasks')).join('') : emptyRow(6, 'Процессы не найдены'); }
+    function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map((t,i)=>renderTaskRow(t,i,'tasks')).join('') : emptyRow(6, 'Задачи не найдены'); }
     function renderRequests(data){ document.getElementById('reqTableBody').innerHTML   = data.length ? data.map((t,i)=>renderTaskRow(t,i,'requests')).join('') : emptyRow(6, 'Заявки не найдены'); }
     function renderDocs(data)    { document.getElementById('docTableBody').innerHTML   = data.length ? data.map(renderDocRow).join('')  : emptyRow(6, 'Документы не найдены'); }
 
