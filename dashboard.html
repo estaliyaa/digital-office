@@ -2950,35 +2950,67 @@
       return `<div class="flex flex-col items-center">${card}${kids}</div>`;
     }
 
-    // One connected company hierarchy with an employees sub-box
-    // underneath each company (matching the old reference layout).
+    // Per-company expand state: which company's employees are revealed
+    const SCHEME_EMP_OPEN = new Set();
+    function toggleCompanyEmps(id) {
+      if (SCHEME_EMP_OPEN.has(id)) SCHEME_EMP_OPEN.delete(id);
+      else SCHEME_EMP_OPEN.add(id);
+      renderStructSchema();
+    }
+    function expandAllCompanyEmps() {
+      Object.keys(COMPANY_MAP).forEach(id => SCHEME_EMP_OPEN.add(id));
+      renderStructSchema();
+    }
+    function collapseAllCompanyEmps() {
+      SCHEME_EMP_OPEN.clear();
+      renderStructSchema();
+    }
+
+    // One company in the chart. Click toggles its employees BELOW it.
+    // Employees are marked with the company's name so there's no doubt
+    // which company they belong to.
     function renderSchemeCompany(c, depth) {
       const hasChildren = (c.children || []).length > 0;
       const isHead = depth === 0;
       const cardCls = isHead
         ? 'bg-indigo-50 border-indigo-200'
         : 'bg-violet-50 border-violet-200';
+      const accent = isHead ? 'text-indigo-600' : 'text-violet-600';
+      const badgeColor = isHead ? 'text-indigo-600' : 'text-violet-600';
       const badge = isHead
-        ? `<span class="text-[10px] font-semibold text-indigo-600">Головная компания</span>`
-        : `<span class="text-[10px] font-semibold text-violet-600">Дочерняя компания</span>`;
+        ? `<span class="text-[10px] font-semibold ${badgeColor}">Головная компания</span>`
+        : `<span class="text-[10px] font-semibold ${badgeColor}">Дочерняя компания</span>`;
+
+      const hasEmps = (c.employeeIds || []).length > 0;
+      const open = SCHEME_EMP_OPEN.has(c.id);
+      const chev = hasEmps ? `<i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5 ${accent}"></i>` : '';
+      const empCount = companyEmployeeCount(c);
+
       const card = `
-        <button type="button" onclick="openCompanyDetail('${c.id}')" class="group inline-flex flex-col items-center gap-0.5 ${cardCls} border rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition-all min-w-[220px]">
-          <div class="flex items-center gap-2">
+        <button type="button" ${hasEmps ? `onclick="toggleCompanyEmps('${c.id}')"` : ''} class="group inline-flex flex-col items-center gap-0.5 ${cardCls} border rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition-all min-w-[230px] ${hasEmps ? 'cursor-pointer' : 'cursor-default'}">
+          <div class="flex items-center gap-2 w-full">
             <div class="w-7 h-7 rounded-full bg-gradient-to-br ${c.color} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
-            <p class="text-sm font-semibold text-slate-900">${c.name}</p>
+            <p class="text-sm font-semibold text-slate-900 flex-1 text-left">${c.name}</p>
+            ${chev}
           </div>
-          ${badge}
+          <div class="flex items-center gap-2">
+            ${badge}
+            <span class="text-[10px] text-slate-400">·</span>
+            <span class="text-[10px] text-slate-500">${empCount} сотр.</span>
+          </div>
         </button>
       `;
 
       const tree = buildEmpTree(c.employeeIds || []);
-      const accent = isHead ? 'text-indigo-600' : 'text-violet-600';
       const bgTint = isHead ? 'bg-indigo-50/30' : 'bg-violet-50/30';
-      const empsBlock = (SCHEME_SHOW_EMPS && tree.length) ? `
-        <div class="relative mt-5">
+      const empsBlock = (open && tree.length) ? `
+        <div class="relative mt-5 w-full flex flex-col items-center">
           <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-px h-5 bg-slate-300"></div>
-          <div class="relative rounded-2xl border border-dashed ${isHead ? 'border-indigo-300' : 'border-violet-300'} ${bgTint} px-5 py-4">
-            <p class="text-[10px] font-semibold uppercase tracking-wider ${accent} text-center mb-3">Сотрудники</p>
+          <div class="relative rounded-2xl border border-dashed ${isHead ? 'border-indigo-300' : 'border-violet-300'} ${bgTint} px-5 pb-4 pt-6">
+            <div class="absolute -top-2.5 left-5 flex items-center gap-1.5 bg-white border ${isHead ? 'border-indigo-200' : 'border-violet-200'} rounded-full px-2.5 py-0.5">
+              <span class="w-1.5 h-1.5 rounded-full ${isHead ? 'bg-indigo-500' : 'bg-violet-500'}"></span>
+              <p class="text-[10px] font-semibold uppercase tracking-wider ${accent}">Сотрудники · ${c.name}</p>
+            </div>
             <div class="flex flex-wrap items-start justify-center gap-6">
               ${tree.map(n => renderEmpNode(n, accent)).join('')}
             </div>
@@ -3001,33 +3033,21 @@
       return `<div class="flex flex-col items-center">${card}${empsBlock}${childrenBlock}</div>`;
     }
 
-    let SCHEME_SHOW_EMPS = true;
-    function toggleSchemeEmps() {
-      SCHEME_SHOW_EMPS = !SCHEME_SHOW_EMPS;
-      renderStructSchema();
-    }
-
-    // Company detail drawer — reuse employee drawer mount for a quick
-    // overview when clicking a company in the scheme.
-    function openCompanyDetail(id) {
-      const c = COMPANY_MAP[id]; if (!c) return;
-      goToCompany(id);
-      setStructView('table');
-    }
-
     function renderStructSchema() {
       const root = document.getElementById('structSchemaView');
       if (!root) return;
-      const toggleLabel = SCHEME_SHOW_EMPS ? 'Скрыть сотрудников' : 'Показать сотрудников';
-      const toggleIcon = SCHEME_SHOW_EMPS ? 'eye-off' : 'eye';
+      const anyOpen = SCHEME_EMP_OPEN.size > 0;
+      const toggleAllLabel = anyOpen ? 'Свернуть всех сотрудников' : 'Развернуть всех сотрудников';
+      const toggleAllIcon  = anyOpen ? 'eye-off' : 'eye';
+      const toggleAllFn    = anyOpen ? 'collapseAllCompanyEmps()' : 'expandAllCompanyEmps()';
       root.innerHTML = `
         <div class="flex items-center justify-end mb-4">
-          <button onclick="toggleSchemeEmps()" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="${toggleIcon}" class="w-3.5 h-3.5"></i>${toggleLabel}</button>
+          <button onclick="${toggleAllFn}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="${toggleAllIcon}" class="w-3.5 h-3.5"></i>${toggleAllLabel}</button>
         </div>
         <div class="flex flex-col items-center gap-2 min-w-[900px]">
           ${COMPANIES.map(c => renderSchemeCompany(c, 0)).join('')}
         </div>
-        <p class="text-center text-[11px] text-slate-400 mt-6">Нажмите на карточку компании для подробностей, на сотрудника — чтобы открыть его профиль</p>
+        <p class="text-center text-[11px] text-slate-400 mt-6">Нажмите на компанию, чтобы раскрыть её сотрудников. Нажмите на сотрудника — откроется его профиль.</p>
       `;
       if (window.lucide) lucide.createIcons();
     }
