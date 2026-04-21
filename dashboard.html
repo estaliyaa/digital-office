@@ -2730,9 +2730,22 @@
       return own + nested;
     }
 
-    const STRUCT_EXPANDED = new Set(['avrora']);
+    // Build a flat lookup + parent links
+    const COMPANY_MAP = {};
+    const COMPANY_PARENT = {};
+    (function indexCompanies(arr, parentId) {
+      arr.forEach(c => {
+        COMPANY_MAP[c.id] = c;
+        COMPANY_PARENT[c.id] = parentId || null;
+        if (c.children) indexCompanies(c.children, c.id);
+      });
+    })(COMPANIES);
+
     let STRUCT_VIEW = 'table';
     let STRUCT_QUERY = '';
+    let ACTIVE_COMPANY_ID = COMPANIES[0].id;
+    let EMP_DEPT_FILTER = 'all';
+    const SCHEME_EXPANDED = new Set([COMPANIES[0].id]);
 
     function setStructView(view) {
       STRUCT_VIEW = view;
@@ -2763,74 +2776,182 @@
       return text.toLowerCase().includes(STRUCT_QUERY.toLowerCase());
     }
 
-    function renderCompanyCard(c, depth = 0) {
-      const expanded = STRUCT_EXPANDED.has(c.id);
-      const badge = c.type === 'head'
+    function companyPath(id) {
+      const path = [];
+      let cur = id;
+      while (cur) { path.unshift(cur); cur = COMPANY_PARENT[cur]; }
+      return path;
+    }
+
+    function goToCompany(id) {
+      if (!COMPANY_MAP[id]) return;
+      ACTIVE_COMPANY_ID = id;
+      EMP_DEPT_FILTER = 'all';
+      renderStructTable();
+    }
+
+    // Drill-down explorer table view: breadcrumb → company summary →
+    // child-company cards → employees list for the focused company.
+    function renderStructTable() {
+      const root = document.getElementById('structTableView');
+      if (!root) return;
+      const active = COMPANY_MAP[ACTIVE_COMPANY_ID];
+      if (!active) return;
+      const path = companyPath(ACTIVE_COMPANY_ID);
+
+      // Breadcrumb
+      const breadcrumb = path.map((id, i) => {
+        const c = COMPANY_MAP[id];
+        const isLast = i === path.length - 1;
+        return `<button ${isLast ? 'disabled' : `onclick="goToCompany('${id}')"`} class="inline-flex items-center gap-1 ${isLast ? 'text-slate-900 font-semibold cursor-default' : 'text-slate-500 hover:text-indigo-600 transition-colors'}">${c.name}</button>`;
+      }).join('<i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 mx-1"></i>');
+
+      const badge = active.type === 'head'
         ? `<span class="inline-flex items-center text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">Головная компания</span>`
         : `<span class="inline-flex items-center text-[11px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">Дочерняя компания</span>`;
-      const count = companyEmployeeCount(c);
-      const chev = expanded ? 'chevron-up' : 'chevron-down';
+      const totalCount = companyEmployeeCount(active);
+      const directEmployees = (active.employeeIds || []).map(id => EMPLOYEES[id]).filter(Boolean);
+      const children = active.children || [];
 
-      const nested = (c.children || []).map(ch => renderCompanyCard(ch, depth + 1)).join('');
+      // Unique departments in the current company's employee list
+      const deptSet = new Set(directEmployees.map(e => e.dept));
+      const deptChips = ['all', ...Array.from(deptSet)];
+      const filtered = directEmployees
+        .filter(e => EMP_DEPT_FILTER === 'all' ? true : e.dept === EMP_DEPT_FILTER)
+        .filter(e => matchesQuery(e.name) || matchesQuery(e.position));
 
-      const employees = (c.employeeIds || []).map(id => EMPLOYEES[id]).filter(Boolean).filter(e => matchesQuery(e.name) || matchesQuery(e.position));
-      const employeeSection = employees.length ? `
-        <div class="mt-3 rounded-xl border border-slate-100 overflow-hidden">
-          <div class="grid grid-cols-[1.3fr_1fr_1.2fr_auto] gap-4 px-4 py-2.5 bg-slate-50/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            <span>Сотрудник</span><span>Отдел</span><span>Контакты</span><span></span>
+      const header = `
+        <div class="bg-white rounded-2xl border border-slate-200 p-5">
+          ${path.length > 1 ? `<nav class="flex items-center gap-1 text-xs text-slate-500 mb-3 flex-wrap">${breadcrumb}</nav>` : ''}
+          <div class="flex items-center gap-4 flex-wrap">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${active.color} text-white text-base font-bold flex items-center justify-center flex-shrink-0">${active.initials}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-lg font-bold text-slate-900">${active.name}</h3>
+                ${badge}
+              </div>
+              <div class="flex items-center gap-4 text-xs text-slate-500 mt-1 flex-wrap">
+                <span class="inline-flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>${totalCount} сотрудников</span>
+                ${children.length ? `<span class="inline-flex items-center gap-1"><i data-lucide="git-branch" class="w-3.5 h-3.5 text-slate-400"></i>${children.length} подразделений</span>` : ''}
+              </div>
+            </div>
+            ${COMPANY_PARENT[ACTIVE_COMPANY_ID] ? `<button onclick="goToCompany('${COMPANY_PARENT[ACTIVE_COMPANY_ID]}')" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-xl transition-colors"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>Наверх</button>` : ''}
           </div>
-          <div class="divide-y divide-slate-100 bg-white">
-            ${employees.map(e => `
-              <button type="button" onclick="openEmployeeDrawer('${e.id}')" class="w-full text-left grid grid-cols-[1.3fr_1fr_1.2fr_auto] gap-4 px-4 py-3 items-center hover:bg-slate-50 transition-colors">
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-9 h-9 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${e.short.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase()}</div>
-                  <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-900 truncate">${e.name}</p>
-                    <p class="text-[11px] text-slate-500 truncate">${e.position}</p>
+        </div>
+      `;
+
+      const childrenGrid = children.length ? `
+        <div class="bg-white rounded-2xl border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Подразделения · ${children.length}</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            ${children.map(ch => `
+              <button type="button" onclick="goToCompany('${ch.id}')" class="group relative text-left rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40 transition-all p-4 flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br ${ch.color} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${ch.initials}</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-slate-900 truncate">${ch.name}</p>
+                    <p class="text-[11px] text-slate-500">${companyEmployeeCount(ch)} сотрудников${(ch.children||[]).length ? ' · ' + ch.children.length + ' дочерних' : ''}</p>
                   </div>
                 </div>
-                <div>${deptPill(e.dept)}</div>
-                <div class="text-[11px] text-slate-500 min-w-0">
-                  <p class="truncate"><i data-lucide="mail" class="w-3 h-3 inline -mt-0.5 mr-1 text-slate-400"></i>${e.email}</p>
-                  <p class="truncate mt-0.5"><i data-lucide="phone" class="w-3 h-3 inline -mt-0.5 mr-1 text-slate-400"></i>${e.phone}</p>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+                <div class="flex items-center justify-end text-[11px] font-medium text-slate-400 group-hover:text-indigo-600 transition-colors">Открыть <i data-lucide="arrow-right" class="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform"></i></div>
               </button>
             `).join('')}
           </div>
         </div>
       ` : '';
 
-      return `
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <button type="button" onclick="toggleStructCompany('${c.id}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br ${c.color} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
-            <div class="flex-1 min-w-0 text-left">
-              <p class="text-sm font-semibold text-slate-900 truncate">${c.name}</p>
-              <p class="text-[11px] text-slate-500">${count} сотрудников</p>
-            </div>
-            ${badge}
-            <i data-lucide="${chev}" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
-          </button>
-          ${expanded ? `<div class="px-4 pb-4 border-t border-slate-100 pt-3 space-y-2">
-            ${nested}
-            ${employeeSection}
-          </div>` : ''}
+      const empChips = directEmployees.length ? `
+        <div class="flex items-center gap-2 flex-wrap mb-3">
+          ${deptChips.map(d => {
+            const count = d === 'all' ? directEmployees.length : directEmployees.filter(e => e.dept === d).length;
+            const label = d === 'all' ? 'Все' : d;
+            const active = EMP_DEPT_FILTER === d;
+            return `<button onclick="setEmpFilter('${d}')" class="inline-flex items-center gap-1.5 text-xs font-semibold border px-2.5 py-1 rounded-full transition-colors ${active ? 'bg-slate-900 text-white border-transparent' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}">${label}<span class="text-[10px] ${active ? 'opacity-80' : 'text-slate-400'}">${count}</span></button>`;
+          }).join('')}
         </div>
-      `;
-    }
+      ` : '';
 
-    function renderStructTable() {
-      const root = document.getElementById('structTableView');
-      if (!root) return;
-      root.innerHTML = COMPANIES.map(c => renderCompanyCard(c)).join('');
+      const employeeBlock = directEmployees.length ? `
+        <div class="bg-white rounded-2xl border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Сотрудники · ${directEmployees.length}</p>
+          </div>
+          ${empChips}
+          <div class="rounded-xl border border-slate-100 overflow-hidden">
+            <div class="grid grid-cols-[1.3fr_0.8fr_1.2fr_auto] gap-4 px-4 py-2.5 bg-slate-50/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <span>Сотрудник</span><span>Отдел</span><span>Контакты</span><span></span>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${filtered.length ? filtered.map(e => `
+                <button type="button" onclick="openEmployeeDrawer('${e.id}')" class="w-full text-left grid grid-cols-[1.3fr_0.8fr_1.2fr_auto] gap-4 px-4 py-3 items-center hover:bg-slate-50 transition-colors">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${e.short.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase()}</div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-semibold text-slate-900 truncate">${e.name}</p>
+                      <p class="text-[11px] text-slate-500 truncate">${e.position}</p>
+                    </div>
+                  </div>
+                  <div>${deptPill(e.dept)}</div>
+                  <div class="text-[11px] text-slate-500 min-w-0">
+                    <p class="truncate"><i data-lucide="mail" class="w-3 h-3 inline -mt-0.5 mr-1 text-slate-400"></i>${e.email}</p>
+                    <p class="truncate mt-0.5"><i data-lucide="phone" class="w-3 h-3 inline -mt-0.5 mr-1 text-slate-400"></i>${e.phone}</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+                </button>
+              `).join('') : `<div class="px-4 py-8 text-center text-xs text-slate-400">Нет сотрудников по выбранному фильтру</div>`}
+            </div>
+          </div>
+        </div>
+      ` : (children.length ? '' : `<div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-xs text-slate-400">Нет сотрудников и подразделений</div>`);
+
+      root.innerHTML = `<div class="space-y-3">${header}${childrenGrid}${employeeBlock}</div>`;
       if (window.lucide) lucide.createIcons();
     }
 
-    function toggleStructCompany(id) {
-      if (STRUCT_EXPANDED.has(id)) STRUCT_EXPANDED.delete(id);
-      else STRUCT_EXPANDED.add(id);
+    function setEmpFilter(d) {
+      EMP_DEPT_FILTER = d;
       renderStructTable();
+    }
+
+    // Interactive scheme: each company card can be expanded in-place
+    // to drop down its children (and those can expand in turn).
+    function renderSchemeNode(c, depth) {
+      const hasChildren = (c.children || []).length > 0;
+      const expanded = SCHEME_EXPANDED.has(c.id);
+      const badgeCls = depth === 0
+        ? 'bg-indigo-50 border-indigo-200'
+        : 'bg-white border-slate-200';
+      const chev = hasChildren ? `<i data-lucide="${expanded ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5 text-slate-400"></i>` : '';
+      const card = `
+        <div class="inline-flex">
+          <button type="button" onclick="${hasChildren ? `toggleSchemeNode('${c.id}')` : `goToCompany('${c.id}'); setStructView('table');`}" class="group flex items-center gap-3 ${badgeCls} border rounded-xl px-3 py-2 shadow-sm hover:shadow-md transition-all min-w-[220px]">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br ${c.color} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
+            <div class="min-w-0 flex-1 text-left">
+              <p class="text-sm font-semibold text-slate-900 truncate">${c.name}</p>
+              <p class="text-[11px] text-slate-500">${companyEmployeeCount(c)} сотрудников${hasChildren ? ' · ' + c.children.length + ' дочерних' : ''}</p>
+            </div>
+            ${chev}
+          </button>
+        </div>
+      `;
+      const kids = (expanded && hasChildren) ? `
+        <div class="relative pt-6 flex items-start gap-4 flex-wrap justify-center">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-px h-6 bg-slate-300"></div>
+          ${c.children.map(ch => `<div class="flex flex-col items-center gap-0 relative">
+            <div class="absolute -top-6 w-px h-6 bg-slate-300"></div>
+            ${renderSchemeNode(ch, depth + 1)}
+          </div>`).join('')}
+        </div>
+      ` : '';
+      return `<div class="flex flex-col items-center">${card}${kids}</div>`;
+    }
+
+    function toggleSchemeNode(id) {
+      if (SCHEME_EXPANDED.has(id)) SCHEME_EXPANDED.delete(id);
+      else SCHEME_EXPANDED.add(id);
+      renderStructSchema();
     }
 
     function renderStructSchema() {
@@ -2838,26 +2959,9 @@
       if (!root) return;
       root.innerHTML = `
         <div class="flex flex-col items-center gap-6 min-w-[900px]">
-          ${COMPANIES.map(head => `
-            <div class="flex flex-col items-center">
-              <div class="flex flex-col items-center gap-1 rounded-2xl bg-indigo-50 border border-indigo-200 px-4 py-2.5 shadow-sm">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${head.color} text-white text-[11px] font-bold flex items-center justify-center">${head.initials}</div>
-                <p class="text-sm font-semibold text-slate-900">${head.name}</p>
-                <p class="text-[11px] text-indigo-600 font-medium">Головная компания · ${companyEmployeeCount(head)} сотрудников</p>
-              </div>
-              <div class="w-px h-6 bg-slate-300"></div>
-              <div class="flex items-start gap-4 flex-wrap justify-center">
-                ${(head.children || []).map(ch => `
-                  <div class="flex flex-col items-center rounded-xl bg-white border border-slate-200 px-4 py-2.5 shadow-sm min-w-[170px]">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br ${ch.color} text-white text-[11px] font-bold flex items-center justify-center mb-1">${ch.initials}</div>
-                    <p class="text-sm font-semibold text-slate-900">${ch.name}</p>
-                    <p class="text-[11px] text-slate-500">${companyEmployeeCount(ch)} сотрудников</p>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
+          ${COMPANIES.map(c => renderSchemeNode(c, 0)).join('')}
         </div>
+        <p class="text-center text-[11px] text-slate-400 mt-6">Нажмите на компанию, чтобы раскрыть её дочерние подразделения</p>
       `;
       if (window.lucide) lucide.createIcons();
     }
@@ -2930,10 +3034,6 @@
     renderStructTable();
     document.getElementById('structSearch')?.addEventListener('input', (e) => {
       STRUCT_QUERY = e.target.value;
-      // Auto-expand everything when searching so matches surface
-      if (STRUCT_QUERY) {
-        COMPANIES.forEach(function add(c) { STRUCT_EXPANDED.add(c.id); (c.children||[]).forEach(add); });
-      }
       if (STRUCT_VIEW === 'table') renderStructTable();
     });
 
