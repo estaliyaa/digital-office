@@ -645,7 +645,7 @@
         <div id="structTableView" class="space-y-2"></div>
 
         <!-- Schema view -->
-        <div id="structSchemaView" class="hidden bg-white rounded-2xl border border-slate-200 p-6 overflow-x-auto"></div>
+        <div id="structSchemaView" class="hidden"></div>
       </div>
 
       <!-- ══ PAGE: Реестр документов ══ -->
@@ -2973,125 +2973,103 @@
       renderStructSchema();
     }
 
-    // Reusable connector: vertical line + arrow-down tip at the bottom.
-    const vLine = (h = 28) => `
-      <div class="flex flex-col items-center" style="height:${h}px">
-        <div class="w-0.5 bg-slate-300 flex-1"></div>
-        <svg width="10" height="6" viewBox="0 0 10 6" class="text-slate-400 -mt-px"><path d="M0 0 L5 6 L10 0 Z" fill="currentColor"/></svg>
-      </div>
-    `;
-
-    // One company in the chart. Click toggles its employees BELOW it.
+    // Clean outline-style org chart. Each company is a full-width panel
+    // that stacks vertically. Daughters are indented with a soft tree
+    // rail on the left. Clicking a panel header expands its employees
+    // in-place; other panels stay untouched.
     function renderSchemeCompany(c, depth) {
       const hasChildren = (c.children || []).length > 0;
       const isHead = depth === 0;
-
-      // Distinct colour roles: head → indigo, daughter → amber
-      const cardCls = isHead
-        ? 'bg-indigo-600 border-indigo-600 text-white'
-        : 'bg-amber-50 border-amber-300 text-amber-900';
-      const avatarCls = isHead
-        ? 'bg-white/20 text-white'
-        : 'bg-amber-500 text-white';
-      const nameCls = isHead ? 'text-white' : 'text-amber-900';
-      const badgeCls = isHead
-        ? 'bg-white/15 text-white'
-        : 'bg-amber-100 text-amber-700';
-      const chevColor = isHead ? 'text-white' : 'text-amber-700';
-      const subColor = isHead ? 'text-indigo-100' : 'text-amber-600';
-
       const hasEmps = (c.employeeIds || []).length > 0;
       const open = SCHEME_EMP_OPEN.has(c.id);
-      const chev = hasEmps ? `<i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 ${chevColor}"></i>` : '';
-      const empCount = companyEmployeeCount(c);
+      const ownCount = (c.employeeIds || []).length;
+      const totalCount = companyEmployeeCount(c);
+
+      // Soft unified palette — one accent colour (indigo) everywhere.
+      // Head vs daughter differ only by stripe width + badge variant.
+      const stripeCls = isHead ? 'bg-indigo-500' : 'bg-indigo-200';
+      const badgeCls = isHead
+        ? 'bg-indigo-600 text-white'
+        : 'bg-slate-100 text-slate-700';
+      const avatarRingCls = isHead ? 'ring-2 ring-indigo-200' : 'ring-1 ring-slate-200';
       const badgeText = isHead ? 'Головная' : 'Дочерняя';
 
-      const card = `
-        <button type="button" ${hasEmps ? `onclick="toggleCompanyEmps('${c.id}')"` : ''} class="inline-flex flex-col items-start gap-1 ${cardCls} border-2 rounded-xl px-4 py-2.5 shadow-sm hover:shadow-lg transition-all min-w-[240px] ${hasEmps ? 'cursor-pointer' : 'cursor-default'}">
-          <div class="flex items-center gap-2 w-full">
-            <div class="w-8 h-8 rounded-full ${avatarCls} text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
-            <p class="text-sm font-semibold ${nameCls} flex-1 text-left">${c.name}</p>
-            ${chev}
+      const chev = hasEmps
+        ? `<i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>`
+        : '';
+
+      const header = `
+        <button type="button" ${hasEmps ? `onclick="toggleCompanyEmps('${c.id}')"` : ''} class="group w-full flex items-center gap-3 px-4 py-3 ${hasEmps ? 'hover:bg-slate-50' : ''} transition-colors text-left">
+          <div class="w-10 h-10 rounded-xl ${avatarRingCls} bg-gradient-to-br ${c.color} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <p class="text-sm font-semibold text-slate-900 truncate">${c.name}</p>
+              <span class="inline-flex items-center text-[10px] font-semibold ${badgeCls} px-1.5 py-0.5 rounded-full">${badgeText}</span>
+            </div>
+            <div class="flex items-center gap-3 mt-0.5">
+              <span class="inline-flex items-center gap-1 text-[11px] text-slate-500"><i data-lucide="users" class="w-3 h-3 text-slate-400"></i>${ownCount} прям. · ${totalCount} всего</span>
+              ${hasChildren ? `<span class="inline-flex items-center gap-1 text-[11px] text-slate-500"><i data-lucide="git-branch" class="w-3 h-3 text-slate-400"></i>${c.children.length} подразд.</span>` : ''}
+            </div>
           </div>
-          <div class="flex items-center gap-2 pl-10">
-            <span class="inline-flex items-center text-[10px] font-semibold ${badgeCls} px-1.5 py-0.5 rounded-full">${badgeText}</span>
-            <span class="text-[10px] ${subColor}">${empCount} сотр.</span>
-          </div>
+          ${chev}
         </button>
       `;
 
-      const tree = buildEmpTree(c.employeeIds || []);
-      const boxBorder = isHead ? 'border-indigo-300' : 'border-amber-300';
-      const boxBg = isHead ? 'bg-indigo-50/60' : 'bg-amber-50/60';
-      const pillBorder = isHead ? 'border-indigo-300' : 'border-amber-300';
-      const pillDot = isHead ? 'bg-indigo-500' : 'bg-amber-500';
-      const pillText = isHead ? 'text-indigo-700' : 'text-amber-700';
-      const accent = isHead ? 'text-indigo-600' : 'text-amber-700';
-
-      const ownCount = (c.employeeIds || []).length;
-      // Above this threshold, switch to a compact searchable grid
-      // (flat, paginated scroll) so huge companies still fit.
-      const COMPACT_THRESHOLD = 10;
-      const compactMode = ownCount > COMPACT_THRESHOLD;
-
-      const empsBlock = (open && tree.length) ? `
-        <div class="flex flex-col items-center w-full">
-          ${vLine(22)}
-          <div class="relative rounded-2xl border-2 border-dashed ${boxBorder} ${boxBg} px-5 pb-4 pt-7 mt-0 w-full max-w-[1100px]">
-            <!-- Label (with count) -->
-            <div class="absolute -top-3 left-5 flex items-center gap-1.5 bg-white border-2 ${pillBorder} rounded-full px-2.5 py-0.5 shadow-sm">
-              <span class="w-1.5 h-1.5 rounded-full ${pillDot}"></span>
-              <p class="text-[10px] font-semibold uppercase tracking-wider ${pillText}">Сотрудники · ${c.name} · ${ownCount}</p>
-            </div>
-            <!-- Close -->
-            <button type="button" onclick="toggleCompanyEmps('${c.id}')" title="Свернуть" class="absolute -top-3 right-5 w-6 h-6 bg-white border-2 ${pillBorder} rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm transition-colors">
-              <i data-lucide="x" class="w-3 h-3"></i>
-            </button>
-            ${compactMode ? `
-              <div class="pt-1">
-                <div class="max-h-[360px] overflow-y-auto pr-1">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    ${(c.employeeIds || []).map(id => EMPLOYEES[id]).filter(Boolean).map(e => {
-                      const init = e.short.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
-                      return `<button type="button" onclick="openEmployeeDrawer('${e.id}')" class="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-100/40 px-2.5 py-1.5 transition-all text-left">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${init}</div>
-                        <div class="min-w-0 flex-1">
-                          <p class="text-[12px] font-semibold text-slate-900 truncate leading-tight">${e.short}</p>
-                          <p class="text-[10px] ${accent} truncate leading-tight">${e.position}</p>
-                        </div>
-                      </button>`;
-                    }).join('')}
+      // Always a clean flat grid now — no reporting tree, no dashed box,
+      // no connector arrows. Employees are a grid of chips.
+      const MAX_EMP_HEIGHT = 360;
+      const empsBlock = (open && hasEmps) ? `
+        <div class="px-4 pb-4 pt-0 border-t border-slate-100 bg-slate-50/40">
+          <div class="flex items-center justify-between mb-2 mt-3">
+            <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Сотрудники · ${ownCount}</p>
+            <button type="button" onclick="toggleCompanyEmps('${c.id}')" class="text-[11px] font-medium text-slate-500 hover:text-slate-900 inline-flex items-center gap-1 transition-colors"><i data-lucide="chevron-up" class="w-3 h-3"></i>Свернуть</button>
+          </div>
+          <div class="max-h-[${MAX_EMP_HEIGHT}px] overflow-y-auto pr-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+              ${(c.employeeIds || []).map(id => EMPLOYEES[id]).filter(Boolean).map(e => {
+                const init = e.short.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+                return `<button type="button" onclick="openEmployeeDrawer('${e.id}')" class="inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-sm px-2.5 py-1.5 transition-all text-left">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${init}</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-[12px] font-semibold text-slate-900 truncate leading-tight">${e.short}</p>
+                    <p class="text-[10px] text-slate-500 truncate leading-tight">${e.position}</p>
                   </div>
-                </div>
-                <p class="text-[10px] text-slate-400 text-center mt-2">Прокрутите список, чтобы увидеть всех</p>
-              </div>
-            ` : `
-              <div class="max-h-[460px] overflow-auto pt-1">
-                <div class="flex flex-wrap items-start justify-center gap-6 min-w-max">
-                  ${tree.map(n => renderEmpNode(n, accent)).join('')}
-                </div>
-              </div>
-            `}
+                </button>`;
+              }).join('')}
+            </div>
           </div>
+          ${ownCount > 12 ? `<p class="text-[10px] text-slate-400 text-center mt-2">Прокрутите список, чтобы увидеть всех</p>` : ''}
         </div>
       ` : '';
 
+      const panel = `
+        <div class="relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="absolute left-0 top-0 bottom-0 w-1 ${stripeCls}"></div>
+          <div class="pl-2">
+            ${header}
+            ${empsBlock}
+          </div>
+        </div>
+      `;
+
+      // Daughter panels sit inside a wrapper with an indent + a subtle
+      // vertical tree-rail so the hierarchy is visible without drawing
+      // busy connector lines.
       const childrenBlock = hasChildren ? `
-        <div class="flex flex-col items-center w-full">
-          ${vLine(28)}
-          <!-- horizontal bus spanning child centers -->
-          <div class="relative pt-0 flex items-start gap-6 flex-wrap justify-center">
-            ${c.children.length > 1 ? `<div class="absolute top-0 left-[12%] right-[12%] h-0.5 bg-slate-300"></div>` : ''}
-            ${c.children.map(ch => `<div class="flex flex-col items-center relative">
-              <!-- descender from bus to this child -->
-              <div class="w-0.5 h-4 bg-slate-300"></div>
-              ${renderSchemeCompany(ch, depth + 1)}
-            </div>`).join('')}
+        <div class="relative mt-3 pl-8">
+          <div class="absolute left-3 top-0 bottom-3 w-px bg-slate-200"></div>
+          <div class="space-y-3">
+            ${c.children.map(ch => `
+              <div class="relative">
+                <div class="absolute -left-5 top-7 w-4 h-px bg-slate-200"></div>
+                ${renderSchemeCompany(ch, depth + 1)}
+              </div>
+            `).join('')}
           </div>
         </div>
       ` : '';
 
-      return `<div class="flex flex-col items-center">${card}${empsBlock}${childrenBlock}</div>`;
+      return `<div class="w-full">${panel}${childrenBlock}</div>`;
     }
 
     function renderStructSchema() {
@@ -3102,23 +3080,19 @@
       const toggleAllIcon  = anyOpen ? 'eye-off' : 'eye';
       const toggleAllFn    = anyOpen ? 'collapseAllCompanyEmps()' : 'expandAllCompanyEmps()';
       root.innerHTML = `
-        <!-- Legend + bulk toggle -->
-        <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
-          <div class="flex items-center gap-3 flex-wrap">
-            <span class="text-xs font-medium text-slate-500">Обозначения:</span>
-            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-indigo-600"></span>Головная компания</span>
-            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-amber-100 border-2 border-amber-300"></span>Дочерняя компания</span>
-            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-white border-2 border-dashed border-indigo-300"></span>Сотрудники</span>
+        <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+          <div class="flex items-center gap-4 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-1 h-4 bg-indigo-500 rounded-sm"></span>Головная компания</span>
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-1 h-4 bg-indigo-200 rounded-sm"></span>Дочерняя компания</span>
           </div>
           <button onclick="${toggleAllFn}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="${toggleAllIcon}" class="w-3.5 h-3.5"></i>${toggleAllLabel}</button>
         </div>
 
-        <!-- Tree -->
-        <div class="flex flex-col items-center gap-0 min-w-[900px]">
+        <div class="space-y-3">
           ${COMPANIES.map(c => renderSchemeCompany(c, 0)).join('')}
         </div>
 
-        <p class="text-center text-[11px] text-slate-400 mt-6">Клик по компании раскрывает её сотрудников под ней. Клик по сотруднику — открывает его профиль.</p>
+        <p class="text-[11px] text-slate-400 mt-5">Нажмите на компанию, чтобы раскрыть её сотрудников. Нажмите на сотрудника — откроется его профиль.</p>
       `;
       if (window.lucide) lucide.createIcons();
     }
