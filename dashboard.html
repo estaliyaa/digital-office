@@ -321,8 +321,8 @@
       <div id="page-statistics" class="page-content active">
         <!-- Greeting -->
         <div class="mb-6 fade-in">
-          <h2 class="text-2xl font-bold text-slate-900 mb-1.5"><span id="greetName"></span>, сводка на сегодня</h2>
-          <p class="text-sm text-slate-500" id="greetSub"></p>
+          <h2 class="text-2xl font-bold text-slate-900 mb-1.5">Мой рабочий стол</h2>
+          <p class="text-sm text-slate-500" id="greetSub">Ключевые процессы, задачи и показатели на сегодня</p>
         </div>
 
         <!-- Summary cards row -->
@@ -1870,10 +1870,7 @@
     if (role === 'user') document.getElementById('settingsLink').classList.add('hidden');
 
     // ── Render statistics page ──
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Доброе утро' : hour < 18 ? 'Добрый день' : 'Добрый вечер';
-    document.getElementById('greetName').textContent = name.split(' ')[0];
-    document.getElementById('greetSub').textContent = `${greeting}. 5 активных задач и 2 просроченных ждут вашего внимания.`;
+    // Heading/subheading are static and descriptive; see #page-statistics.
 
     // Status badge helper
     function statusBadge(status) {
