@@ -2222,6 +2222,12 @@
       renderProcesses();
     }
 
+    // Hoisted task-detail state (needed by navigateTo → saveDraftComment/applyDraftState,
+    // which can fire during the initial navigateTo('statistics') call below).
+    var ACTIVE_TASK_SOURCE = 'tasks';  // 'tasks' | 'requests'
+    var ACTIVE_TASK_IDX = -1;
+    var DRAFTS = {};
+
     function navigateTo(pageId) {
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('page-' + pageId);
@@ -3167,9 +3173,8 @@
     // activeTask points at the task currently rendered in the detail page;
     // DRAFTS keeps per-task draft state so leaving/returning to different
     // rows preserves each row's own in-progress data.
-    let ACTIVE_TASK_SOURCE = 'tasks';  // 'tasks' | 'requests'
-    let ACTIVE_TASK_IDX = -1;
-    const DRAFTS = {};                 // `${source}:${idx}` → draft
+    // (ACTIVE_TASK_SOURCE / ACTIVE_TASK_IDX / DRAFTS are hoisted above
+    //  navigateTo to avoid a TDZ crash during init.)
     function draftKey(src, idx) { return `${src}:${idx}`; }
     function getDraft() {
       const k = draftKey(ACTIVE_TASK_SOURCE, ACTIVE_TASK_IDX);
