@@ -845,20 +845,21 @@
             <div class="min-w-0 flex-1">
               <!-- Top chips: ID · Type · Process status · Current stage · Date -->
               <div class="flex items-center gap-2 mb-3 flex-wrap">
-                <span class="inline-flex items-center text-xs font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">№23596</span>
-                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md"><i data-lucide="briefcase" class="w-3 h-3"></i>Трудоустройство</span>
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>В работе</span>
+                <span id="tdTaskId" class="inline-flex items-center text-xs font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">№23596</span>
+                <span id="tdTaskType" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md"><i data-lucide="briefcase" class="w-3 h-3"></i>Трудоустройство</span>
+                <span id="tdTaskStatus" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-md"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>В работе</span>
                 <button onclick="openStagesDrawer()" title="Показать все этапы" class="group inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 hover:border-indigo-300 px-2 py-0.5 rounded-md transition-colors">
                   <i data-lucide="git-branch" class="w-3 h-3"></i>
                   <span>Этап · Анкета</span>
                   <span class="text-[10px] font-mono text-indigo-500">2/9</span>
                   <i data-lucide="chevron-right" class="w-3 h-3 text-indigo-400 group-hover:translate-x-0.5 transition-transform"></i>
                 </button>
-                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500"><i data-lucide="calendar" class="w-3 h-3"></i>Создано 10 ноября 2025</span>
+                <span id="tdTaskCreated" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500"><i data-lucide="calendar" class="w-3 h-3"></i>Создано 10 ноября 2025</span>
               </div>
 
               <!-- Title -->
-              <h1 class="text-2xl font-bold text-slate-900 leading-tight">Приём на работу Рамиль Арманович Серкебаев</h1>
+              <h1 id="tdTaskTitle" class="text-2xl font-bold text-slate-900 leading-tight">Приём на работу Рамиль Арманович Серкебаев</h1>
+              <p id="tdTaskFrom" class="text-sm text-slate-500 mt-1">HR · Трудоустройство</p>
             </div>
 
           </div>
@@ -2708,11 +2709,11 @@
       return `<div class="flex items-center -space-x-2">${avatars}${more}</div>`;
     }
 
-    function renderTaskRow(t) {
+    function renderTaskRow(t, i, source) {
       const draftMarker = t.hasDraft
         ? `<span title="У задачи есть несохранённый черновик" class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-md ml-1.5 align-middle"><i data-lucide="pencil-line" class="w-2.5 h-2.5"></i>Черновик</span>`
         : '';
-      return `<tr onclick="navigateTo('task-detail')" class="cursor-pointer hover:bg-slate-50 transition-colors ${t.hasDraft ? 'bg-amber-50/30' : ''}">
+      return `<tr data-task-idx="${i}" data-task-source="${source}" onclick="openTaskDetail(${i},'${source}')" class="cursor-pointer hover:bg-slate-50 transition-colors ${t.hasDraft ? 'bg-amber-50/30' : ''}">
         <td>
           <p class="text-sm font-medium text-slate-900 leading-snug">${t.title}${draftMarker}</p>
           <p class="text-xs text-slate-400 mt-0.5">${t.from} — ${t.fromSub}</p>
@@ -2740,8 +2741,8 @@
     }
 
     // ── Render tables ──
-    function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map(renderTaskRow).join('') : emptyRow(6, 'Процессы не найдены'); }
-    function renderRequests(data){ document.getElementById('reqTableBody').innerHTML   = data.length ? data.map(renderTaskRow).join('') : emptyRow(6, 'Заявки не найдены'); }
+    function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map((t,i)=>renderTaskRow(t,i,'tasks')).join('') : emptyRow(6, 'Процессы не найдены'); }
+    function renderRequests(data){ document.getElementById('reqTableBody').innerHTML   = data.length ? data.map((t,i)=>renderTaskRow(t,i,'requests')).join('') : emptyRow(6, 'Заявки не найдены'); }
     function renderDocs(data)    { document.getElementById('docTableBody').innerHTML   = data.length ? data.map(renderDocRow).join('')  : emptyRow(6, 'Документы не найдены'); }
 
     renderTasks(TASKS_DATA);
@@ -3162,11 +3163,67 @@
       navigateTo('tasks');
     }
 
-    // ── Task execution (with draft persistence) ──
-    // The task-detail page represents TASKS_DATA[TASK_DRAFT.taskIndex].
-    // A draft is created once "Начать выполнение" is clicked; it survives
-    // navigation away and the form/textarea state is restored on return.
-    const TASK_DRAFT = { taskIndex: 0, started: false, formRevealed: false, comment: '' };
+    // ── Active task + per-task draft persistence ──
+    // activeTask points at the task currently rendered in the detail page;
+    // DRAFTS keeps per-task draft state so leaving/returning to different
+    // rows preserves each row's own in-progress data.
+    let ACTIVE_TASK_SOURCE = 'tasks';  // 'tasks' | 'requests'
+    let ACTIVE_TASK_IDX = -1;
+    const DRAFTS = {};                 // `${source}:${idx}` → draft
+    function draftKey(src, idx) { return `${src}:${idx}`; }
+    function getDraft() {
+      const k = draftKey(ACTIVE_TASK_SOURCE, ACTIVE_TASK_IDX);
+      if (!DRAFTS[k]) DRAFTS[k] = { started: false, formRevealed: false, comment: '' };
+      return DRAFTS[k];
+    }
+    function activeTask() {
+      const ds = ACTIVE_TASK_SOURCE === 'requests' ? REQ_DATA : TASKS_DATA;
+      return ds[ACTIVE_TASK_IDX] || null;
+    }
+
+    function openTaskDetail(idx, source) {
+      ACTIVE_TASK_SOURCE = source || 'tasks';
+      ACTIVE_TASK_IDX = idx;
+      renderTaskDetail();
+      navigateTo('task-detail');
+    }
+
+    function renderTaskDetail() {
+      const t = activeTask();
+      if (!t) return;
+      const idLabel = `№${2359 + ACTIVE_TASK_IDX + (ACTIVE_TASK_SOURCE === 'requests' ? 100 : 0)}`;
+      document.getElementById('tdTaskId').textContent = idLabel;
+
+      const typeEl = document.getElementById('tdTaskType');
+      if (typeEl) typeEl.innerHTML = `<i data-lucide="briefcase" class="w-3 h-3"></i>${t.type || 'Процесс'}`;
+
+      const statusBadgeMap = {
+        'В работе':        { text:'text-amber-800',   bg:'bg-amber-100',   border:'border-amber-200',   dot:'bg-amber-500 animate-pulse' },
+        'На согласовании': { text:'text-amber-800',   bg:'bg-amber-100',   border:'border-amber-200',   dot:'bg-amber-500 animate-pulse' },
+        'На проверке':     { text:'text-sky-800',     bg:'bg-sky-100',     border:'border-sky-200',     dot:'bg-sky-500 animate-pulse' },
+        'Новая':           { text:'text-indigo-800',  bg:'bg-indigo-100',  border:'border-indigo-200',  dot:'bg-indigo-500' },
+        'Завершена':       { text:'text-emerald-800', bg:'bg-emerald-100', border:'border-emerald-200', dot:'bg-emerald-500' },
+        'Отклонена':       { text:'text-rose-800',    bg:'bg-rose-100',    border:'border-rose-200',    dot:'bg-rose-500' },
+        'В разработке':    { text:'text-sky-800',     bg:'bg-sky-100',     border:'border-sky-200',     dot:'bg-sky-500 animate-pulse' },
+      };
+      const sb = statusBadgeMap[t.status] || { text:'text-slate-700', bg:'bg-slate-100', border:'border-slate-200', dot:'bg-slate-400' };
+      const statusEl = document.getElementById('tdTaskStatus');
+      if (statusEl) {
+        statusEl.className = `inline-flex items-center gap-1.5 text-xs font-semibold ${sb.text} ${sb.bg} border ${sb.border} px-2 py-0.5 rounded-md`;
+        statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${sb.dot}"></span>${t.status}`;
+      }
+
+      document.getElementById('tdTaskCreated').innerHTML =
+        `<i data-lucide="calendar" class="w-3 h-3"></i>Создано ${t.created}`;
+      document.getElementById('tdTaskTitle').textContent = t.title;
+      const fromEl = document.getElementById('tdTaskFrom');
+      if (fromEl) fromEl.textContent = `${t.from} · ${t.fromSub}`;
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Legacy alias for older state machine (kept so startTask etc. still work)
+    const TASK_DRAFT = { get taskIndex(){ return ACTIVE_TASK_IDX; } };
 
     function setTaskState(running) {
       const badge = document.getElementById('taskStateBadge');
@@ -3184,6 +3241,7 @@
     }
 
     function applyDraftState() {
+      const d = (ACTIVE_TASK_IDX >= 0) ? getDraft() : { started:false, formRevealed:false, comment:'' };
       const startBtn = document.getElementById('startTaskBtn');
       const stopBtn = document.getElementById('stopTaskBtn');
       const actions = document.getElementById('globalActions');
@@ -3192,21 +3250,21 @@
       const textarea = document.querySelector('#taskExecForm textarea');
       document.getElementById('sendAnketaMenu')?.classList.add('hidden');
       document.getElementById('moreActionsMenu')?.classList.add('hidden');
-      if (TASK_DRAFT.started) {
+      if (d.started) {
         startBtn?.classList.add('hidden');
         stopBtn?.classList.remove('hidden');
         stopBtn?.classList.add('inline-flex');
         actions?.classList.remove('hidden');
         actions?.classList.add('inline-flex');
         setTaskState(true);
-        if (TASK_DRAFT.formRevealed) {
+        if (d.formRevealed) {
           landing?.classList.add('hidden');
           form?.classList.remove('hidden');
         } else {
           landing?.classList.remove('hidden');
           form?.classList.add('hidden');
         }
-        if (textarea) textarea.value = TASK_DRAFT.comment || '';
+        if (textarea) textarea.value = d.comment || '';
         switchTaskTab('execution');
       } else {
         startBtn?.classList.remove('hidden');
@@ -3224,18 +3282,23 @@
     }
 
     function saveDraftComment() {
+      if (ACTIVE_TASK_IDX < 0) return;
       const ta = document.querySelector('#taskExecForm textarea');
-      if (ta) TASK_DRAFT.comment = ta.value;
+      if (ta) getDraft().comment = ta.value;
     }
 
     function markTaskDraft(flag) {
-      const t = TASKS_DATA[TASK_DRAFT.taskIndex];
+      const t = activeTask();
       if (t) t.hasDraft = !!flag;
-      if (typeof renderTasks === 'function') renderTasks(TASKS_DATA);
+      const ds = ACTIVE_TASK_SOURCE === 'requests' ? REQ_DATA : TASKS_DATA;
+      if (ACTIVE_TASK_SOURCE === 'requests' && typeof renderRequests === 'function') renderRequests(ds);
+      else if (typeof renderTasks === 'function') renderTasks(ds);
     }
 
     function startTask() {
-      TASK_DRAFT.started = true;
+      if (ACTIVE_TASK_IDX < 0) return;
+      const d = getDraft();
+      d.started = true;
       markTaskDraft(true);
       applyDraftState();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3244,19 +3307,23 @@
     // Called by the small 'Отменить запуск' ghost link — cancels the run,
     // wipes the draft, returns the task to idle.
     function stopTask() {
-      TASK_DRAFT.started = false;
-      TASK_DRAFT.formRevealed = false;
-      TASK_DRAFT.comment = '';
+      if (ACTIVE_TASK_IDX < 0) { applyDraftState(); return; }
+      const d = getDraft();
+      d.started = false;
+      d.formRevealed = false;
+      d.comment = '';
       markTaskDraft(false);
       applyDraftState();
     }
 
     // Called by the primary submit button inside the execution form.
     function submitTask() {
+      if (ACTIVE_TASK_IDX < 0) return;
       saveDraftComment();
-      TASK_DRAFT.started = false;
-      TASK_DRAFT.formRevealed = false;
-      TASK_DRAFT.comment = '';
+      const d = getDraft();
+      d.started = false;
+      d.formRevealed = false;
+      d.comment = '';
       markTaskDraft(false);
       applyDraftState();
       if (typeof showAlert === 'function') showAlert('Задача успешно завершена', 'success');
@@ -3278,7 +3345,7 @@
 
     // Reveal the actual execution form (from the landing state)
     function revealExecForm() {
-      TASK_DRAFT.formRevealed = true;
+      if (ACTIVE_TASK_IDX >= 0) getDraft().formRevealed = true;
       document.getElementById('taskExecLanding')?.classList.add('hidden');
       document.getElementById('taskExecForm')?.classList.remove('hidden');
       if (window.lucide) lucide.createIcons();
