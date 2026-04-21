@@ -2966,52 +2966,74 @@
       renderStructSchema();
     }
 
+    // Reusable connector: vertical line + arrow-down tip at the bottom.
+    const vLine = (h = 28) => `
+      <div class="flex flex-col items-center" style="height:${h}px">
+        <div class="w-0.5 bg-slate-300 flex-1"></div>
+        <svg width="10" height="6" viewBox="0 0 10 6" class="text-slate-400 -mt-px"><path d="M0 0 L5 6 L10 0 Z" fill="currentColor"/></svg>
+      </div>
+    `;
+
     // One company in the chart. Click toggles its employees BELOW it.
-    // Employees are marked with the company's name so there's no doubt
-    // which company they belong to.
     function renderSchemeCompany(c, depth) {
       const hasChildren = (c.children || []).length > 0;
       const isHead = depth === 0;
+
+      // Distinct colour roles: head → indigo, daughter → amber
       const cardCls = isHead
-        ? 'bg-indigo-50 border-indigo-200'
-        : 'bg-violet-50 border-violet-200';
-      const accent = isHead ? 'text-indigo-600' : 'text-violet-600';
-      const badgeColor = isHead ? 'text-indigo-600' : 'text-violet-600';
-      const badge = isHead
-        ? `<span class="text-[10px] font-semibold ${badgeColor}">Головная компания</span>`
-        : `<span class="text-[10px] font-semibold ${badgeColor}">Дочерняя компания</span>`;
+        ? 'bg-indigo-600 border-indigo-600 text-white'
+        : 'bg-amber-50 border-amber-300 text-amber-900';
+      const avatarCls = isHead
+        ? 'bg-white/20 text-white'
+        : 'bg-amber-500 text-white';
+      const nameCls = isHead ? 'text-white' : 'text-amber-900';
+      const badgeCls = isHead
+        ? 'bg-white/15 text-white'
+        : 'bg-amber-100 text-amber-700';
+      const chevColor = isHead ? 'text-white' : 'text-amber-700';
+      const subColor = isHead ? 'text-indigo-100' : 'text-amber-600';
 
       const hasEmps = (c.employeeIds || []).length > 0;
       const open = SCHEME_EMP_OPEN.has(c.id);
-      const chev = hasEmps ? `<i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5 ${accent}"></i>` : '';
+      const chev = hasEmps ? `<i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 ${chevColor}"></i>` : '';
       const empCount = companyEmployeeCount(c);
+      const badgeText = isHead ? 'Головная' : 'Дочерняя';
 
       const card = `
-        <button type="button" ${hasEmps ? `onclick="toggleCompanyEmps('${c.id}')"` : ''} class="group inline-flex flex-col items-center gap-0.5 ${cardCls} border rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition-all min-w-[230px] ${hasEmps ? 'cursor-pointer' : 'cursor-default'}">
+        <button type="button" ${hasEmps ? `onclick="toggleCompanyEmps('${c.id}')"` : ''} class="inline-flex flex-col items-start gap-1 ${cardCls} border-2 rounded-xl px-4 py-2.5 shadow-sm hover:shadow-lg transition-all min-w-[240px] ${hasEmps ? 'cursor-pointer' : 'cursor-default'}">
           <div class="flex items-center gap-2 w-full">
-            <div class="w-7 h-7 rounded-full bg-gradient-to-br ${c.color} text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
-            <p class="text-sm font-semibold text-slate-900 flex-1 text-left">${c.name}</p>
+            <div class="w-8 h-8 rounded-full ${avatarCls} text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
+            <p class="text-sm font-semibold ${nameCls} flex-1 text-left">${c.name}</p>
             ${chev}
           </div>
-          <div class="flex items-center gap-2">
-            ${badge}
-            <span class="text-[10px] text-slate-400">·</span>
-            <span class="text-[10px] text-slate-500">${empCount} сотр.</span>
+          <div class="flex items-center gap-2 pl-10">
+            <span class="inline-flex items-center text-[10px] font-semibold ${badgeCls} px-1.5 py-0.5 rounded-full">${badgeText}</span>
+            <span class="text-[10px] ${subColor}">${empCount} сотр.</span>
           </div>
         </button>
       `;
 
       const tree = buildEmpTree(c.employeeIds || []);
-      const bgTint = isHead ? 'bg-indigo-50/30' : 'bg-violet-50/30';
+      const boxBorder = isHead ? 'border-indigo-300' : 'border-amber-300';
+      const boxBg = isHead ? 'bg-indigo-50/60' : 'bg-amber-50/60';
+      const pillBorder = isHead ? 'border-indigo-300' : 'border-amber-300';
+      const pillDot = isHead ? 'bg-indigo-500' : 'bg-amber-500';
+      const pillText = isHead ? 'text-indigo-700' : 'text-amber-700';
+      const accent = isHead ? 'text-indigo-600' : 'text-amber-700';
+
       const empsBlock = (open && tree.length) ? `
-        <div class="relative mt-5 w-full flex flex-col items-center">
-          <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-px h-5 bg-slate-300"></div>
-          <div class="relative rounded-2xl border border-dashed ${isHead ? 'border-indigo-300' : 'border-violet-300'} ${bgTint} px-5 pb-4 pt-6">
-            <div class="absolute -top-2.5 left-5 flex items-center gap-1.5 bg-white border ${isHead ? 'border-indigo-200' : 'border-violet-200'} rounded-full px-2.5 py-0.5">
-              <span class="w-1.5 h-1.5 rounded-full ${isHead ? 'bg-indigo-500' : 'bg-violet-500'}"></span>
-              <p class="text-[10px] font-semibold uppercase tracking-wider ${accent}">Сотрудники · ${c.name}</p>
+        <div class="flex flex-col items-center w-full">
+          ${vLine(22)}
+          <div class="relative rounded-2xl border-2 border-dashed ${boxBorder} ${boxBg} px-5 pb-4 pt-7 mt-0">
+            <!-- Label + close -->
+            <div class="absolute -top-3 left-5 flex items-center gap-1.5 bg-white border-2 ${pillBorder} rounded-full px-2.5 py-0.5 shadow-sm">
+              <span class="w-1.5 h-1.5 rounded-full ${pillDot}"></span>
+              <p class="text-[10px] font-semibold uppercase tracking-wider ${pillText}">Сотрудники · ${c.name}</p>
             </div>
-            <div class="flex flex-wrap items-start justify-center gap-6">
+            <button type="button" onclick="toggleCompanyEmps('${c.id}')" title="Свернуть" class="absolute -top-3 right-5 w-6 h-6 bg-white border-2 ${pillBorder} rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm transition-colors">
+              <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+            <div class="flex flex-wrap items-start justify-center gap-6 pt-1">
               ${tree.map(n => renderEmpNode(n, accent)).join('')}
             </div>
           </div>
@@ -3019,11 +3041,14 @@
       ` : '';
 
       const childrenBlock = hasChildren ? `
-        <div class="relative mt-6">
-          <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-px h-6 bg-slate-300"></div>
-          <div class="relative pt-2 flex items-start gap-6 flex-wrap justify-center">
+        <div class="flex flex-col items-center w-full">
+          ${vLine(28)}
+          <!-- horizontal bus spanning child centers -->
+          <div class="relative pt-0 flex items-start gap-6 flex-wrap justify-center">
+            ${c.children.length > 1 ? `<div class="absolute top-0 left-[12%] right-[12%] h-0.5 bg-slate-300"></div>` : ''}
             ${c.children.map(ch => `<div class="flex flex-col items-center relative">
-              <div class="absolute -top-2 w-px h-2 bg-slate-300"></div>
+              <!-- descender from bus to this child -->
+              <div class="w-0.5 h-4 bg-slate-300"></div>
               ${renderSchemeCompany(ch, depth + 1)}
             </div>`).join('')}
           </div>
@@ -3041,13 +3066,23 @@
       const toggleAllIcon  = anyOpen ? 'eye-off' : 'eye';
       const toggleAllFn    = anyOpen ? 'collapseAllCompanyEmps()' : 'expandAllCompanyEmps()';
       root.innerHTML = `
-        <div class="flex items-center justify-end mb-4">
+        <!-- Legend + bulk toggle -->
+        <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-xs font-medium text-slate-500">Обозначения:</span>
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-indigo-600"></span>Головная компания</span>
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-amber-100 border-2 border-amber-300"></span>Дочерняя компания</span>
+            <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-white border-2 border-dashed border-indigo-300"></span>Сотрудники</span>
+          </div>
           <button onclick="${toggleAllFn}" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="${toggleAllIcon}" class="w-3.5 h-3.5"></i>${toggleAllLabel}</button>
         </div>
-        <div class="flex flex-col items-center gap-2 min-w-[900px]">
+
+        <!-- Tree -->
+        <div class="flex flex-col items-center gap-0 min-w-[900px]">
           ${COMPANIES.map(c => renderSchemeCompany(c, 0)).join('')}
         </div>
-        <p class="text-center text-[11px] text-slate-400 mt-6">Нажмите на компанию, чтобы раскрыть её сотрудников. Нажмите на сотрудника — откроется его профиль.</p>
+
+        <p class="text-center text-[11px] text-slate-400 mt-6">Клик по компании раскрывает её сотрудников под ней. Клик по сотруднику — открывает его профиль.</p>
       `;
       if (window.lucide) lucide.createIcons();
     }
