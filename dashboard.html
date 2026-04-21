@@ -709,7 +709,27 @@
       <!-- ══ PAGE: Детали задачи / заявки ══ -->
       <div id="page-task-detail" class="page-content">
 
-        <!-- Process member drawer (right-side panel) -->
+        <!-- Participants list drawer (opened from the Участники процесса table column) -->
+        <div id="participantsOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeParticipantsDrawer()"></div>
+        <aside id="participantsDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[440px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
+          <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-white">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 mb-1">Участники процесса</p>
+              <h3 id="participantsTitle" class="text-base font-bold text-slate-900">Процесс №23596</h3>
+              <p id="participantsSub" class="text-xs text-slate-500 mt-0.5">—</p>
+            </div>
+            <button onclick="closeParticipantsDrawer()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition-colors flex-shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto px-6 py-5">
+            <ol id="participantsList" class="relative border-l-2 border-slate-100 ml-2 space-y-4 pl-6"></ol>
+          </div>
+          <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs">
+            <span class="text-slate-500">Всего участников</span>
+            <span id="participantsTotal" class="font-semibold text-slate-900">—</span>
+          </div>
+        </aside>
+
+        <!-- Process member drawer (right-side panel) — single-member detail -->
         <div id="memberOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeMemberDrawer()"></div>
         <aside id="memberDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
           <div class="flex items-start justify-between gap-3 px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50/60 to-white">
@@ -2242,7 +2262,7 @@
 
     // Move fixed-position drawers out of page-content containers so they
     // remain functional on any page (otherwise parent display:none hides them).
-    ['memberOverlay','memberDrawer','stagesOverlay','stagesDrawer'].forEach(id => {
+    ['memberOverlay','memberDrawer','stagesOverlay','stagesDrawer','participantsOverlay','participantsDrawer'].forEach(id => {
       const el = document.getElementById(id);
       if (el && el.parentElement && el.parentElement !== document.body) {
         document.body.appendChild(el);
@@ -2999,10 +3019,91 @@
       lucide.createIcons();
     }
 
+    // Called from table avatar — opens the PARTICIPANTS LIST drawer for the row
     function openMemberByName(name, e) {
       if (e) { e.stopPropagation(); e.preventDefault(); }
-      openMemberDrawer(memberFromName(name));
+      const btn = e?.currentTarget;
+      const row = btn?.closest('tr');
+      let participants = null;
+      let rowTitle = 'Процесс';
+      if (row) {
+        const rowIndex = [...row.parentNode.children].indexOf(row);
+        const tbodyId = row.parentNode.id;
+        const dataset = tbodyId === 'tasksTableBody' ? TASKS_DATA
+                      : tbodyId === 'reqTableBody'   ? REQ_DATA
+                      : null;
+        if (dataset && dataset[rowIndex]) {
+          participants = (dataset[rowIndex].members || []).map(n => memberFromName(n));
+          rowTitle = dataset[rowIndex].title || rowTitle;
+        }
+      }
+      if (!participants) participants = [memberFromName(name)];
+      openParticipantsDrawer(participants, name, rowTitle);
     }
+
+    function pluralRu(n, forms) {
+      const mod10 = n % 10, mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return forms[0];
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
+      return forms[2];
+    }
+
+    function renderParticipantsList(members, highlightName) {
+      const list = document.getElementById('participantsList');
+      if (!list) return;
+      list.innerHTML = members.map(m => {
+        const isActive = highlightName && m.name === highlightName;
+        const dotClass = isActive
+          ? 'bg-indigo-600 border-4 border-white ring-2 ring-indigo-200'
+          : 'bg-white border-2 border-slate-200';
+        const dotInner = isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>' : '';
+        const wrapClass = isActive
+          ? 'rounded-xl border border-indigo-200 bg-indigo-50/50 px-3 py-2.5 -ml-2'
+          : 'rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 px-3 py-2.5 -ml-2 transition-colors';
+        return `
+          <li class="relative">
+            <span class="absolute -left-[33px] top-3 w-5 h-5 rounded-full ${dotClass} flex items-center justify-center z-10">${dotInner}</span>
+            <div class="${wrapClass}">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br ${m.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${m.initials}</div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold ${isActive ? 'text-indigo-700' : 'text-slate-900'}">${m.name}</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">${m.position}</p>
+                  <p class="text-[11px] font-medium ${isActive ? 'text-indigo-600' : 'text-slate-600'} mt-1 inline-flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-500 animate-pulse' : 'bg-slate-400'}"></span>${m.status}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </li>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openParticipantsDrawer(participants, highlightName, title) {
+      const drawer = document.getElementById('participantsDrawer');
+      const overlay = document.getElementById('participantsOverlay');
+      if (!drawer || !overlay) return;
+      document.getElementById('participantsTitle').textContent = title || 'Процесс';
+      document.getElementById('participantsSub').textContent =
+        `${participants.length} ${pluralRu(participants.length, ['участник','участника','участников'])}`;
+      document.getElementById('participantsTotal').textContent = participants.length;
+      renderParticipantsList(participants, highlightName);
+      overlay.classList.remove('hidden');
+      requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
+      document.body.style.overflow = 'hidden';
+    }
+    function closeParticipantsDrawer() {
+      const drawer = document.getElementById('participantsDrawer');
+      const overlay = document.getElementById('participantsOverlay');
+      if (!drawer || !overlay) return;
+      drawer.classList.add('translate-x-full');
+      setTimeout(() => { overlay.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
+    }
+    document.addEventListener('keydown', e => {
+      const d = document.getElementById('participantsDrawer');
+      if (d && !d.classList.contains('translate-x-full') && e.key === 'Escape') closeParticipantsDrawer();
+    });
     function closeMemberDrawer() {
       const drawer = document.getElementById('memberDrawer');
       const overlay = document.getElementById('memberOverlay');
