@@ -627,27 +627,25 @@
         <div class="mb-3">
           <h2 class="text-2xl font-bold text-slate-900">Структура предприятия</h2>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-8">
-          <!-- Org chart -->
-          <div class="flex flex-col items-center">
-            <div class="bg-indigo-600 text-white rounded-2xl px-6 py-4 text-center shadow-lg shadow-indigo-600/20"><p class="font-bold">Генеральный директор</p><p class="text-indigo-200 text-sm">Нуржанкызы А.</p></div>
-            <div class="w-px h-8 bg-slate-300"></div>
-            <div class="flex gap-8 items-start">
-              <div class="flex flex-col items-center">
-                <div class="bg-white border-2 border-indigo-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">HR отдел</p><p class="text-xs text-slate-500">8 сотрудников</p></div>
-              </div>
-              <div class="flex flex-col items-center">
-                <div class="bg-white border-2 border-emerald-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">Финансы</p><p class="text-xs text-slate-500">6 сотрудников</p></div>
-              </div>
-              <div class="flex flex-col items-center">
-                <div class="bg-white border-2 border-amber-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">Юридический</p><p class="text-xs text-slate-500">4 сотрудника</p></div>
-              </div>
-              <div class="flex flex-col items-center">
-                <div class="bg-white border-2 border-violet-200 rounded-xl px-5 py-3 text-center"><p class="font-semibold text-sm text-slate-900">IT отдел</p><p class="text-xs text-slate-500">6 сотрудников</p></div>
-              </div>
-            </div>
+
+        <!-- Toolbar: search + view toggle + export -->
+        <div class="flex items-center gap-3 mb-3 flex-wrap">
+          <div class="relative flex-1 min-w-[260px] max-w-[520px]">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            <input id="structSearch" type="text" placeholder="Поиск по сотрудникам и компаниям" class="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
           </div>
+          <div class="ml-auto inline-flex items-center bg-slate-100 p-1 rounded-xl" role="tablist">
+            <button id="structViewTable" onclick="setStructView('table')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-900 bg-white shadow-sm rounded-lg transition-all"><i data-lucide="list" class="w-3.5 h-3.5"></i>Таблица</button>
+            <button id="structViewSchema" onclick="setStructView('schema')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 rounded-lg transition-all"><i data-lucide="git-branch" class="w-3.5 h-3.5"></i>Схема</button>
+          </div>
+          <button class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-2 rounded-xl transition-colors"><i data-lucide="download" class="w-4 h-4"></i>Экспорт</button>
         </div>
+
+        <!-- Table view -->
+        <div id="structTableView" class="space-y-2"></div>
+
+        <!-- Schema view -->
+        <div id="structSchemaView" class="hidden bg-white rounded-2xl border border-slate-200 p-6 overflow-x-auto"></div>
       </div>
 
       <!-- ══ PAGE: Реестр документов ══ -->
@@ -788,6 +786,16 @@
               </div>
             </dl>
           </div>
+        </aside>
+
+        <!-- Employee drawer (Структура предприятия) -->
+        <div id="employeeOverlay" class="fixed inset-0 bg-slate-900/30 z-40 hidden" onclick="closeEmployeeDrawer()"></div>
+        <aside id="employeeDrawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[460px] bg-white border-l border-slate-200 shadow-xl z-50 translate-x-full transition-transform duration-300 ease-out flex flex-col">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <h3 class="text-base font-bold text-slate-900">Сотрудник</h3>
+            <button onclick="closeEmployeeDrawer()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto" id="employeeDrawerBody"></div>
         </aside>
 
         <!-- Stages drawer (right-side panel) -->
@@ -2298,7 +2306,7 @@
 
     // Move fixed-position drawers out of page-content containers so they
     // remain functional on any page (otherwise parent display:none hides them).
-    ['memberOverlay','memberDrawer','stagesOverlay','stagesDrawer','participantsOverlay','participantsDrawer'].forEach(id => {
+    ['memberOverlay','memberDrawer','stagesOverlay','stagesDrawer','participantsOverlay','participantsDrawer','employeeOverlay','employeeDrawer'].forEach(id => {
       const el = document.getElementById(id);
       if (el && el.parentElement && el.parentElement !== document.body) {
         document.body.appendChild(el);
@@ -2667,6 +2675,266 @@
       document.getElementById('confirmPwd').value = '';
 
       showAlert('Пароль успешно изменён', 'success');
+    });
+
+    // ══════════════════════════════════════════
+    // ── COMPANY STRUCTURE
+    // ══════════════════════════════════════════
+    const STRUCT_DEPTS = [
+      { name: 'Руководство',    color: 'bg-indigo-50 text-indigo-700' },
+      { name: 'Разработка',     color: 'bg-sky-50 text-sky-700' },
+      { name: 'HR',             color: 'bg-emerald-50 text-emerald-700' },
+      { name: 'Финансы',        color: 'bg-amber-50 text-amber-700' },
+      { name: 'Юридический',    color: 'bg-violet-50 text-violet-700' },
+      { name: 'Служба безопасности', color: 'bg-rose-50 text-rose-700' },
+    ];
+    function deptPill(name) {
+      const d = STRUCT_DEPTS.find(x => x.name === name);
+      const cls = d ? d.color : 'bg-slate-100 text-slate-600';
+      return `<span class="inline-flex items-center text-[11px] font-medium ${cls} px-2 py-0.5 rounded-full">${name}</span>`;
+    }
+
+    // Employees (flat list, referenced by id from companies)
+    const EMPLOYEES = {
+      'e1':  { id:'e1', name:'Кузнецов Анатолий Алексеевич', short:'Кузнецов А.А.', position:'CEO',                   dept:'Руководство', email:'a.kuznetsov@adata.kz',  phone:'+7 (700) 111-11-11', birth:'15.02.1978', iin:'780215301234', role:'Руководитель', gradient:'from-indigo-500 to-violet-600', managerIds:[],        subIds:['e2','e3','e4'], colleagueIds:[] },
+      'e2':  { id:'e2', name:'Смирнов Олег Дмитриевич',       short:'Смирнов О.Д.', position:'Lead developer',         dept:'Разработка',  email:'o.smirnov@adata.kz',    phone:'+7 (700) 222-22-22', birth:'21.06.1987', iin:'870621302234', role:'Пользователь', gradient:'from-rose-500 to-pink-600',    managerIds:['e1'],      subIds:['e5','e6'],      colleagueIds:['e3','e4'] },
+      'e3':  { id:'e3', name:'Кузнецов Денис Игоревич',       short:'Кузнецов Д.И.', position:'Lead developer',         dept:'Разработка',  email:'d.kuznetsov@adata.kz',  phone:'+7 (700) 333-33-33', birth:'03.09.1985', iin:'850903301111', role:'Пользователь', gradient:'from-emerald-500 to-teal-600', managerIds:['e1'],      subIds:[],               colleagueIds:['e2','e4'] },
+      'e4':  { id:'e4', name:'Соколов Иван Сергеевич',        short:'Соколов И.С.',  position:'Lead developer',         dept:'Разработка',  email:'i.sokolov@adata.kz',    phone:'+7 (700) 444-44-44', birth:'11.11.1990', iin:'901111300004', role:'Пользователь', gradient:'from-sky-500 to-blue-600',     managerIds:['e1'],      subIds:[],               colleagueIds:['e2','e3'] },
+      'e5':  { id:'e5', name:'Кузнецов Сергей Артёмович',     short:'Кузнецов С.А.', position:'Senior developer',       dept:'Разработка',  email:'s.kuznetsov@adata.kz',  phone:'+7 (700) 555-55-55', birth:'08.04.1992', iin:'920408300555', role:'Пользователь', gradient:'from-amber-500 to-orange-600', managerIds:['e2'],      subIds:['e6'],           colleagueIds:[] },
+      'e6':  { id:'e6', name:'Белов Михаил Александрович',    short:'Белов М.А.',    position:'Middle developer',       dept:'Разработка',  email:'m.belov@adata.kz',      phone:'+7 (700) 666-66-66', birth:'17.12.1995', iin:'951217300066', role:'Пользователь', gradient:'from-violet-500 to-fuchsia-600', managerIds:['e5'],    subIds:[],               colleagueIds:[] },
+      'e7':  { id:'e7', name:'Иванов Анатолий Петрович',      short:'Иванов А.П.',   position:'CEO',                   dept:'Руководство', email:'ivanov@technomir.kz',   phone:'+7 (700) 700-00-00', birth:'02.03.1975', iin:'750302301111', role:'Руководитель', gradient:'from-indigo-500 to-blue-600',  managerIds:[],          subIds:[],               colleagueIds:[] },
+      'e8':  { id:'e8', name:'Сидорова Мария Викторовна',     short:'Сидорова М.В.', position:'HR специалист',          dept:'HR',          email:'sidorova@adata.kz',     phone:'+7 (700) 800-00-00', birth:'14.07.1988', iin:'880714400888', role:'Пользователь', gradient:'from-emerald-500 to-green-600',managerIds:['e1'],     subIds:[],               colleagueIds:[] },
+      'e9':  { id:'e9', name:'Петров Алексей Сергеевич',      short:'Петров А.С.',   position:'Backend разработчик',    dept:'Разработка',  email:'petrov@adata.kz',       phone:'+7 (700) 900-00-00', birth:'25.11.1991', iin:'911125300009', role:'Пользователь', gradient:'from-sky-500 to-indigo-600',   managerIds:['e2'],      subIds:[],               colleagueIds:[] },
+      'e10': { id:'e10',name:'Смирнов Андрей Олегович',        short:'Смирнов А.О.',  position:'Middle developer',       dept:'Разработка',  email:'a.smirnov@adata.kz',    phone:'+7 (700) 101-01-01', birth:'12.12.1993', iin:'931212300010', role:'Пользователь', gradient:'from-rose-400 to-pink-500',    managerIds:['e3'],      subIds:[],               colleagueIds:[] },
+    };
+
+    const COMPANIES = [
+      { id: 'avrora', name: 'ТОО "Аврора Холдинг"',  type:'head',  initials:'АХ', color:'from-indigo-500 to-violet-600',
+        employeeIds: ['e1','e2','e3','e4','e5','e6'],
+        children: [
+          { id:'technomir', name:'ИП "ТехноМир"', type:'child', initials:'ТМ', color:'from-sky-500 to-blue-600',
+            employeeIds: ['e7','e8','e9'] },
+          { id:'sever',     name:'ИП "Север"',    type:'child', initials:'СВ', color:'from-emerald-500 to-teal-600',
+            employeeIds: ['e10'] },
+          { id:'centr',     name:'ИП "Центр"',    type:'child', initials:'ЦТ', color:'from-amber-500 to-orange-600',
+            employeeIds: ['e8'] },
+          { id:'zapad',     name:'ИП "Запад"',    type:'child', initials:'ЗП', color:'from-violet-500 to-fuchsia-600',
+            employeeIds: ['e9','e10'] },
+        ]
+      }
+    ];
+
+    function companyEmployeeCount(c) {
+      const own = (c.employeeIds || []).length;
+      const nested = (c.children || []).reduce((s,ch) => s + companyEmployeeCount(ch), 0);
+      return own + nested;
+    }
+
+    const STRUCT_EXPANDED = new Set(['avrora']);
+    let STRUCT_VIEW = 'table';
+    let STRUCT_QUERY = '';
+
+    function setStructView(view) {
+      STRUCT_VIEW = view;
+      const table = document.getElementById('structTableView');
+      const schema = document.getElementById('structSchemaView');
+      const vt = document.getElementById('structViewTable');
+      const vs = document.getElementById('structViewSchema');
+      const active = 'text-slate-900 bg-white shadow-sm';
+      const inactive = 'text-slate-500 hover:text-slate-900';
+      if (view === 'schema') {
+        table.classList.add('hidden');
+        schema.classList.remove('hidden');
+        vt.className = `inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${inactive}`;
+        vs.className = `inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${active}`;
+        renderStructSchema();
+      } else {
+        table.classList.remove('hidden');
+        schema.classList.add('hidden');
+        vt.className = `inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${active}`;
+        vs.className = `inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${inactive}`;
+        renderStructTable();
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function matchesQuery(text) {
+      if (!STRUCT_QUERY) return true;
+      return text.toLowerCase().includes(STRUCT_QUERY.toLowerCase());
+    }
+
+    function renderCompanyCard(c, depth = 0) {
+      const expanded = STRUCT_EXPANDED.has(c.id);
+      const badge = c.type === 'head'
+        ? `<span class="inline-flex items-center text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">Головная компания</span>`
+        : `<span class="inline-flex items-center text-[11px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">Дочерняя компания</span>`;
+      const count = companyEmployeeCount(c);
+      const chev = expanded ? 'chevron-up' : 'chevron-down';
+
+      const nested = (c.children || []).map(ch => renderCompanyCard(ch, depth + 1)).join('');
+
+      const employees = (c.employeeIds || []).map(id => EMPLOYEES[id]).filter(Boolean).filter(e => matchesQuery(e.name) || matchesQuery(e.position));
+      const employeeSection = employees.length ? `
+        <div class="mt-3 rounded-xl border border-slate-100 overflow-hidden">
+          <div class="grid grid-cols-[1.3fr_1fr_1.2fr_auto] gap-4 px-4 py-2.5 bg-slate-50/60 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            <span>Сотрудник</span><span>Отдел</span><span>Контакты</span><span></span>
+          </div>
+          <div class="divide-y divide-slate-100 bg-white">
+            ${employees.map(e => `
+              <button type="button" onclick="openEmployeeDrawer('${e.id}')" class="w-full text-left grid grid-cols-[1.3fr_1fr_1.2fr_auto] gap-4 px-4 py-3 items-center hover:bg-slate-50 transition-colors">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-9 h-9 rounded-full bg-gradient-to-br ${e.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${e.short.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase()}</div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-900 truncate">${e.name}</p>
+                    <p class="text-[11px] text-slate-500 truncate">${e.position}</p>
+                  </div>
+                </div>
+                <div>${deptPill(e.dept)}</div>
+                <div class="text-[11px] text-slate-500 min-w-0">
+                  <p class="truncate"><i data-lucide="mail" class="w-3 h-3 inline -mt-0.5 mr-1 text-slate-400"></i>${e.email}</p>
+                  <p class="truncate mt-0.5"><i data-lucide="phone" class="w-3 h-3 inline -mt-0.5 mr-1 text-slate-400"></i>${e.phone}</p>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <button type="button" onclick="toggleStructCompany('${c.id}')" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br ${c.color} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${c.initials}</div>
+            <div class="flex-1 min-w-0 text-left">
+              <p class="text-sm font-semibold text-slate-900 truncate">${c.name}</p>
+              <p class="text-[11px] text-slate-500">${count} сотрудников</p>
+            </div>
+            ${badge}
+            <i data-lucide="${chev}" class="w-4 h-4 text-slate-400 flex-shrink-0"></i>
+          </button>
+          ${expanded ? `<div class="px-4 pb-4 border-t border-slate-100 pt-3 space-y-2">
+            ${nested}
+            ${employeeSection}
+          </div>` : ''}
+        </div>
+      `;
+    }
+
+    function renderStructTable() {
+      const root = document.getElementById('structTableView');
+      if (!root) return;
+      root.innerHTML = COMPANIES.map(c => renderCompanyCard(c)).join('');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function toggleStructCompany(id) {
+      if (STRUCT_EXPANDED.has(id)) STRUCT_EXPANDED.delete(id);
+      else STRUCT_EXPANDED.add(id);
+      renderStructTable();
+    }
+
+    function renderStructSchema() {
+      const root = document.getElementById('structSchemaView');
+      if (!root) return;
+      root.innerHTML = `
+        <div class="flex flex-col items-center gap-6 min-w-[900px]">
+          ${COMPANIES.map(head => `
+            <div class="flex flex-col items-center">
+              <div class="flex flex-col items-center gap-1 rounded-2xl bg-indigo-50 border border-indigo-200 px-4 py-2.5 shadow-sm">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${head.color} text-white text-[11px] font-bold flex items-center justify-center">${head.initials}</div>
+                <p class="text-sm font-semibold text-slate-900">${head.name}</p>
+                <p class="text-[11px] text-indigo-600 font-medium">Головная компания · ${companyEmployeeCount(head)} сотрудников</p>
+              </div>
+              <div class="w-px h-6 bg-slate-300"></div>
+              <div class="flex items-start gap-4 flex-wrap justify-center">
+                ${(head.children || []).map(ch => `
+                  <div class="flex flex-col items-center rounded-xl bg-white border border-slate-200 px-4 py-2.5 shadow-sm min-w-[170px]">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br ${ch.color} text-white text-[11px] font-bold flex items-center justify-center mb-1">${ch.initials}</div>
+                    <p class="text-sm font-semibold text-slate-900">${ch.name}</p>
+                    <p class="text-[11px] text-slate-500">${companyEmployeeCount(ch)} сотрудников</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openEmployeeDrawer(id) {
+      const e = EMPLOYEES[id]; if (!e) return;
+      const managerList = (e.managerIds || []).map(mid => EMPLOYEES[mid]).filter(Boolean);
+      const subList = (e.subIds || []).map(sid => EMPLOYEES[sid]).filter(Boolean);
+      const colList = (e.colleagueIds || []).map(cid => EMPLOYEES[cid]).filter(Boolean);
+      const initials = e.short.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+      const tile = (p) => `
+        <button type="button" onclick="openEmployeeDrawer('${p.id}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-left">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br ${p.gradient} text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0">${p.short.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()}</div>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold text-slate-900 truncate">${p.name}</p>
+            <p class="text-[11px] text-slate-500 truncate">${p.position}</p>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
+        </button>`;
+      const body = `
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-4">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br ${e.gradient} text-white text-base font-bold flex items-center justify-center">${initials}</div>
+          <div class="min-w-0 flex-1">
+            <p class="text-base font-bold text-slate-900">${e.name}</p>
+            <p class="text-sm text-slate-500 mt-0.5">${e.position}</p>
+            <div class="flex items-center gap-2 mt-2">
+              <a href="mailto:${e.email}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors"><i data-lucide="mail" class="w-3.5 h-3.5"></i>Написать</a>
+              <a href="tel:${e.phone.replace(/\s/g,'')}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg transition-colors"><i data-lucide="phone" class="w-3.5 h-3.5"></i>Позвонить</a>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-5 border-b border-slate-100">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">Личная информация</p>
+          <dl class="text-sm divide-y divide-slate-100">
+            <div class="flex items-center justify-between gap-4 py-2.5"><dt class="text-xs text-slate-500">E-mail</dt><dd class="text-indigo-600 truncate text-right">${e.email}</dd></div>
+            <div class="flex items-center justify-between gap-4 py-2.5"><dt class="text-xs text-slate-500">Номер телефона</dt><dd class="text-slate-900">${e.phone}</dd></div>
+            <div class="flex items-center justify-between gap-4 py-2.5"><dt class="text-xs text-slate-500">Дата рождения</dt><dd class="text-slate-900">${e.birth}</dd></div>
+            <div class="flex items-center justify-between gap-4 py-2.5"><dt class="text-xs text-slate-500">ИИН</dt><dd class="font-mono text-slate-900">${e.iin}</dd></div>
+            <div class="flex items-center justify-between gap-4 py-2.5"><dt class="text-xs text-slate-500">Структура</dt><dd class="text-slate-900">${e.dept}</dd></div>
+            <div class="flex items-center justify-between gap-4 py-2.5"><dt class="text-xs text-slate-500">Роль пользователя</dt><dd class="text-slate-900">${e.role}</dd></div>
+          </dl>
+        </div>
+        <div class="px-6 py-5 space-y-5">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Дополнительная информация</p>
+          ${managerList.length ? `<div><p class="text-xs text-slate-500 mb-2">Руководитель${managerList.length > 1 ? 'и' : ''}</p><div class="space-y-1">${managerList.map(tile).join('')}</div></div>` : ''}
+          ${subList.length ? `<div><p class="text-xs text-slate-500 mb-2">Подчинённые · ${subList.length}</p><div class="space-y-1">${subList.map(tile).join('')}</div></div>` : ''}
+          ${colList.length ? `<div><p class="text-xs text-slate-500 mb-2">Коллеги · ${colList.length}</p><div class="space-y-1">${colList.map(tile).join('')}</div></div>` : ''}
+        </div>`;
+      document.getElementById('employeeDrawerBody').innerHTML = body;
+      const drawer = document.getElementById('employeeDrawer');
+      const overlay = document.getElementById('employeeOverlay');
+      overlay.classList.remove('hidden');
+      requestAnimationFrame(() => drawer.classList.remove('translate-x-full'));
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons();
+    }
+    function closeEmployeeDrawer() {
+      const drawer = document.getElementById('employeeDrawer');
+      const overlay = document.getElementById('employeeOverlay');
+      if (!drawer || !overlay) return;
+      drawer.classList.add('translate-x-full');
+      setTimeout(() => { overlay.classList.add('hidden'); document.body.style.overflow = ''; }, 300);
+    }
+    document.addEventListener('keydown', e => {
+      const d = document.getElementById('employeeDrawer');
+      if (d && !d.classList.contains('translate-x-full') && e.key === 'Escape') closeEmployeeDrawer();
+    });
+
+    // Initial render + search wiring
+    renderStructTable();
+    document.getElementById('structSearch')?.addEventListener('input', (e) => {
+      STRUCT_QUERY = e.target.value;
+      // Auto-expand everything when searching so matches surface
+      if (STRUCT_QUERY) {
+        COMPANIES.forEach(function add(c) { STRUCT_EXPANDED.add(c.id); (c.children||[]).forEach(add); });
+      }
+      if (STRUCT_VIEW === 'table') renderStructTable();
     });
 
     // ══════════════════════════════════════════
