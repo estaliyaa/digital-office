@@ -145,12 +145,6 @@
       font-size: 13px; color: #334155; background: #fff; transition: all 0.15s;
     }
     .doc-filter-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
-    .doc-filter-options { display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto; padding-right: 4px; }
-    .doc-filter-options::-webkit-scrollbar { width: 5px; }
-    .doc-filter-options::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
-    .doc-filter-chk { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; font-size: 13px; color: #475569; }
-    .doc-filter-chk input { width: 14px; height: 14px; accent-color: #4f46e5; cursor: pointer; border-radius: 3px; }
-    .doc-filter-chk:hover { color: #0f172a; }
 
     /* ── Page toolbar ── */
     .page-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -770,15 +764,24 @@
                 <div class="doc-filter-col">
                   <div class="doc-filter-block">
                     <p class="doc-filter-label"><i data-lucide="file-type-2" class="w-3.5 h-3.5"></i>Тип документа</p>
-                    <div id="dfTypeList" class="doc-filter-options"></div>
+                    <select id="dfType" class="doc-filter-input"><option value="">Все типы</option></select>
                   </div>
                   <div class="doc-filter-block">
                     <p class="doc-filter-label"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Статус</p>
-                    <div id="dfStatusList" class="doc-filter-options"></div>
+                    <select id="dfStatus" class="doc-filter-input"><option value="">Все статусы</option></select>
                   </div>
                   <div class="doc-filter-block">
                     <p class="doc-filter-label"><i data-lucide="calendar" class="w-3.5 h-3.5"></i>Дата</p>
-                    <div class="grid grid-cols-2 gap-2">
+                    <select id="dfDatePreset" class="doc-filter-input" onchange="docFilterDatePresetChange()">
+                      <option value="">За всё время</option>
+                      <option value="today">Сегодня</option>
+                      <option value="week">На этой неделе</option>
+                      <option value="month">В этом месяце</option>
+                      <option value="quarter">В этом квартале</option>
+                      <option value="year">В этом году</option>
+                      <option value="custom">Выбрать диапазон…</option>
+                    </select>
+                    <div id="dfDateRangeWrap" class="hidden grid grid-cols-2 gap-2 mt-2">
                       <input type="date" id="dfDateFrom" class="doc-filter-input" placeholder="От">
                       <input type="date" id="dfDateTo"   class="doc-filter-input" placeholder="До">
                     </div>
@@ -4470,11 +4473,6 @@
       const processes   = uniq([...DOC_DATA.map(d => d.process), ...DOC_DATA.map(d => d.project)]);
       const proponents  = uniq(DOC_DATA.map(d => d.counterparty).filter(c => c && c !== '—'));
 
-      const typeList = document.getElementById('dfTypeList');
-      const statusList = document.getElementById('dfStatusList');
-      typeList.innerHTML = types.map(t => `<label class="doc-filter-chk"><input type="checkbox" class="df-type" value="${t}"><span>${t}</span></label>`).join('');
-      statusList.innerHTML = statuses.map(s => `<label class="doc-filter-chk"><input type="checkbox" class="df-status" value="${s}"><span>${s}</span></label>`).join('');
-
       const fillSelect = (id, items) => {
         const sel = document.getElementById(id);
         items.forEach(v => {
@@ -4483,6 +4481,8 @@
           sel.appendChild(opt);
         });
       };
+      fillSelect('dfType',      types);
+      fillSelect('dfStatus',    statuses);
       fillSelect('dfStaff',     staff);
       fillSelect('dfDivision',  divisions);
       fillSelect('dfProcess',   processes);
@@ -4494,21 +4494,39 @@
         if (!document.getElementById('docFilterWrap').contains(e.target)) dropdown.classList.add('hidden');
       });
 
-      const getChecked = (sel) => [...document.querySelectorAll(sel)].filter(c => c.checked).map(c => c.value);
       const getVal = (id) => (document.getElementById(id).value || '').trim();
 
-      function apply() {
-        const fType   = getChecked('.df-type');
-        const fStatus = getChecked('.df-status');
-        const from    = getVal('dfDateFrom');
-        const to      = getVal('dfDateTo');
-        const fStaff  = getVal('dfStaff');
-        const fDiv    = getVal('dfDivision');
-        const fProc   = getVal('dfProcess');
-        const fProp   = getVal('dfProponent');
+      // Resolve the selected date preset into an explicit [from, to] range.
+      function resolveDateRange() {
+        const preset = getVal('dfDatePreset');
+        if (!preset) return [null, null];
+        if (preset === 'custom') {
+          const f = getVal('dfDateFrom'); const t = getVal('dfDateTo');
+          return [f ? new Date(f) : null, t ? new Date(t) : null];
+        }
+        const now = new Date();
+        const start = new Date(now); start.setHours(0,0,0,0);
+        const end   = new Date(now); end.setHours(23,59,59,999);
+        if (preset === 'today') return [start, end];
+        if (preset === 'week')  { const day = (start.getDay() + 6) % 7; start.setDate(start.getDate() - day); return [start, end]; }
+        if (preset === 'month') { start.setDate(1); return [start, end]; }
+        if (preset === 'quarter'){ const q = Math.floor(start.getMonth() / 3); start.setMonth(q * 3, 1); return [start, end]; }
+        if (preset === 'year')  { start.setMonth(0, 1); return [start, end]; }
+        return [null, null];
+      }
 
-        const count = fType.length + fStatus.length
-          + (from || to ? 1 : 0)
+      function apply() {
+        const fType    = getVal('dfType');
+        const fStatus  = getVal('dfStatus');
+        const preset   = getVal('dfDatePreset');
+        const [fromDate, toDateObj] = resolveDateRange();
+        const fStaff   = getVal('dfStaff');
+        const fDiv     = getVal('dfDivision');
+        const fProc    = getVal('dfProcess');
+        const fProp    = getVal('dfProponent');
+
+        const count = (fType ? 1 : 0) + (fStatus ? 1 : 0)
+          + (preset ? 1 : 0)
           + (fStaff ? 1 : 0) + (fDiv ? 1 : 0) + (fProc ? 1 : 0) + (fProp ? 1 : 0);
 
         if (count > 0) {
@@ -4519,17 +4537,15 @@
           activeEl.classList.add('hidden');
         }
 
-        // parse DD.MM.YYYY to Date
+        // parse DD.MM.YYYY → Date for row "created" values
         const toDate = (str) => {
           const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(str || '');
           return m ? new Date(+m[3], +m[2]-1, +m[1]) : null;
         };
-        const fromDate = from ? new Date(from) : null;
-        const toDateObj = to ? new Date(to) : null;
 
         const filtered = DOC_DATA.filter(d => {
-          if (fType.length   && !fType.includes(d.type))     return false;
-          if (fStatus.length && !fStatus.includes(d.status)) return false;
+          if (fType   && d.type   !== fType)   return false;
+          if (fStatus && d.status !== fStatus) return false;
           if (fStaff  && ![d.owner, d.author, d.responsible].includes(fStaff)) return false;
           if (fDiv    && ![d.ownerDept, d.dept].includes(fDiv)) return false;
           if (fProc   && ![d.process, d.project].includes(fProc)) return false;
@@ -4553,10 +4569,10 @@
       document.getElementById('dfApply').addEventListener('click', apply);
 
       document.getElementById('dfClear').addEventListener('click', () => {
-        document.querySelectorAll('.df-type, .df-status').forEach(c => c.checked = false);
-        ['dfDateFrom','dfDateTo','dfStaff','dfDivision','dfProcess','dfProponent'].forEach(id => {
-          document.getElementById(id).value = '';
+        ['dfType','dfStatus','dfDatePreset','dfDateFrom','dfDateTo','dfStaff','dfDivision','dfProcess','dfProponent'].forEach(id => {
+          const el = document.getElementById(id); if (el) el.value = '';
         });
+        document.getElementById('dfDateRangeWrap')?.classList.add('hidden');
         countEl.classList.add('hidden');
         activeEl.classList.add('hidden');
         renderDocs(DOC_DATA);
@@ -4566,6 +4582,15 @@
 
       return (q) => { searchQ = q; apply(); };
     })();
+
+    // Show/hide the custom date range inputs when the preset changes.
+    function docFilterDatePresetChange() {
+      const preset = document.getElementById('dfDatePreset').value;
+      const wrap = document.getElementById('dfDateRangeWrap');
+      if (!wrap) return;
+      if (preset === 'custom') wrap.classList.remove('hidden');
+      else { wrap.classList.add('hidden'); document.getElementById('dfDateFrom').value = ''; document.getElementById('dfDateTo').value = ''; }
+    }
     document.getElementById('docSearch').addEventListener('input', e => setDocSearch(e.target.value.toLowerCase()));
 
     // ══════════════════════════════════════════
