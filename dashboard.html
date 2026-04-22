@@ -957,7 +957,7 @@
               <p id="tdTaskFrom" class="text-sm text-slate-500 mt-1">HR · Трудоустройство</p>
             </div>
 
-            <!-- Action slot: Start button OR Завершить + Ещё (same row as title) -->
+            <!-- Action slot: Start OR Завершить+Ещё OR Waiting for others (mutually exclusive) -->
             <div class="flex items-center gap-2 flex-wrap justify-end flex-shrink-0">
               <button id="startTaskBtn" onclick="startTask()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="play" class="w-4 h-4"></i>Начать выполнение</button>
 
@@ -972,6 +972,19 @@
                     <button class="flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-rose-50 text-sm font-medium text-rose-700 text-left transition-colors"><i data-lucide="x-circle" class="w-4 h-4 text-rose-600"></i>Отменить задачу</button>
                   </div>
                 </div>
+              </div>
+
+              <!-- Waiting for others — shown after this user submits their part but the task still needs other performers -->
+              <div id="taskWaitingChip" class="hidden items-center gap-3 pl-3 pr-2 py-2 bg-violet-50 border border-violet-200 rounded-xl">
+                <span class="relative flex items-center justify-center w-5 h-5 flex-shrink-0">
+                  <span class="absolute w-5 h-5 rounded-full bg-violet-400 opacity-40 animate-ping"></span>
+                  <span class="relative w-2.5 h-2.5 rounded-full bg-violet-500"></span>
+                </span>
+                <div class="flex flex-col text-left">
+                  <p class="text-[13px] font-semibold text-violet-800 leading-tight">Ваша часть выполнена</p>
+                  <p class="text-[11px] text-violet-600 leading-tight">Ожидание других участников</p>
+                </div>
+                <button onclick="revertSubmission()" type="button" title="Отозвать выполнение" class="ml-1 w-7 h-7 rounded-lg text-violet-600 hover:text-violet-900 hover:bg-white/70 flex items-center justify-center transition-colors flex-shrink-0"><i data-lucide="undo-2" class="w-4 h-4"></i></button>
               </div>
             </div>
           </div>
@@ -996,6 +1009,55 @@
 
         <!-- ═══ TASK EXECUTION block (tab: Выполнение) ═══ -->
         <div id="taskPane-execution" class="task-pane hidden">
+
+          <!-- Waiting for other participants (shown after this user submits) -->
+          <div id="taskExecWaiting" class="hidden bg-white rounded-2xl border border-violet-200 overflow-hidden mb-3">
+            <div class="bg-gradient-to-br from-violet-50 via-white to-white px-6 py-8 flex flex-col items-center text-center">
+              <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[220px] h-auto mb-4" aria-hidden="true">
+                <defs>
+                  <linearGradient id="hgGlass" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ede9fe"/>
+                    <stop offset="100%" stop-color="#ddd6fe"/>
+                  </linearGradient>
+                  <linearGradient id="hgSand" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#8b5cf6"/>
+                    <stop offset="100%" stop-color="#6d28d9"/>
+                  </linearGradient>
+                </defs>
+                <ellipse cx="120" cy="160" rx="60" ry="5" fill="#c4b5fd" opacity="0.35"/>
+                <circle cx="42" cy="46" r="2.5" fill="#c4b5fd"/>
+                <circle cx="198" cy="54" r="2" fill="#a78bfa"/>
+                <circle cx="208" cy="122" r="2" fill="#c4b5fd"/>
+                <circle cx="36" cy="116" r="1.8" fill="#a78bfa"/>
+                <!-- Plates -->
+                <rect x="76" y="30" width="88" height="6" rx="2" fill="#7c3aed"/>
+                <rect x="76" y="144" width="88" height="6" rx="2" fill="#7c3aed"/>
+                <!-- Hourglass glass -->
+                <path d="M82 36 H158 L130 90 L158 144 H82 L110 90 Z" fill="url(#hgGlass)" stroke="#a78bfa" stroke-width="2" stroke-linejoin="round"/>
+                <!-- Sand top (draining) -->
+                <path d="M92 42 H148 L125 86 H115 Z" fill="url(#hgSand)" opacity="0.85"/>
+                <!-- Sand stream -->
+                <rect x="118.5" y="86" width="3" height="14" fill="#6d28d9"/>
+                <!-- Sand bottom (growing) -->
+                <path d="M95 138 H145 L132 110 H108 Z" fill="url(#hgSand)"/>
+                <!-- Highlight -->
+                <path d="M92 42 H108 L118 65" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.55"/>
+              </svg>
+              <h3 class="text-lg font-bold text-slate-900">Ваша часть задачи выполнена</h3>
+              <p class="text-sm text-slate-500 max-w-md mt-1">Ожидаем, пока остальные участники завершат свою работу. Когда все подтвердят, задача автоматически перейдёт на следующий этап.</p>
+
+              <!-- Participants progress -->
+              <div class="mt-5 w-full max-w-md bg-slate-50 rounded-xl border border-slate-100 p-4 text-left">
+                <div class="flex items-center justify-between mb-3">
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Участники этапа</p>
+                  <span id="taskWaitingProgress" class="text-[11px] font-semibold text-slate-500">—</span>
+                </div>
+                <div id="taskWaitingList" class="space-y-2"></div>
+              </div>
+
+              <button onclick="revertSubmission()" type="button" class="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors"><i data-lucide="undo-2" class="w-3.5 h-3.5"></i>Отозвать выполнение</button>
+            </div>
+          </div>
 
           <!-- Landing (illustration + Start run) -->
           <div id="taskExecLanding" class="bg-white rounded-2xl border border-slate-200 p-10 mb-3 flex flex-col items-center justify-center text-center">
@@ -4083,7 +4145,7 @@
     const TASK_COLUMNS = [
       // Сотрудник
       { id:'id',             label:'ID',                              group:'Сотрудник',  minWidth:110, default:true  },
-      { id:'fio',            label:'ФИО',                             group:'Сотрудник',  minWidth:220, default:true  },
+      { id:'fio',            label:'ФИО · Подразделение',             group:'Сотрудник',  minWidth:280, default:true  },
       { id:'iin',            label:'ИИН',                             group:'Сотрудник',  minWidth:150, default:false },
       { id:'company',        label:'Компания',                        group:'Сотрудник',  minWidth:170, default:false },
       { id:'position',       label:'Должность',                       group:'Сотрудник',  minWidth:190, default:true  },
@@ -4213,12 +4275,28 @@
       return `<span class="text-sm text-slate-600 line-clamp-1" title="${(str || '—').replace(/"/g,'&quot;')}">${str || '—'}</span>`;
     }
 
+    // Render a name + department/subdepartment cell for the tasks table.
+    // Stacks: FIO on top, "Подразделение · Подотдел" underneath.
+    function fioDeptCell(name, dept, sub) {
+      const parts = (name || '').replace(/\./g,'').split(/\s+/).filter(Boolean);
+      const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      const esc = (name || '').replace(/"/g, '&quot;').replace(/'/g, "\\'");
+      const line2 = [dept, sub].filter(Boolean).join(' · ') || '—';
+      return `<button type="button" onclick="event.stopPropagation(); openMemberByName('${esc}', event)" class="flex items-center gap-2.5 min-w-0 hover:opacity-80 text-left">
+        <span class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${initials || '—'}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold text-slate-900 truncate leading-tight">${name || '—'}</span>
+          <span class="block text-[11px] text-slate-500 truncate leading-tight mt-0.5">${line2}</span>
+        </span>
+      </button>`;
+    }
+
     function renderTaskCell(colId, t, idx) {
       const s = taskSynth(t, idx);
       const plain = (v) => `<span class="text-sm text-slate-600">${v || '—'}</span>`;
       switch (colId) {
         case 'id':             return `<span class="font-mono text-xs font-semibold text-slate-700">${s.id}</span>`;
-        case 'fio':            return personCell(s.fio);
+        case 'fio':            return fioDeptCell(s.fio, t.from, t.fromSub);
         case 'iin':            return `<span class="font-mono text-sm text-slate-700">${s.iin}</span>`;
         case 'company':        return plain(s.company);
         case 'position':       return plain(s.position);
@@ -5095,7 +5173,7 @@
     function draftKey(src, idx) { return `${src}:${idx}`; }
     function getDraft() {
       const k = draftKey(ACTIVE_TASK_SOURCE, ACTIVE_TASK_IDX);
-      if (!DRAFTS[k]) DRAFTS[k] = { started: false, formRevealed: false, comment: '' };
+      if (!DRAFTS[k]) DRAFTS[k] = { started: false, formRevealed: false, comment: '', submitted: false };
       return DRAFTS[k];
     }
     function activeTask() {
@@ -5257,21 +5335,44 @@
     }
 
     function applyDraftState() {
-      const d = (ACTIVE_TASK_IDX >= 0) ? getDraft() : { started:false, formRevealed:false, comment:'' };
+      const d = (ACTIVE_TASK_IDX >= 0) ? getDraft() : { started:false, formRevealed:false, comment:'', submitted:false };
       const startBtn = document.getElementById('startTaskBtn');
       const stopBtn = document.getElementById('stopTaskBtn');
       const actions = document.getElementById('globalActions');
+      const waitChip = document.getElementById('taskWaitingChip');
       const landing = document.getElementById('taskExecLanding');
       const form = document.getElementById('taskExecForm');
+      const waiting = document.getElementById('taskExecWaiting');
       const textarea = document.querySelector('#taskExecForm textarea');
       document.getElementById('sendAnketaMenu')?.classList.add('hidden');
       document.getElementById('moreActionsMenu')?.classList.add('hidden');
-      if (d.started) {
+
+      // State machine: submitted (wait) > started (active) > idle (start)
+      if (d.submitted) {
+        // Hide start + action buttons, show waiting chip
+        startBtn?.classList.add('hidden');
+        stopBtn?.classList.add('hidden');
+        stopBtn?.classList.remove('inline-flex');
+        actions?.classList.add('hidden');
+        actions?.classList.remove('inline-flex');
+        waitChip?.classList.remove('hidden');
+        waitChip?.classList.add('inline-flex');
+        // Execution pane: show waiting panel, hide landing/form
+        waiting?.classList.remove('hidden');
+        landing?.classList.add('hidden');
+        form?.classList.add('hidden');
+        renderTaskWaitingList();
+        setTaskState(false);
+        if (textarea) textarea.value = '';
+      } else if (d.started) {
         startBtn?.classList.add('hidden');
         stopBtn?.classList.remove('hidden');
         stopBtn?.classList.add('inline-flex');
         actions?.classList.remove('hidden');
         actions?.classList.add('inline-flex');
+        waitChip?.classList.add('hidden');
+        waitChip?.classList.remove('inline-flex');
+        waiting?.classList.add('hidden');
         setTaskState(true);
         if (d.formRevealed) {
           landing?.classList.add('hidden');
@@ -5288,6 +5389,9 @@
         stopBtn?.classList.remove('inline-flex');
         actions?.classList.add('hidden');
         actions?.classList.remove('inline-flex');
+        waitChip?.classList.add('hidden');
+        waitChip?.classList.remove('inline-flex');
+        waiting?.classList.add('hidden');
         landing?.classList.remove('hidden');
         form?.classList.add('hidden');
         if (textarea) textarea.value = '';
@@ -5295,6 +5399,53 @@
         switchTaskTab('overview');
       }
       if (window.lucide) lucide.createIcons();
+    }
+
+    // Build the "Участники этапа" list shown in the waiting panel.
+    // First performer = current user (you); rest are still pending.
+    function renderTaskWaitingList() {
+      const list = document.getElementById('taskWaitingList');
+      const progressEl = document.getElementById('taskWaitingProgress');
+      if (!list) return;
+      const t = activeTask();
+      const members = (t && t.members && t.members.length) ? t.members : ['Вы'];
+      // Index 0 = author of process (not a performer); use performers from index 1 onward,
+      // but if members length is 1, just show that one as "you".
+      const performers = members.length > 1 ? members.slice(1) : members.slice(0);
+      const rows = performers.map((name, i) => {
+        const isYou = i === 0;
+        const parts = (name || '').replace(/\./g,'').split(/\s+/).filter(Boolean);
+        const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+        if (isYou) {
+          return `<div class="flex items-center gap-3 text-sm">
+            <span class="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0"><i data-lucide="check" class="w-3.5 h-3.5 text-white" stroke-width="3"></i></span>
+            <span class="flex-1 min-w-0 text-slate-800 font-medium truncate">Вы · <span class="font-normal text-slate-500">${name}</span></span>
+            <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Выполнено</span>
+          </div>`;
+        }
+        return `<div class="flex items-center gap-3 text-sm">
+          <span class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-slate-600">${initials || '—'}</span>
+          <span class="flex-1 min-w-0 text-slate-700 truncate">${name}</span>
+          <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>Ожидание</span>
+        </div>`;
+      }).join('');
+      list.innerHTML = rows || '<p class="text-xs text-slate-400 text-center py-2">Нет других участников</p>';
+      const done = 1;
+      const total = performers.length;
+      if (progressEl) progressEl.textContent = `${done} из ${total} выполнили`;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Roll back the submission so the reviewer can re-test the flow.
+    function revertSubmission() {
+      if (ACTIVE_TASK_IDX < 0) return;
+      const d = getDraft();
+      d.submitted = false;
+      d.started = false;
+      d.formRevealed = false;
+      d.comment = '';
+      markTaskDraft(false);
+      applyDraftState();
     }
 
     function saveDraftComment() {
@@ -5334,16 +5485,17 @@
     }
 
     // Called by the primary submit button inside the execution form.
+    // Marks this user's part as done and drops the task into "waiting for others" mode.
     function submitTask() {
       if (ACTIVE_TASK_IDX < 0) return;
       saveDraftComment();
       const d = getDraft();
       d.started = false;
       d.formRevealed = false;
-      d.comment = '';
+      d.submitted = true;
       markTaskDraft(false);
       applyDraftState();
-      if (typeof showAlert === 'function') showAlert('Задача успешно завершена', 'success');
+      if (typeof showAlert === 'function') showAlert('Ваша часть задачи выполнена · ждём остальных участников', 'success');
     }
     function toggleSendAnketaMenu(e) {
       e.stopPropagation();
