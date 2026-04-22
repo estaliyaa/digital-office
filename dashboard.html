@@ -690,6 +690,30 @@
               </div>
             </div>
           </div>
+
+          <!-- Column customizer -->
+          <div class="relative" id="docColsWrap">
+            <button id="docColsBtn" type="button" class="toolbar-btn" onclick="toggleDocColsDropdown(event)">
+              <i data-lucide="columns-3" class="w-4 h-4"></i>
+              Колонки
+              <span id="docColsCount" class="text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-full"></span>
+            </button>
+            <div id="docColsDropdown" class="hidden absolute left-0 top-full mt-2 z-40 w-[320px] bg-white rounded-2xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+              <div class="px-5 py-3 border-b border-slate-100">
+                <p class="text-sm font-bold text-slate-900">Настройка колонок</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Выберите, какие колонки отображать в реестре</p>
+              </div>
+              <div id="docColsList" class="max-h-[320px] overflow-y-auto px-2 py-2"></div>
+              <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                <button id="docColsReset" class="text-xs text-slate-500 hover:text-slate-900 transition-colors">По умолчанию</button>
+                <div class="flex items-center gap-2">
+                  <button id="docColsCancel" class="text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">Отменить</button>
+                  <button id="docColsApply" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition-colors">Применить</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="relative">
             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
             <input id="docSearch" type="text" placeholder="Поиск документов..."
@@ -705,17 +729,8 @@
             <div class="scroll-edge-arrow arrow-left"  id="dArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="scroll-edge-arrow arrow-right" id="dArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="overflow-x-auto" id="docScroll" style="scrollbar-width:none">
-              <table class="uni-table" style="min-width:900px">
-                <thead>
-                  <tr>
-                    <th style="min-width:280px">Документ</th>
-                    <th style="min-width:130px">Тип</th>
-                    <th style="min-width:145px">Статус</th>
-                    <th style="min-width:145px">Дата создания</th>
-                    <th style="min-width:145px">Дата исполнения</th>
-                    <th style="min-width:130px">Время в работе</th>
-                  </tr>
-                </thead>
+              <table id="docTable" class="uni-table" style="min-width:900px">
+                <thead><tr></tr></thead>
                 <tbody id="docTableBody"></tbody>
               </table>
             </div>
@@ -3401,14 +3416,70 @@
     ];
 
     const DOC_DATA = [
-      { title: 'Договор поставки',          num: 'DOC-0415', type: 'Договор',            status: 'Подписан',   created: '14.04.2026', due: '30.04.2026', time: '2д 3ч' },
-      { title: 'Акт сверки за март',        num: 'DOC-0414', type: 'Акт',                status: 'На подписи', created: '13.04.2026', due: '17.04.2026', time: '4д 0ч' },
-      { title: 'Договор с ТОО «Альфа»',     num: 'DOC-0412', type: 'Договор',            status: 'Подписан',   created: '12.04.2026', due: '25.04.2026', time: '5д 1ч' },
-      { title: 'Приказ о приёме на работу', num: 'DOC-0398', type: 'Приказ',             status: 'Подписан',   created: '10.04.2026', due: '10.04.2026', time: '0д 4ч' },
-      { title: 'Служебная записка об IT',   num: 'DOC-0391', type: 'Служебная записка',  status: 'Черновик',   created: '07.04.2026', due: '14.04.2026', time: '3д 8ч' },
-      { title: 'Договор аренды офиса',      num: 'DOC-0385', type: 'Договор',            status: 'Отклонён',   created: '05.04.2026', due: '12.04.2026', time: '7д 0ч' },
-      { title: 'Акт приёма-передачи',       num: 'DOC-0374', type: 'Акт',                status: 'На подписи', created: '01.04.2026', due: '18.04.2026', time: '6д 5ч' },
+      { title: 'Договор поставки № 2026-0415',      num: 'DOC-0415', type: 'Договор',            status: 'Подписан',   created: '14.04.2026', due: '30.04.2026', time: '2д 3ч',  author:'Қойшыбай Темірлан',  responsible:'Анна Смирнова',    counterparty:'ТОО «Альфа»',      amount:'1 200 000 ₸',  signed:'3/3',  dept:'Юридический', project:'Закупка сырья',     modified:'14.04.2026, 12:40' },
+      { title: 'Акт сверки за март 2026',           num: 'DOC-0414', type: 'Акт',                status: 'На подписи', created: '13.04.2026', due: '17.04.2026', time: '4д 0ч',  author:'Нурланов С.М.',       responsible:'Касымов Д.Р.',      counterparty:'ТОО «Бета»',       amount:'—',            signed:'1/2',  dept:'Бухгалтерия', project:'Взаиморасчёты Q1',   modified:'13.04.2026, 09:12' },
+      { title: 'Договор с ТОО «Альфа»',             num: 'DOC-0412', type: 'Договор',            status: 'Подписан',   created: '12.04.2026', due: '25.04.2026', time: '5д 1ч',  author:'Қойшыбай Темірлан',   responsible:'Жумабаева А.Т.',    counterparty:'ТОО «Альфа»',      amount:'850 000 ₸',    signed:'2/2',  dept:'Юридический', project:'Партнёрство',        modified:'12.04.2026, 18:55' },
+      { title: 'Приказ о приёме на работу',         num: 'DOC-0398', type: 'Приказ',             status: 'Подписан',   created: '10.04.2026', due: '10.04.2026', time: '0д 4ч',  author:'Оспанова Л.Е.',       responsible:'Жумабаева А.Т.',    counterparty:'—',                amount:'—',            signed:'1/1',  dept:'HR',          project:'Онбординг',          modified:'10.04.2026, 14:02' },
+      { title: 'Служебная записка об IT-закупке',   num: 'DOC-0391', type: 'Служебная записка',  status: 'Черновик',   created: '07.04.2026', due: '14.04.2026', time: '3д 8ч',  author:'Сериков Р.Н.',        responsible:'Нурланов С.М.',     counterparty:'—',                amount:'320 000 ₸',    signed:'0/1',  dept:'IT',          project:'Обновление парка',   modified:'08.04.2026, 11:30' },
+      { title: 'Договор аренды офиса',              num: 'DOC-0385', type: 'Договор',            status: 'Отклонён',   created: '05.04.2026', due: '12.04.2026', time: '7д 0ч',  author:'Алиев Б.К.',          responsible:'Қойшыбай Темірлан', counterparty:'ИП «Центр»',        amount:'2 400 000 ₸',  signed:'1/3',  dept:'Юридический', project:'Аренда',             modified:'06.04.2026, 16:20' },
+      { title: 'Акт приёма-передачи',               num: 'DOC-0374', type: 'Акт',                status: 'На подписи', created: '01.04.2026', due: '18.04.2026', time: '6д 5ч',  author:'Касымов Д.Р.',         responsible:'Бекенов Т.А.',      counterparty:'АО «Kaspi Bank»',  amount:'—',            signed:'0/2',  dept:'Бухгалтерия', project:'Поставка оборудования', modified:'02.04.2026, 10:10' },
+      { title: 'Распоряжение №47',                  num: 'DOC-0371', type: 'Распоряжение',       status: 'Подписан',   created: '30.03.2026', due: '30.03.2026', time: '0д 2ч',  author:'Нуржанкызы А.',        responsible:'—',                counterparty:'—',                amount:'—',            signed:'1/1',  dept:'Администрация', project:'Внутренние',       modified:'30.03.2026, 17:45' },
+      { title: 'NDA с ТОО «Аврора Technics»',       num: 'DOC-0369', type: 'Соглашение',         status: 'Подписан',   created: '28.03.2026', due: '28.03.2029', time: '1д 3ч',  author:'Қойшыбай Темірлан',   responsible:'Анна Смирнова',     counterparty:'ТОО «Аврора Technics»', amount:'—',        signed:'2/2',  dept:'Юридический', project:'Партнёрство',        modified:'29.03.2026, 09:00' },
     ];
+
+    // All available columns for the registry.
+    // `required` columns can't be hidden; `default` controls initial visibility.
+    const DOC_COLUMNS = [
+      { id:'document',     label:'Документ',          minWidth:280, required:true,  default:true  },
+      { id:'type',         label:'Тип',               minWidth:150, default:true  },
+      { id:'status',       label:'Статус',            minWidth:150, default:true  },
+      { id:'author',       label:'Автор',             minWidth:180, default:true  },
+      { id:'responsible',  label:'Ответственный',     minWidth:180, default:true  },
+      { id:'counterparty', label:'Контрагент',        minWidth:210, default:false },
+      { id:'amount',       label:'Сумма',             minWidth:140, default:false },
+      { id:'signed',       label:'Подписи',           minWidth:120, default:false },
+      { id:'dept',         label:'Подразделение',     minWidth:170, default:false },
+      { id:'project',      label:'Проект',            minWidth:180, default:false },
+      { id:'created',      label:'Дата создания',     minWidth:150, default:true  },
+      { id:'due',          label:'Срок',              minWidth:150, default:true  },
+      { id:'modified',     label:'Изменён',           minWidth:170, default:false },
+      { id:'time',         label:'Время в работе',    minWidth:140, default:false },
+    ];
+
+    // Mutable selection (persisted to localStorage)
+    let DOC_VISIBLE = (() => {
+      try {
+        const saved = JSON.parse(localStorage.getItem('do_doc_cols') || 'null');
+        if (Array.isArray(saved)) return new Set(saved);
+      } catch (e) {}
+      return new Set(DOC_COLUMNS.filter(c => c.default).map(c => c.id));
+    })();
+    // Ensure required columns are always on
+    DOC_COLUMNS.filter(c => c.required).forEach(c => DOC_VISIBLE.add(c.id));
+
+    function saveDocColumns() {
+      try { localStorage.setItem('do_doc_cols', JSON.stringify([...DOC_VISIBLE])); } catch (e) {}
+    }
+
+    function renderDocCell(colId, d) {
+      switch (colId) {
+        case 'document':     return `<div><p class="text-sm font-medium text-slate-900 leading-snug">${d.title}</p><p class="text-xs text-slate-400 mt-0.5">${d.num}</p></div>`;
+        case 'type':         return typeBadge(d.type);
+        case 'status':       return statusBadge(d.status);
+        case 'author':       return `<span class="text-sm text-slate-700">${d.author || '—'}</span>`;
+        case 'responsible':  return `<span class="text-sm text-slate-700">${d.responsible || '—'}</span>`;
+        case 'counterparty': return `<span class="text-sm text-slate-700">${d.counterparty || '—'}</span>`;
+        case 'amount':       return `<span class="text-sm font-medium text-slate-900">${d.amount || '—'}</span>`;
+        case 'signed':       return `<span class="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full"><i data-lucide="pen-tool" class="w-3 h-3 text-slate-500"></i>${d.signed || '—'}</span>`;
+        case 'dept':         return `<span class="text-sm text-slate-600">${d.dept || '—'}</span>`;
+        case 'project':      return `<span class="text-sm text-slate-600">${d.project || '—'}</span>`;
+        case 'created':      return `<span class="text-sm text-slate-600">${d.created || '—'}</span>`;
+        case 'due':          return `<span class="text-sm text-slate-600">${d.due || '—'}</span>`;
+        case 'modified':     return `<span class="text-sm text-slate-600">${d.modified || '—'}</span>`;
+        case 'time':         return `<span class="text-sm font-medium text-slate-700">${d.time || '—'}</span>`;
+        default:             return '';
+      }
+    }
 
     // ── Render helpers ──
     function emptyRow(cols, msg) {
@@ -3448,23 +3519,32 @@
     }
 
     function renderDocRow(d) {
-      return `<tr onclick="navigateTo('task-detail')" class="cursor-pointer hover:bg-slate-50 transition-colors">
-        <td>
-          <p class="text-sm font-medium text-slate-900 leading-snug">${d.title}</p>
-          <p class="text-xs text-slate-400 mt-0.5">${d.num}</p>
-        </td>
-        <td>${typeBadge(d.type)}</td>
-        <td>${statusBadge(d.status)}</td>
-        <td><span class="text-sm text-slate-600">${d.created}</span></td>
-        <td><span class="text-sm text-slate-600">${d.due}</span></td>
-        <td><span class="text-sm font-medium text-slate-700">${d.time}</span></td>
-      </tr>`;
+      const cols = DOC_COLUMNS.filter(c => DOC_VISIBLE.has(c.id));
+      const cells = cols.map(c => `<td>${renderDocCell(c.id, d)}</td>`).join('');
+      return `<tr class="cursor-pointer hover:bg-slate-50 transition-colors">${cells}</tr>`;
+    }
+
+    function renderDocHeader() {
+      const cols = DOC_COLUMNS.filter(c => DOC_VISIBLE.has(c.id));
+      const ths = cols.map(c => `<th style="min-width:${c.minWidth}px">${c.label}</th>`).join('');
+      const head = document.querySelector('#docTable thead tr');
+      if (head) head.innerHTML = ths;
+      const table = document.getElementById('docTable');
+      const total = cols.reduce((s,c) => s + c.minWidth, 0);
+      if (table) table.style.minWidth = total + 'px';
     }
 
     // ── Render tables ──
     function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map((t,i)=>renderTaskRow(t,i,'tasks')).join('') : emptyRow(6, 'Задачи не найдены'); }
     function renderRequests(data){ document.getElementById('reqTableBody').innerHTML   = data.length ? data.map((t,i)=>renderTaskRow(t,i,'requests')).join('') : emptyRow(6, 'Заявки не найдены'); }
-    function renderDocs(data)    { document.getElementById('docTableBody').innerHTML   = data.length ? data.map(renderDocRow).join('')  : emptyRow(6, 'Документы не найдены'); }
+    function renderDocs(data) {
+      renderDocHeader();
+      const visibleCols = DOC_COLUMNS.filter(c => DOC_VISIBLE.has(c.id)).length;
+      document.getElementById('docTableBody').innerHTML = data.length
+        ? data.map(renderDocRow).join('')
+        : emptyRow(visibleCols || 6, 'Документы не найдены');
+      if (window.lucide) lucide.createIcons();
+    }
 
     renderTasks(TASKS_DATA);
     renderRequests(REQ_DATA);
@@ -3599,6 +3679,73 @@
     initScrollArrows('tasksScroll', 'tArrowL', 'tArrowR');
     initScrollArrows('reqScroll',   'rArrowL', 'rArrowR');
     initScrollArrows('docScroll',   'dArrowL', 'dArrowR');
+
+    // ══════════════════════════════════════════
+    // ── DOC REGISTRY COLUMN PICKER
+    // ══════════════════════════════════════════
+    let DOC_VISIBLE_DRAFT = new Set(DOC_VISIBLE);
+
+    function renderDocColsDropdown() {
+      const list = document.getElementById('docColsList');
+      if (!list) return;
+      list.innerHTML = DOC_COLUMNS.map(c => {
+        const checked = DOC_VISIBLE_DRAFT.has(c.id);
+        const disabled = c.required;
+        return `<label class="flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-slate-50 cursor-pointer'} transition-colors">
+          <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} data-col="${c.id}" class="w-4 h-4 accent-indigo-600 ${disabled ? 'cursor-not-allowed' : ''}">
+          <span class="text-sm text-slate-800 flex-1">${c.label}</span>
+          ${disabled ? '<span class="text-[10px] text-slate-400">обязательная</span>' : ''}
+        </label>`;
+      }).join('');
+      list.querySelectorAll('input[data-col]').forEach(cb => {
+        cb.addEventListener('change', () => {
+          if (cb.checked) DOC_VISIBLE_DRAFT.add(cb.dataset.col);
+          else DOC_VISIBLE_DRAFT.delete(cb.dataset.col);
+        });
+      });
+      const btn = document.getElementById('docColsCount');
+      if (btn) btn.textContent = DOC_VISIBLE.size;
+    }
+
+    function toggleDocColsDropdown(e) {
+      if (e) e.stopPropagation();
+      const dd = document.getElementById('docColsDropdown');
+      if (!dd) return;
+      const willOpen = dd.classList.contains('hidden');
+      dd.classList.toggle('hidden');
+      if (willOpen) {
+        DOC_VISIBLE_DRAFT = new Set(DOC_VISIBLE);
+        renderDocColsDropdown();
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+    function closeDocColsDropdown() {
+      document.getElementById('docColsDropdown')?.classList.add('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('docColsWrap');
+      if (wrap && !wrap.contains(e.target)) closeDocColsDropdown();
+    });
+    document.getElementById('docColsCancel')?.addEventListener('click', closeDocColsDropdown);
+    document.getElementById('docColsReset')?.addEventListener('click', () => {
+      DOC_VISIBLE_DRAFT = new Set(DOC_COLUMNS.filter(c => c.default).map(c => c.id));
+      renderDocColsDropdown();
+    });
+    document.getElementById('docColsApply')?.addEventListener('click', () => {
+      // Ensure required columns stay
+      DOC_COLUMNS.filter(c => c.required).forEach(c => DOC_VISIBLE_DRAFT.add(c.id));
+      DOC_VISIBLE = new Set(DOC_VISIBLE_DRAFT);
+      saveDocColumns();
+      renderDocs(DOC_DATA);
+      document.getElementById('docColsCount').textContent = DOC_VISIBLE.size;
+      closeDocColsDropdown();
+    });
+
+    // Initial paint of the columns count pill
+    (function () {
+      const el = document.getElementById('docColsCount');
+      if (el) el.textContent = DOC_VISIBLE.size;
+    })();
 
     // ══════════════════════════════════════════
     // ── CREATE FLOW MODAL ──
