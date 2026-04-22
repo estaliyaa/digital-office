@@ -1671,13 +1671,14 @@
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-sm shadow-indigo-400/40"><i data-lucide="file-plus-2" class="w-5 h-5"></i></div>
             <div>
               <h2 class="text-base font-bold text-slate-900">Создать задачу</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Заполните данные новой задачи и назначьте исполнителя</p>
+              <p class="text-xs text-slate-500 mt-0.5">Заполните данные новой задачи</p>
             </div>
           </div>
 
-          <!-- Form — flat list of fields (no grouping, admin controls which fields are shown) -->
+          <!-- Form — long inputs are full-width; compact selectors/dates sit in a 3-column grid -->
           <form id="createTaskForm" onsubmit="submitCreateTask(event)" class="p-6 space-y-4">
 
+            <!-- Full-width long inputs -->
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1.5">Название задачи <span class="text-rose-500">*</span></label>
               <input id="ctTitle" type="text" required placeholder="Введите название задачи" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all placeholder:text-slate-400">
@@ -1688,7 +1689,8 @@
               <textarea id="ctDescription" rows="4" placeholder="Опишите, что нужно сделать..." class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all placeholder:text-slate-400 resize-none"></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Compact 3-up grid: selectors + dates take less width -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1.5">Тип процесса <span class="text-rose-500">*</span></label>
                 <select id="ctType" required class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
@@ -1707,19 +1709,6 @@
                   <option>Срочный</option>
                 </select>
               </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Автор</label>
-                <select id="ctAuthor" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
-                  <option>Қойшыбай Темірлан</option>
-                  <option>Нурланов С.М.</option>
-                  <option>Жумабаева А.Т.</option>
-                  <option>Касымов Д.Р.</option>
-                  <option>Ратников Сергей</option>
-                </select>
-              </div>
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1.5">Подразделение</label>
                 <select id="ctDept" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
@@ -1731,28 +1720,16 @@
                   <option>Администрация</option>
                 </select>
               </div>
-            </div>
-
-            <!-- Custom chip-based performer selector -->
-            <div>
-              <label class="block text-xs font-medium text-slate-600 mb-1.5">Исполнители <span class="text-rose-500">*</span></label>
-              <div id="ctPerformersWrap" class="relative">
-                <div id="ctPerformersInput" class="flex items-center gap-1.5 flex-wrap min-h-[44px] w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl cursor-text focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all" onclick="toggleCtPerformersDropdown(event)">
-                  <div id="ctPerformersChips" class="flex items-center gap-1.5 flex-wrap"></div>
-                  <span id="ctPerformersPlaceholder" class="text-sm text-slate-400 px-1.5">Выберите одного или несколько…</span>
-                  <i data-lucide="chevron-down" class="ml-auto w-4 h-4 text-slate-400"></i>
-                </div>
-                <div id="ctPerformersDropdown" class="hidden absolute left-0 right-0 top-full mt-1 z-40 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
-                  <div class="px-3 py-2 border-b border-slate-100">
-                    <input id="ctPerformersSearch" type="text" placeholder="Поиск сотрудников…" class="w-full px-3 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
-                  </div>
-                  <div id="ctPerformersList" class="max-h-[260px] overflow-y-auto p-1"></div>
-                </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1.5">Автор</label>
+                <select id="ctAuthor" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
+                  <option>Қойшыбай Темірлан</option>
+                  <option>Нурланов С.М.</option>
+                  <option>Жумабаева А.Т.</option>
+                  <option>Касымов Д.Р.</option>
+                  <option>Ратников Сергей</option>
+                </select>
               </div>
-              <p class="text-[11px] text-slate-400 mt-1">Нажмите, чтобы добавить. Крестик у чипа убирает исполнителя.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1.5">Дата начала</label>
                 <input id="ctStartDate" type="date" class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all">
@@ -1763,6 +1740,7 @@
               </div>
             </div>
 
+            <!-- Full-width dropzone -->
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1.5">Вложения</label>
               <label class="flex flex-col items-center justify-center gap-2 p-5 border-2 border-dashed border-slate-200 rounded-xl hover:border-indigo-300 hover:bg-indigo-50/30 transition-all cursor-pointer">
@@ -4972,66 +4950,6 @@
     }
 
     // ── Create task form ──
-    const CT_PERFORMERS_POOL = [
-      'Тажибаев Нурлыбек','Анатолий Кузнецов','Сергей Иванов','Анна Смирнова','Лейла Оспанова',
-      'Касымов Д.Р.','Бекенов Т.А.','Оспанова Л.Е.','Нурланов С.М.','Сериков Р.Н.','Алиев Б.К.','Жумабаева А.Т.',
-      'Қалдыбай Алия Нуржанкызы','Хван Юлиана','Джаманкулова Аружан Канатбековна','Данияров Рахат','Ким Лилия','Абдиразак Ерсин','Амангелді Даниал','Ратников Сергей',
-    ];
-    let CT_PICKED = [];
-    let CT_PERF_QUERY = '';
-
-    function renderCtPerformers() {
-      const chipsEl = document.getElementById('ctPerformersChips');
-      const phEl = document.getElementById('ctPerformersPlaceholder');
-      const listEl = document.getElementById('ctPerformersList');
-      if (!chipsEl || !listEl) return;
-      const palette = ['from-indigo-500 to-violet-600','from-emerald-500 to-teal-600','from-amber-500 to-orange-600','from-sky-500 to-blue-600','from-rose-500 to-pink-600'];
-      chipsEl.innerHTML = CT_PICKED.map((n, i) => {
-        const init = n.replace(/\./g,'').split(/\s+/).filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase();
-        return `<span class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 pl-1 pr-2 py-0.5 text-xs font-medium">
-          <span class="w-5 h-5 rounded-full bg-gradient-to-br ${palette[i % palette.length]} text-white text-[9px] font-bold flex items-center justify-center">${init}</span>${n}
-          <button type="button" onclick="event.stopPropagation(); ctRemovePerformer('${n.replace(/'/g,"\\'")}')" class="ml-1 text-indigo-400 hover:text-indigo-700 transition-colors"><i data-lucide="x" class="w-3 h-3"></i></button>
-        </span>`;
-      }).join('');
-      if (phEl) phEl.style.display = CT_PICKED.length ? 'none' : '';
-
-      const q = (CT_PERF_QUERY || '').toLowerCase();
-      const available = CT_PERFORMERS_POOL.filter(n => !CT_PICKED.includes(n)).filter(n => !q || n.toLowerCase().includes(q));
-      listEl.innerHTML = available.length ? available.map(n => `
-        <button type="button" onclick="ctAddPerformer('${n.replace(/'/g,"\\'")}')" class="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 text-sm text-slate-800 text-left transition-colors">
-          <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold flex items-center justify-center">${n.replace(/\./g,'').split(/\s+/).filter(Boolean).map(w => w[0]).slice(0,2).join('').toUpperCase()}</span>
-          ${n}
-        </button>
-      `).join('') : '<p class="text-xs text-slate-400 text-center py-3">Ничего не найдено</p>';
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function ctAddPerformer(name) {
-      if (!CT_PICKED.includes(name)) CT_PICKED.push(name);
-      const s = document.getElementById('ctPerformersSearch');
-      if (s) s.value = '';
-      CT_PERF_QUERY = '';
-      renderCtPerformers();
-    }
-    function ctRemovePerformer(name) {
-      CT_PICKED = CT_PICKED.filter(n => n !== name);
-      renderCtPerformers();
-    }
-    function toggleCtPerformersDropdown(e) {
-      if (e && e.target.closest('button')) return; // don't toggle when clicking chip remove
-      document.getElementById('ctPerformersDropdown')?.classList.toggle('hidden');
-      renderCtPerformers();
-      setTimeout(() => document.getElementById('ctPerformersSearch')?.focus(), 40);
-    }
-    document.addEventListener('click', (e) => {
-      const wrap = document.getElementById('ctPerformersWrap');
-      if (wrap && !wrap.contains(e.target)) document.getElementById('ctPerformersDropdown')?.classList.add('hidden');
-    });
-    document.getElementById('ctPerformersSearch')?.addEventListener('input', (e) => {
-      CT_PERF_QUERY = e.target.value;
-      renderCtPerformers();
-    });
-
     // Friendly Russian "today" string for Created
     function todayRu() {
       const d = new Date();
@@ -5040,10 +4958,6 @@
 
     function submitCreateTask(e) {
       e.preventDefault();
-      if (!CT_PICKED.length) {
-        showAlert('Укажите хотя бы одного исполнителя', 'error');
-        return;
-      }
       const title = document.getElementById('ctTitle').value.trim();
       const type = document.getElementById('ctType').value;
       const priority = document.getElementById('ctPriority').value;
@@ -5053,7 +4967,8 @@
       const formattedDue = due
         ? `${due.slice(8)}.${due.slice(5,7)}.${due.slice(0,4)}`
         : '—';
-      const members = [author, ...CT_PICKED.filter(n => n !== author)];
+      // Performer assignment happens later in the workflow, not at creation time.
+      const members = author ? [author] : [];
       const newTask = {
         title, from: dept, fromSub: type, type,
         status: 'Новая',
@@ -5067,12 +4982,7 @@
       TASKS_DATA.unshift(newTask);
       renderTasks(TASKS_DATA);
 
-      // reset form + picker
       e.target.reset();
-      CT_PICKED = [];
-      CT_PERF_QUERY = '';
-      renderCtPerformers();
-
       showAlert('Задача успешно создана', 'success');
       navigateTo('tasks');
 
