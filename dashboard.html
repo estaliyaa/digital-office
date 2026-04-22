@@ -286,10 +286,6 @@
         <i data-lucide="menu" class="w-5 h-5"></i>
       </button>
 
-      <!-- Company badge -->
-      <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 shrink-0">
-        <i data-lucide="building-2" class="w-3 h-3"></i>Adata
-      </span>
       <!-- hidden span keeps JS working -->
       <h1 id="pageTitle" class="sr-only"></h1>
 
@@ -305,6 +301,10 @@
 
       <!-- Right controls -->
       <div class="flex items-center gap-2 ml-auto">
+        <!-- Company badge -->
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 shrink-0">
+          <i data-lucide="building-2" class="w-3 h-3"></i>Adata
+        </span>
         <span id="roleBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"></span>
 
         <!-- Notifications bell + dropdown -->
@@ -1037,7 +1037,7 @@
         <!-- ── ROW 1: Candidate info (full width) ── -->
         <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-3">
           <div class="flex items-center gap-2 mb-4">
-            <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
+            <i data-lucide="info" class="w-4 h-4 text-slate-400"></i>
             <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Основная информация</p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-5 gap-y-4 text-sm">
@@ -3432,7 +3432,7 @@
 
     function renderTaskRow(t, i, source) {
       const draftMarker = t.hasDraft
-        ? `<span title="У задачи есть несохранённый черновик" class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-md ml-1.5 align-middle"><i data-lucide="pencil-line" class="w-2.5 h-2.5"></i>Черновик</span>`
+        ? `<span title="Задача начата — есть несохранённый черновик" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 ml-1.5 align-middle"><i data-lucide="loader-2" class="w-3 h-3 animate-spin" style="animation-duration:2.2s"></i></span>`
         : '';
       return `<tr data-task-idx="${i}" data-task-source="${source}" onclick="openTaskDetail(${i},'${source}')" class="cursor-pointer hover:bg-slate-50 transition-colors ${t.hasDraft ? 'bg-amber-50/30' : ''}">
         <td>
@@ -4019,6 +4019,7 @@
       if (ACTIVE_TASK_IDX < 0) return;
       const d = getDraft();
       d.started = true;
+      d.formRevealed = true; // skip landing, go straight to the completion form
       markTaskDraft(true);
       applyDraftState();
       window.scrollTo({ top: 0, behavior: 'smooth' });
