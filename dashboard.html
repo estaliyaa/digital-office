@@ -3639,6 +3639,47 @@
       { title: 'NDA с ТОО «Аврора Technics»',       num: 'DOC-0369', type: 'Соглашение',         status: 'Подписан',   created: '28.03.2026', due: '28.03.2029', signedAt:'29.03.2026', time: '1д 3ч',  author:'Қойшыбай Темірлан',    responsible:'Анна Смирнова',     owner:'Анна Смирнова',      ownerDept:'Финансовый отдел',       ownerGradient:'from-cyan-500 to-indigo-600',     entity:'ТОО «Adata Holding»',        process:'Партнёрство — NDA',             signatories:[{name:'Анна Смирнова',role:'Финансовый директор',status:'signed',signedAt:'28.03.2026, 14:30',dept:'Финансовый отдел'},{name:'Қойшыбай Темірлан',role:'Юридическая экспертиза',status:'signed',signedAt:'29.03.2026, 09:00',dept:'Юридический отдел'}], counterparty:'ТОО «Аврора Technics»', amount:'—',         signed:'2/2',  dept:'Юридический',   project:'Партнёрство',           modified:'29.03.2026, 09:00', fileSize:'520 КБ', filePages:3 },
     ];
 
+    // ── Post-process: attach files[], taskIdx, owner position/contact ──
+    // Per-doc extension data (index-aligned with DOC_DATA). Keeps the declarations above readable.
+    const DOC_EXT = [
+      { taskIdx: 0, position: 'Юрист',                    email: 'k.temirlan@adata.kz',      phone: '+7 (700) 100-20-30', files: [
+        { name: 'DOC-0415_Dogovor_postavki.pdf',       size: '2.4 МБ', pages: 8, ext: 'pdf'  },
+        { name: 'DOC-0415_Specifikatsiya_prilojenie1.pdf', size: '820 КБ', pages: 3, ext: 'pdf' },
+        { name: 'DOC-0415_Komm_predlozhenie.docx',     size: '640 КБ', pages: 4, ext: 'docx' },
+      ]},
+      { taskIdx: 1, position: 'Главный бухгалтер',        email: 'nurlanov@adata.kz',        phone: '+7 (700) 201-34-56', files: [
+        { name: 'DOC-0414_Akt_sverki_mart.pdf',        size: '1.1 МБ', pages: 4, ext: 'pdf' },
+        { name: 'DOC-0414_Vygruzka_1С.xlsx',           size: '540 КБ', pages: 1, ext: 'xlsx' },
+      ]},
+      { taskIdx: 2, position: 'HR-менеджер',              email: 'jumabayeva@adata.kz',      phone: '+7 (700) 302-45-78', files: [
+        { name: 'DOC-0412_Dogovor_Alfa.pdf',           size: '1.8 МБ', pages: 6, ext: 'pdf' },
+        { name: 'DOC-0412_Dopsoglashenie_1.pdf',       size: '520 КБ', pages: 2, ext: 'pdf' },
+      ]},
+      { taskIdx: 4, position: 'Юрисконсульт',             email: 'ospanova@adata.kz',        phone: '+7 (700) 403-56-89', files: [
+        { name: 'DOC-0398_Prikaz_priema.pdf',          size: '420 КБ', pages: 2, ext: 'pdf' },
+      ]},
+      { taskIdx: 4, position: 'Специалист снабжения',     email: 'serikov@adata.kz',         phone: '+7 (700) 504-67-90', files: [
+        { name: 'DOC-0391_Sluzhebnaya_zapiska.pdf',    size: '680 КБ', pages: 3, ext: 'pdf' },
+        { name: 'DOC-0391_Kommercheskoe.jpg',          size: '1.2 МБ', pages: 1, ext: 'jpg' },
+      ]},
+      { taskIdx: 5, position: 'Генеральный директор',     email: 'aliev@adata.kz',           phone: '+7 (700) 605-78-01', files: [
+        { name: 'DOC-0385_Dogovor_arendy.pdf',         size: '3.2 МБ', pages: 14, ext: 'pdf' },
+        { name: 'DOC-0385_Plan_pomescheniya.jpg',      size: '2.1 МБ', pages: 1, ext: 'jpg' },
+        { name: 'DOC-0385_Svidetelstvo.pdf',           size: '780 КБ', pages: 2, ext: 'pdf' },
+      ]},
+      { taskIdx: 6, position: 'Финансовый контролёр',     email: 'kasymov@adata.kz',         phone: '+7 (700) 706-89-12', files: [
+        { name: 'DOC-0374_Akt_priema_peredachi.pdf',   size: '1.3 МБ', pages: 5, ext: 'pdf' },
+      ]},
+      { taskIdx: 3, position: 'Директор',                 email: 'nurzhankyzy@adata.kz',     phone: '+7 (700) 807-90-23', files: [
+        { name: 'DOC-0371_Rasporyazhenie_47.pdf',      size: '180 КБ', pages: 1, ext: 'pdf' },
+      ]},
+      { taskIdx: 0, position: 'Финансовый директор',      email: 'smirnova@adata.kz',        phone: '+7 (700) 908-01-34', files: [
+        { name: 'DOC-0369_NDA_Avrora_Technics.pdf',    size: '520 КБ', pages: 3, ext: 'pdf' },
+        { name: 'DOC-0369_Prilozhenie_A.pdf',          size: '210 КБ', pages: 1, ext: 'pdf' },
+      ]},
+    ];
+    DOC_DATA.forEach((d, i) => Object.assign(d, DOC_EXT[i] || {}));
+
     // Fixed registry columns — column picker has moved to the All Tasks page.
     const DOC_COLUMNS = [
       { id:'document',  label:'Документ',        minWidth:300 },
@@ -3837,7 +3878,43 @@
       }).join('');
 
       const canDownloadSigned = d.status === 'Подписан';
-      const filename = `${d.num}_${(d.title || '').replace(/\s+/g,'_').slice(0,40)}.pdf`;
+
+      // ── Files: normalise to an array; fall back to a single synthesised entry. ──
+      const files = (d.files && d.files.length)
+        ? d.files
+        : [{ name: `${d.num}_${(d.title || '').replace(/\s+/g,'_').slice(0,40)}.pdf`, size: d.fileSize || '—', pages: d.filePages || 1, ext: 'pdf' }];
+      const fileIconMap = {
+        pdf:  { icon: 'file-text',  cls: 'bg-rose-100 text-rose-600'   },
+        doc:  { icon: 'file-text',  cls: 'bg-sky-100 text-sky-600'     },
+        docx: { icon: 'file-text',  cls: 'bg-sky-100 text-sky-600'     },
+        xls:  { icon: 'file-spreadsheet', cls: 'bg-emerald-100 text-emerald-600' },
+        xlsx: { icon: 'file-spreadsheet', cls: 'bg-emerald-100 text-emerald-600' },
+        jpg:  { icon: 'image',      cls: 'bg-violet-100 text-violet-600'},
+        jpeg: { icon: 'image',      cls: 'bg-violet-100 text-violet-600'},
+        png:  { icon: 'image',      cls: 'bg-violet-100 text-violet-600'},
+      };
+      const fileRow = (f) => {
+        const meta = fileIconMap[(f.ext || '').toLowerCase()] || fileIconMap.pdf;
+        const sizePage = [f.size, (f.pages ? `${f.pages} стр.` : '')].filter(Boolean).join(' · ');
+        return `
+          <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100/60 transition-colors">
+            <div class="w-9 h-9 rounded-lg ${meta.cls} flex items-center justify-center flex-shrink-0"><i data-lucide="${meta.icon}" class="w-4 h-4"></i></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-slate-900 truncate" title="${f.name}">${f.name}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">${(f.ext || 'PDF').toUpperCase()} · ${sizePage}</p>
+            </div>
+            <div class="relative tdDocDl-wrap flex-shrink-0">
+              <button type="button" onclick="toggleTdDocDl(this, event)" title="Скачать" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-500 flex items-center justify-center transition-colors"><i data-lucide="download" class="w-4 h-4"></i></button>
+              <div class="tdDocDl-menu hidden absolute right-0 top-full mt-1 z-20 w-56 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+                ${canDownloadSigned
+                  ? `<button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2 transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ</button>`
+                  : `<button disabled title="Документ ещё не подписан" class="w-full px-3.5 py-2.5 text-left text-sm text-slate-400 bg-slate-50/60 cursor-not-allowed flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ<span class="ml-auto text-[10px] font-normal">недоступно</span></button>`}
+                <button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригинал документа</button>
+              </div>
+            </div>
+          </div>
+        `;
+      };
 
       host.innerHTML = `
         <!-- Back button -->
@@ -3863,17 +3940,20 @@
               <p class="text-sm text-slate-500 mt-1">${d.entity || '—'}${d.process ? ' · ' + d.process : ''}</p>
             </div>
 
-            <!-- Action slot: single Download button with dropdown (signed option disabled when unsigned) -->
+            <!-- Action slot: jump to the source task + single Download dropdown -->
             <div class="flex items-center gap-2 flex-wrap justify-end flex-shrink-0">
+              ${typeof d.taskIdx === 'number'
+                ? `<button type="button" onclick="openTaskDetail(${d.taskIdx}, 'tasks')" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="briefcase" class="w-4 h-4"></i>Перейти к задаче<i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i></button>`
+                : ''}
               <div class="relative tdDocDl-wrap">
                 <button type="button" onclick="toggleTdDocDl(this, event)" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors">
-                  <i data-lucide="download" class="w-4 h-4"></i>Скачать<i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-80"></i>
+                  <i data-lucide="download" class="w-4 h-4"></i>Скачать${(d.files && d.files.length > 1) ? ` <span class="text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded-md">${d.files.length}</span>` : ''}<i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-80"></i>
                 </button>
-                <div class="tdDocDl-menu hidden absolute right-0 top-full mt-2 z-30 w-64 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+                <div class="tdDocDl-menu hidden absolute right-0 top-full mt-2 z-30 w-72 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
                   ${canDownloadSigned
-                    ? `<button class="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2.5 transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ</button>`
-                    : `<button disabled title="Документ ещё не подписан" class="w-full px-4 py-3 text-left text-sm text-slate-400 bg-slate-50/60 cursor-not-allowed flex items-center gap-2.5"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ<span class="ml-auto text-[10px] font-normal">недоступно</span></button>`}
-                  <button class="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2.5 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригинал документа</button>
+                    ? `<button class="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2.5 transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанные документы${(d.files && d.files.length > 1) ? ` <span class="ml-auto text-[10px] text-slate-400">ZIP · ${d.files.length}</span>` : ''}</button>`
+                    : `<button disabled title="Документ ещё не подписан" class="w-full px-4 py-3 text-left text-sm text-slate-400 bg-slate-50/60 cursor-not-allowed flex items-center gap-2.5"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанные документы<span class="ml-auto text-[10px] font-normal">недоступно</span></button>`}
+                  <button class="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2.5 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригиналы документов${(d.files && d.files.length > 1) ? ` <span class="ml-auto text-[10px] text-slate-400">ZIP · ${d.files.length}</span>` : ''}</button>
                 </div>
               </div>
             </div>
@@ -3921,66 +4001,50 @@
             </div>
           </div>
 
-          <!-- ── ROW 3: Команда (Ответственный + Подписанты) + Документ ── -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
+          <!-- ── ROW 3: Ответственный profile + Документы list ── -->
+          <div class="grid grid-cols-1 lg:grid-cols-5 gap-5 mb-3">
 
-            <!-- Team card (2/3) -->
-            <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5">
-              <div class="flex items-center justify-between mb-4">
-                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Команда документа</p>
-                <span class="text-[11px] text-slate-400">${1 + signerList.length} ${signerList.length >= 1 ? 'человек' : 'человека'}</span>
-              </div>
-
-              <!-- Responsible (Ответственный) row -->
-              <div class="mb-4 pb-4 border-b border-slate-100">
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 mb-2">Ответственный</p>
-                <div class="flex items-center gap-3">
-                  <div class="w-11 h-11 rounded-full bg-gradient-to-br ${ownerGrad} text-white text-sm font-bold flex items-center justify-center flex-shrink-0">${ownerInitials || '—'}</div>
-                  <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-slate-900 truncate">${d.owner || '—'}</p>
-                    <p class="text-xs text-slate-500 truncate">${d.ownerDept || '—'}</p>
-                  </div>
-                  <button class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors flex-shrink-0"><i data-lucide="mail" class="w-3.5 h-3.5"></i>Написать</button>
+            <!-- Responsible profile (2/5) — focused on the owner; signers live in Лист подписей below -->
+            <div class="lg:col-span-2 relative bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <!-- Accent bar with gradient matching owner avatar -->
+              <div class="h-16 bg-gradient-to-r ${ownerGrad} opacity-90"></div>
+              <div class="px-5 pb-5 -mt-8">
+                <div class="flex items-end justify-between gap-3 mb-4">
+                  <div class="w-16 h-16 rounded-2xl bg-gradient-to-br ${ownerGrad} text-white text-lg font-bold flex items-center justify-center flex-shrink-0 ring-4 ring-white shadow-sm">${ownerInitials || '—'}</div>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-white/95 border border-indigo-200 px-2 py-1 rounded-full shadow-sm mb-1"><i data-lucide="shield-check" class="w-3 h-3"></i>Ответственный</span>
                 </div>
-              </div>
+                <p class="text-base font-bold text-slate-900 leading-tight">${d.owner || '—'}</p>
+                <p class="text-xs text-slate-500 mt-0.5">${d.position || '—'}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5 inline-flex items-center gap-1"><i data-lucide="building" class="w-3 h-3"></i>${d.ownerDept || '—'}</p>
 
-              <!-- Signers summary -->
-              <div>
-                <div class="flex items-center justify-between mb-3">
-                  <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Подписанты <span class="text-slate-400 font-medium">· ${d.signed || '0/0'}</span></p>
+                <div class="h-px bg-slate-100 my-4"></div>
+
+                <div class="space-y-2 text-xs">
+                  ${d.email ? `<a href="mailto:${d.email}" onclick="event.stopPropagation()" class="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors group"><span class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-100 transition-colors"><i data-lucide="mail" class="w-3.5 h-3.5"></i></span><span class="truncate">${d.email}</span></a>` : ''}
+                  ${d.phone ? `<a href="tel:${d.phone.replace(/\s/g,'')}" onclick="event.stopPropagation()" class="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors group"><span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 transition-colors"><i data-lucide="phone" class="w-3.5 h-3.5"></i></span><span class="font-mono">${d.phone}</span></a>` : ''}
+                  <div class="flex items-center gap-2 text-slate-600"><span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0"><i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i></span><span>Создал ${d.created || '—'}</span></div>
                 </div>
-                ${signerList.length
-                  ? `<div class="flex items-center -space-x-2 mb-3">${signerAvatars}</div>
-                     <div class="space-y-1.5">
-                       ${signerList.slice(0, 3).map(s => {
-                         const statusDot = s.status === 'signed' ? 'bg-emerald-500' : s.status === 'rejected' ? 'bg-rose-500' : 'bg-amber-500';
-                         const statusText = s.status === 'signed' ? 'Подписано' : s.status === 'rejected' ? 'Отклонено' : 'Ожидает';
-                         const statusColor = s.status === 'signed' ? 'text-emerald-700' : s.status === 'rejected' ? 'text-rose-700' : 'text-amber-700';
-                         return `<div class="flex items-center justify-between gap-3 text-xs">
-                           <span class="text-slate-700 truncate"><span class="font-semibold text-slate-900">${s.name}</span> · ${s.role || '—'}</span>
-                           <span class="inline-flex items-center gap-1.5 font-semibold ${statusColor} flex-shrink-0"><span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>${statusText}</span>
-                         </div>`;
-                       }).join('')}
-                       ${signerList.length > 3 ? `<p class="text-[11px] text-slate-400 pt-1">+ ещё ${signerList.length - 3}</p>` : ''}
-                     </div>`
-                  : '<p class="text-sm text-slate-400">Подписанты не назначены</p>'}
+
+                <div class="flex items-center gap-2 mt-4">
+                  ${d.email ? `<a href="mailto:${d.email}" onclick="event.stopPropagation()" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3 py-2 rounded-lg transition-colors"><i data-lucide="mail" class="w-3.5 h-3.5"></i>Написать</a>` : ''}
+                  ${d.phone ? `<a href="tel:${d.phone.replace(/\s/g,'')}" onclick="event.stopPropagation()" class="flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 px-3 py-2 rounded-lg transition-colors"><i data-lucide="phone" class="w-3.5 h-3.5"></i>Позвонить</a>` : ''}
+                </div>
               </div>
             </div>
 
-            <!-- File card (1/3) — info only; download lives in the hero -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5">
+            <!-- Документы list (3/5) — supports multiple files, each with its own download dropdown -->
+            <div class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-5">
               <div class="flex items-center justify-between mb-3">
-                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Документ</p>
+                <div>
+                  <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Документы</p>
+                  <p class="text-xs text-slate-500 mt-0.5">${files.length} ${files.length === 1 ? 'файл' : (files.length < 5 ? 'файла' : 'файлов')} в пакете</p>
+                </div>
                 <span class="inline-flex items-center gap-1 text-[11px] font-semibold ${canDownloadSigned ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-amber-700 bg-amber-50 border-amber-200'} border px-2 py-0.5 rounded-full">
                   ${canDownloadSigned ? '<i data-lucide="check" class="w-3 h-3" stroke-width="3"></i>Подписан' : '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>На подписании'}
                 </span>
               </div>
-              <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-slate-900 truncate" title="${filename}">${filename}</p>
-                  <p class="text-[11px] text-slate-500 mt-0.5">PDF · ${d.fileSize || '—'} · ${d.filePages || 1} стр.</p>
-                </div>
+              <div class="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                ${files.map(fileRow).join('')}
               </div>
             </div>
           </div>
