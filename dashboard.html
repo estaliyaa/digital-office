@@ -287,7 +287,7 @@
   <div id="mobileOverlay" class="fixed inset-0 bg-black/30 z-30 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
 
   <!-- ═══ MAIN AREA ═══ -->
-  <div id="mainArea" class="flex-1 ml-64 transition-all duration-250">
+  <div id="mainArea" class="flex-1 ml-64 transition-all duration-250 min-w-0 overflow-x-hidden">
     <!-- Top Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-20 h-16 flex items-center px-6 gap-4">
       <!-- Mobile menu -->
@@ -625,7 +625,18 @@
         </div>
 
         <!-- Department filter pills -->
-        <div class="flex items-center gap-2 flex-wrap mb-3" id="notifFilterRow"></div>
+        <!-- Department filter strip: horizontal scroll with edge arrows -->
+        <div class="relative mb-3" id="notifFilterWrap">
+          <button id="notifFilterArrowL" onclick="scrollNotifFilter(-1)" type="button"
+            class="hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <button id="notifFilterArrowR" onclick="scrollNotifFilter(1)" type="button"
+            class="hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+          <div id="notifFilterRow" class="flex items-center gap-2 overflow-x-auto scroll-smooth py-1 px-1" style="scrollbar-width:none"></div>
+        </div>
 
         <!-- Notifications list, grouped by date -->
         <div id="notifList" class="space-y-6"></div>
@@ -2703,14 +2714,42 @@
       'e15': { id:'e15',name:'Бекенов Темирлан Алиевич',        short:'Бекенов Т.А.',  position:'Frontend разработчик',   dept:'Разработка',  email:'t.bekenov@adata.kz',    phone:'+7 (700) 555-66-77', birth:'09.10.1995', iin:'951009300015', role:'Пользователь', gradient:'from-rose-400 to-red-500',     managerIds:['e2'],      subIds:[],               colleagueIds:[] },
       'e16': { id:'e16',name:'Сериков Руслан Нурланович',       short:'Сериков Р.Н.',  position:'Backend разработчик',    dept:'Разработка',  email:'r.serikov@adata.kz',    phone:'+7 (700) 666-77-88', birth:'18.04.1993', iin:'930418300016', role:'Пользователь', gradient:'from-indigo-400 to-blue-500',  managerIds:['e4'],      subIds:[],               colleagueIds:[] },
       'e17': { id:'e17',name:'Алиев Бахытжан Касымович',        short:'Алиев Б.К.',    position:'QA инженер',             dept:'Разработка',  email:'b.aliev@adata.kz',      phone:'+7 (700) 777-88-99', birth:'25.03.1991', iin:'910325300017', role:'Пользователь', gradient:'from-teal-400 to-emerald-500', managerIds:['e2'],      subIds:[],               colleagueIds:[] },
+
+      // ── Adata subsidiary — organised by department ──
+      // Руководство
+      'ad-mgmt-1': { id:'ad-mgmt-1', name:'Ратников Сергей',           short:'Ратников С.', position:'Руководитель',      dept:'Руководство', email:'s.ratnikov@adata.kz',    phone:'+7 (700) 101-20-01', birth:'07.02.1980', iin:'800207301001', role:'Руководитель', gradient:'from-indigo-500 to-violet-600',  managerIds:[],           subIds:[],               colleagueIds:[] },
+      // PM
+      'ad-pm-1':   { id:'ad-pm-1',   name:'Қойшыбай Темірлан',         short:'Қойшыбай Т.',  position:'Project Manager',   dept:'PM',          email:'t.koishybay@adata.kz',   phone:'+7 (700) 202-20-02', birth:'10.05.1988', iin:'880510302002', role:'Пользователь', gradient:'from-emerald-500 to-teal-600',  managerIds:['ad-mgmt-1'],subIds:[],               colleagueIds:['ad-pm-2','ad-pm-3'] },
+      'ad-pm-2':   { id:'ad-pm-2',   name:'Тажибаев Нурлыбек',         short:'Тажибаев Н.',  position:'Project Manager',   dept:'PM',          email:'n.tazhibaev@adata.kz',   phone:'+7 (700) 202-20-03', birth:'22.09.1990', iin:'900922302003', role:'Пользователь', gradient:'from-amber-500 to-orange-600',  managerIds:['ad-mgmt-1'],subIds:[],               colleagueIds:['ad-pm-1','ad-pm-3'] },
+      'ad-pm-3':   { id:'ad-pm-3',   name:'Амангелді Даниал',           short:'Амангелді Д.', position:'Project Manager',   dept:'PM',          email:'d.amangeldy@adata.kz',   phone:'+7 (700) 202-20-04', birth:'18.01.1993', iin:'930118302004', role:'Пользователь', gradient:'from-rose-500 to-pink-600',     managerIds:['ad-mgmt-1'],subIds:[],               colleagueIds:['ad-pm-1','ad-pm-2'] },
+      // Designer
+      'ad-ds-1':   { id:'ad-ds-1',   name:'Қалдыбай Алия Нуржанкызы',  short:'Қалдыбай А.',  position:'Design Team Lead',  dept:'Designer',    email:'a.kaldybai@adata.kz',    phone:'+7 (700) 303-30-01', birth:'14.06.1992', iin:'920614303001', role:'Пользователь', gradient:'from-violet-500 to-fuchsia-600', managerIds:['ad-mgmt-1'],subIds:['ad-ds-2','ad-ds-3','ad-ds-4','ad-ds-5'], colleagueIds:[] },
+      'ad-ds-2':   { id:'ad-ds-2',   name:'Хван Юлиана',                short:'Хван Ю.',      position:'Designer',          dept:'Designer',    email:'y.khvan@adata.kz',       phone:'+7 (700) 303-30-02', birth:'02.07.1995', iin:'950702303002', role:'Пользователь', gradient:'from-pink-500 to-rose-600',      managerIds:['ad-ds-1'],  subIds:[],               colleagueIds:['ad-ds-3','ad-ds-4','ad-ds-5'] },
+      'ad-ds-3':   { id:'ad-ds-3',   name:'Жамаукова Аружан Канатбековна', short:'Жамаукова А.', position:'Designer',       dept:'Designer',    email:'a.zhamaukova@adata.kz',  phone:'+7 (700) 303-30-03', birth:'11.11.1996', iin:'961111403003', role:'Пользователь', gradient:'from-fuchsia-500 to-pink-600',   managerIds:['ad-ds-1'],  subIds:[],               colleagueIds:['ad-ds-2','ad-ds-4','ad-ds-5'] },
+      'ad-ds-4':   { id:'ad-ds-4',   name:'Данияров Рахат',             short:'Данияров Р.',  position:'Designer',          dept:'Designer',    email:'r.daniyarov@adata.kz',   phone:'+7 (700) 303-30-04', birth:'23.03.1994', iin:'940323303004', role:'Пользователь', gradient:'from-sky-500 to-indigo-600',     managerIds:['ad-ds-1'],  subIds:[],               colleagueIds:['ad-ds-2','ad-ds-3','ad-ds-5'] },
+      'ad-ds-5':   { id:'ad-ds-5',   name:'Ким Лилия',                  short:'Ким Л.',       position:'Designer',          dept:'Designer',    email:'l.kim@adata.kz',         phone:'+7 (700) 303-30-05', birth:'05.09.1997', iin:'970905403005', role:'Пользователь', gradient:'from-teal-500 to-emerald-600',   managerIds:['ad-ds-1'],  subIds:[],               colleagueIds:['ad-ds-2','ad-ds-3','ad-ds-4'] },
+      // Frontend
+      'ad-fe-1':   { id:'ad-fe-1',   name:'Абдиразак Ерсин',            short:'Абдиразак Е.', position:'Frontend Team Lead', dept:'Frontend',    email:'e.abdirazak@adata.kz',   phone:'+7 (700) 404-40-01', birth:'12.12.1989', iin:'891212304001', role:'Пользователь', gradient:'from-blue-500 to-sky-600',       managerIds:['ad-mgmt-1'],subIds:[],               colleagueIds:[] },
     };
 
     const COMPANIES = [
       { id: 'avrora', name: 'ТОО "Аврора Холдинг"',  type:'head',  initials:'АХ', color:'from-indigo-500 to-violet-600',
         employeeIds: ['e1','e2','e3','e4','e5','e6','e11','e12','e13','e14','e15','e16','e17'],
         children: [
-          { id:'alldata',      name:'ТОО "Alldata"',        type:'child', initials:'AL', color:'from-sky-500 to-blue-600',
-            employeeIds: ['e7','e8','e9'] },
+          { id:'adata',        name:'ТОО "Adata"',          type:'child', initials:'AD', color:'from-sky-500 to-blue-600',
+            employeeIds: ['ad-mgmt-1','ad-pm-1','ad-pm-2','ad-pm-3','ad-ds-1','ad-ds-2','ad-ds-3','ad-ds-4','ad-ds-5','ad-fe-1'],
+            departments: [
+              { id:'ad-mgmt',   name:'Руководство',  icon:'crown',       employeeIds:['ad-mgmt-1'] },
+              { id:'ad-pm',     name:'PM',           icon:'clipboard-list', employeeIds:['ad-pm-1','ad-pm-2','ad-pm-3'] },
+              { id:'ad-design', name:'Designer',     icon:'palette',     employeeIds:['ad-ds-1','ad-ds-2','ad-ds-3','ad-ds-4','ad-ds-5'] },
+              { id:'ad-fe',     name:'Frontend',     icon:'code-2',      employeeIds:['ad-fe-1'] },
+              { id:'ad-be',     name:'Backend',      icon:'server',      employeeIds:[] },
+              { id:'ad-qa',     name:'QA Engineer',  icon:'check-circle',employeeIds:[] },
+              { id:'ad-devops', name:'DevOps',       icon:'cog',         employeeIds:[] },
+              { id:'ad-data',   name:'Data Engineer',icon:'database',    employeeIds:[] },
+              { id:'ad-ai',     name:'AI',           icon:'sparkles',    employeeIds:[] },
+            ]
+          },
           { id:'avrora-brands',name:'ТОО "Аврора Brands"',   type:'child', initials:'АB', color:'from-rose-500 to-pink-600',
             employeeIds: ['e10','e14'] },
           { id:'avrora-tech',  name:'ТОО "Аврора Technics"', type:'child', initials:'АT', color:'from-emerald-500 to-teal-600',
@@ -3019,27 +3058,81 @@
     }
 
     // Сотрудники group box. Flat compact grid when > threshold, tree otherwise.
+    // Tracks which departments are expanded in the scheme
+    const SCHEME_DEPT_OPEN = new Set();
+    function toggleDept(id) {
+      if (SCHEME_DEPT_OPEN.has(id)) SCHEME_DEPT_OPEN.delete(id);
+      else SCHEME_DEPT_OPEN.add(id);
+      renderStructSchema();
+    }
+
+    function deptBlock(dept, variant) {
+      const open = SCHEME_DEPT_OPEN.has(dept.id);
+      const ids = dept.employeeIds || [];
+      const count = ids.length;
+      const dotCls = variant === 'head' ? 'bg-indigo-500' : 'bg-violet-500';
+      const textCls = variant === 'head' ? 'text-indigo-700' : 'text-violet-700';
+      const hoverCls = variant === 'head' ? 'hover:border-indigo-300' : 'hover:border-violet-300';
+      const employeesHtml = open && ids.length ? `
+        <div class="mt-3 px-2 pb-2">
+          <div class="max-h-[280px] overflow-y-auto pr-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              ${ids.map(id => EMPLOYEES[id]).filter(Boolean).map(empCard).join('')}
+            </div>
+          </div>
+        </div>
+      ` : open && !ids.length ? `
+        <p class="text-[11px] text-slate-400 text-center py-3">Сотрудников пока нет</p>
+      ` : '';
+      return `
+        <div class="bg-white border border-slate-200 rounded-xl ${hoverCls} transition-colors">
+          <button type="button" onclick="toggleDept('${dept.id}')" class="w-full flex items-center gap-3 px-3 py-2.5 text-left">
+            <div class="w-7 h-7 rounded-lg ${variant === 'head' ? 'bg-indigo-50 text-indigo-600' : 'bg-violet-50 text-violet-600'} flex items-center justify-center flex-shrink-0"><i data-lucide="${dept.icon || 'users'}" class="w-3.5 h-3.5"></i></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-slate-900">${dept.name}</p>
+              <p class="text-[11px] text-slate-500">${count} ${count === 1 ? 'сотрудник' : count >= 2 && count <= 4 ? 'сотрудника' : 'сотрудников'}</p>
+            </div>
+            <i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 ${textCls}"></i>
+          </button>
+          ${employeesHtml}
+        </div>
+      `;
+    }
+
     function empGroupBox(c, variant) {
       const ids = c.employeeIds || [];
-      if (!ids.length) return '';
+      const depts = c.departments || null;
+      if (!ids.length && !(depts && depts.length)) return '';
       const tint = variant === 'head' ? 'bg-indigo-50 border-indigo-200' : 'bg-violet-50 border-violet-200';
       const label = variant === 'head' ? 'text-indigo-600' : 'text-violet-600';
       const title = 'Сотрудники · ' + c.name.replace(/^ТОО |^ИП /, '').replace(/["«»]/g, '');
-      const COMPACT = ids.length > 10;
-      const body = COMPACT ? `
-        <div class="max-h-[360px] overflow-y-auto pr-1 w-full">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            ${ids.map(id => EMPLOYEES[id]).filter(Boolean).map(empCard).join('')}
+
+      let body;
+      if (depts && depts.length) {
+        // Show departments — each is collapsible and lists its own employees
+        body = `
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[520px] overflow-y-auto pr-1">
+            ${depts.map(d => deptBlock(d, variant)).join('')}
           </div>
-        </div>
-        ${ids.length > 12 ? `<p class="text-[10px] text-slate-400 text-center mt-2">Прокрутите список, чтобы увидеть всех</p>` : ''}
-      ` : `
-        <div class="flex flex-wrap items-start justify-center gap-4">
-          ${buildEmpTree(ids).map(renderEmpTreeNode).join('')}
-        </div>
-      `;
+        `;
+      } else {
+        const COMPACT = ids.length > 10;
+        body = COMPACT ? `
+          <div class="max-h-[360px] overflow-y-auto pr-1 w-full">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              ${ids.map(id => EMPLOYEES[id]).filter(Boolean).map(empCard).join('')}
+            </div>
+          </div>
+          ${ids.length > 12 ? `<p class="text-[10px] text-slate-400 text-center mt-2">Прокрутите список, чтобы увидеть всех</p>` : ''}
+        ` : `
+          <div class="flex flex-wrap items-start justify-center gap-4">
+            ${buildEmpTree(ids).map(renderEmpTreeNode).join('')}
+          </div>
+        `;
+      }
+      const widthCls = depts && depts.length ? 'min-w-[560px]' : 'min-w-[280px]';
       return `
-        <div class="relative ${tint} border-2 rounded-2xl px-5 pt-6 pb-5 min-w-[280px]">
+        <div class="relative ${tint} border-2 rounded-2xl px-5 pt-6 pb-5 ${widthCls}">
           <p class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white border-2 ${tint.split(' ')[1]} rounded-full px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${label} whitespace-nowrap">${title}</p>
           ${body}
         </div>
@@ -3170,13 +3263,22 @@
     // Department palette mirrors "Все процессы" (page-processes) so a
     // notification tinted indigo is understood as HR, rose as СБ, etc.
     const DEPT_COLORS = {
-      hr:    { name: 'HR',              border: 'border-indigo-500',  bg: 'bg-indigo-50',  text: 'text-indigo-700',  dot: 'bg-indigo-500',  icon: 'users' },
-      sb:    { name: 'СБ',              border: 'border-rose-500',    bg: 'bg-rose-50',    text: 'text-rose-700',    dot: 'bg-rose-500',    icon: 'shield' },
-      fin:   { name: 'Бухгалтерия',     border: 'border-emerald-500', bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500', icon: 'calculator' },
-      it:    { name: 'IT',              border: 'border-sky-500',     bg: 'bg-sky-50',     text: 'text-sky-700',     dot: 'bg-sky-500',     icon: 'cpu' },
-      legal: { name: 'Юридический',     border: 'border-violet-500',  bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-500',  icon: 'scale' },
-      admin: { name: 'Администрация',   border: 'border-amber-500',   bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500',   icon: 'briefcase' },
-      system:{ name: 'Система',         border: 'border-slate-400',   bg: 'bg-slate-100',  text: 'text-slate-700',   dot: 'bg-slate-400',   icon: 'settings' },
+      hr:         { name: 'HR',             border: 'border-indigo-500',   bg: 'bg-indigo-50',   text: 'text-indigo-700',   dot: 'bg-indigo-500',    icon: 'users' },
+      sb:         { name: 'СБ',             border: 'border-rose-500',     bg: 'bg-rose-50',     text: 'text-rose-700',     dot: 'bg-rose-500',      icon: 'shield' },
+      fin:        { name: 'Бухгалтерия',    border: 'border-emerald-500',  bg: 'bg-emerald-50',  text: 'text-emerald-700',  dot: 'bg-emerald-500',   icon: 'calculator' },
+      it:         { name: 'IT',             border: 'border-sky-500',      bg: 'bg-sky-50',      text: 'text-sky-700',      dot: 'bg-sky-500',       icon: 'cpu' },
+      legal:      { name: 'Юридический',    border: 'border-violet-500',   bg: 'bg-violet-50',   text: 'text-violet-700',   dot: 'bg-violet-500',    icon: 'scale' },
+      admin:      { name: 'Администрация',  border: 'border-amber-500',    bg: 'bg-amber-50',    text: 'text-amber-700',    dot: 'bg-amber-500',     icon: 'briefcase' },
+      marketing:  { name: 'Маркетинг',      border: 'border-pink-500',     bg: 'bg-pink-50',     text: 'text-pink-700',     dot: 'bg-pink-500',      icon: 'megaphone' },
+      sales:      { name: 'Продажи',        border: 'border-orange-500',   bg: 'bg-orange-50',   text: 'text-orange-700',   dot: 'bg-orange-500',    icon: 'trending-up' },
+      ops:        { name: 'Операции',       border: 'border-teal-500',     bg: 'bg-teal-50',     text: 'text-teal-700',     dot: 'bg-teal-500',      icon: 'settings-2' },
+      logistics:  { name: 'Логистика',      border: 'border-cyan-500',     bg: 'bg-cyan-50',     text: 'text-cyan-700',     dot: 'bg-cyan-500',      icon: 'truck' },
+      rnd:        { name: 'R&D',            border: 'border-fuchsia-500',  bg: 'bg-fuchsia-50',  text: 'text-fuchsia-700',  dot: 'bg-fuchsia-500',   icon: 'flask-conical' },
+      training:   { name: 'Обучение',       border: 'border-lime-500',     bg: 'bg-lime-50',     text: 'text-lime-700',     dot: 'bg-lime-500',      icon: 'graduation-cap' },
+      quality:    { name: 'Качество',       border: 'border-yellow-500',   bg: 'bg-yellow-50',   text: 'text-yellow-700',   dot: 'bg-yellow-500',    icon: 'award' },
+      pr:         { name: 'PR',             border: 'border-purple-500',   bg: 'bg-purple-50',   text: 'text-purple-700',   dot: 'bg-purple-500',    icon: 'newspaper' },
+      procurement:{ name: 'Снабжение',      border: 'border-red-500',      bg: 'bg-red-50',      text: 'text-red-700',      dot: 'bg-red-500',       icon: 'package' },
+      system:     { name: 'Система',        border: 'border-slate-400',    bg: 'bg-slate-100',   text: 'text-slate-700',    dot: 'bg-slate-400',     icon: 'settings' },
     };
 
     // taskIdx/taskSource point to a row in TASKS_DATA/REQ_DATA so
@@ -3190,7 +3292,15 @@
       { id: 6, dept: 'hr',    icon: 'plane',          title: 'Заявка на командировку',         body: 'Тажибаев Н. — Астана, 20–22 апреля',           time: 'Вчера, 14:02',    group: 'Вчера',   unread: false, taskIdx: 2, taskSource: 'requests' },
       { id: 7, dept: 'admin', icon: 'megaphone',      title: 'Новое распоряжение',             body: 'Распоряжение №47 опубликовано',                time: 'Вчера, 11:30',    group: 'Вчера',   unread: false, taskIdx: 7, taskSource: 'tasks' },
       { id: 8, dept: 'legal', icon: 'gavel',          title: 'Претензионное письмо',           body: 'Входящая претензия от ТОО «Альфа»',            time: '2 дня назад',     group: 'Ранее',   unread: false, taskIdx: 3, taskSource: 'requests' },
-      { id: 9, dept: 'system',icon: 'log-in',         title: 'Новый вход в систему',           body: 'timeke@adata.kz выполнил вход',                time: '3 дня назад',     group: 'Ранее',   unread: false },
+      { id: 9, dept: 'system',     icon: 'log-in',          title: 'Новый вход в систему',       body: 'timeke@adata.kz выполнил вход',                time: '3 дня назад',    group: 'Ранее',   unread: false },
+      { id:10, dept: 'marketing',  icon: 'megaphone',       title: 'Запуск кампании',            body: 'Email-рассылка «Весна 2026» запущена',          time: 'Сегодня, 10:30', group: 'Сегодня', unread: true  },
+      { id:11, dept: 'sales',      icon: 'trending-up',     title: 'Сделка закрыта',             body: 'Контракт с ТОО «Каскад» на 5 млн ₸',            time: 'Вчера, 16:10',   group: 'Вчера',   unread: false },
+      { id:12, dept: 'logistics',  icon: 'truck',           title: 'Отгрузка доставлена',        body: 'Партия №482 принята на склад',                  time: 'Вчера, 09:45',   group: 'Вчера',   unread: false },
+      { id:13, dept: 'ops',        icon: 'settings-2',      title: 'Регламент обновлён',         body: 'Новая версия регламента операций v2.4',         time: '2 дня назад',    group: 'Ранее',   unread: false },
+      { id:14, dept: 'rnd',        icon: 'flask-conical',   title: 'Прототип готов',             body: 'Прототип «Adata Bot» передан на тестирование',  time: '3 дня назад',    group: 'Ранее',   unread: false },
+      { id:15, dept: 'training',   icon: 'graduation-cap',  title: 'Новый курс',                 body: 'Тренинг «Основы безопасности» открыт',          time: '4 дня назад',    group: 'Ранее',   unread: false },
+      { id:16, dept: 'quality',    icon: 'award',           title: 'Аудит пройден',              body: 'ISO 9001 — рекомендации приняты',               time: '5 дней назад',   group: 'Ранее',   unread: false },
+      { id:17, dept: 'procurement',icon: 'package',         title: 'Заявка на закупку',          body: 'Закупка оборудования №74 на согласовании',      time: '6 дней назад',   group: 'Ранее',   unread: false },
     ];
 
     let NOTIF_FILTER = 'all'; // 'all' | 'unread' | dept id
@@ -3280,6 +3390,8 @@
           return `<button data-filter="${p.id}" class="inline-flex items-center gap-1.5 text-xs font-semibold border px-3 py-1.5 rounded-full transition-colors ${cls}">${dot}${p.name}<span class="text-[10px] ${active ? 'opacity-80' : 'text-slate-400'}">${cnt}</span></button>`;
         }).join('');
         row.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => { NOTIF_FILTER = b.dataset.filter; renderNotifPage(); }));
+        // Recalculate arrow visibility once the pills are laid out
+        if (typeof refreshNotifFilterArrows === 'function') setTimeout(refreshNotifFilterArrows, 50);
       }
 
       // List (grouped)
@@ -3336,6 +3448,30 @@
       const wrap = document.getElementById('notifDropdownWrap');
       if (wrap && !wrap.contains(e.target)) closeNotifDropdown();
     });
+
+    // Horizontal scroll for the department filter strip
+    function scrollNotifFilter(dir) {
+      const row = document.getElementById('notifFilterRow');
+      if (!row) return;
+      row.scrollBy({ left: dir * 220, behavior: 'smooth' });
+    }
+    function refreshNotifFilterArrows() {
+      const row = document.getElementById('notifFilterRow');
+      const l = document.getElementById('notifFilterArrowL');
+      const r = document.getElementById('notifFilterArrowR');
+      if (!row || !l || !r) return;
+      const canL = row.scrollLeft > 2;
+      const canR = row.scrollLeft + row.clientWidth < row.scrollWidth - 2;
+      l.classList.toggle('hidden', !canL);
+      r.classList.toggle('hidden', !canR);
+    }
+    (function wireNotifFilterScroll() {
+      const row = document.getElementById('notifFilterRow');
+      if (!row) return;
+      row.addEventListener('scroll', refreshNotifFilterArrows);
+      if (window.ResizeObserver) new ResizeObserver(refreshNotifFilterArrows).observe(row);
+      setTimeout(refreshNotifFilterArrows, 120);
+    })();
 
     // Initial paint
     updateNotifBadges();
