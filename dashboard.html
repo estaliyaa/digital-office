@@ -721,14 +721,20 @@
 
         <!-- Schema view -->
         <div id="structSchemaView" class="hidden bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
-          <!-- Fixed zoom toolbar — stays anchored at the top of the card, never moves with scroll -->
-          <div id="structZoomControls" class="flex items-center justify-end gap-1 px-3 py-2 border-b border-slate-100 bg-slate-50/60 flex-shrink-0">
-            <span class="mr-auto text-[11px] font-semibold uppercase tracking-wider text-slate-400 pl-2">Масштаб</span>
-            <button type="button" onclick="structZoom(-1)" title="Уменьшить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="minus" class="w-4 h-4"></i></button>
-            <button type="button" onclick="structZoomReset()" title="100%" class="min-w-[54px] px-2 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-slate-700 hover:bg-white hover:shadow-sm transition-all"><span id="structZoomLabel">100%</span></button>
-            <button type="button" onclick="structZoom(+1)" title="Увеличить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="plus" class="w-4 h-4"></i></button>
-            <div class="w-px h-6 bg-slate-200 mx-0.5"></div>
-            <button type="button" onclick="structZoomFit()" title="Вписать" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+          <!-- Fixed toolbar: legend + zoom controls in one row. Stays anchored; only the tree below scrolls/zooms. -->
+          <div id="structZoomControls" class="flex items-center justify-between gap-4 px-4 py-2.5 border-b border-slate-100 bg-slate-50/60 flex-shrink-0 flex-wrap">
+            <div class="flex items-center gap-4 flex-wrap">
+              <span class="text-xs font-medium text-slate-500">Обозначения:</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-indigo-50 border-2 border-indigo-200"></span>Головная компания</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-violet-50 border-2 border-violet-200"></span>Дочерняя компания</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="structZoom(-1)" title="Уменьшить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="minus" class="w-4 h-4"></i></button>
+              <button type="button" onclick="structZoomReset()" title="100%" class="min-w-[54px] px-2 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-slate-700 hover:bg-white hover:shadow-sm transition-all"><span id="structZoomLabel">100%</span></button>
+              <button type="button" onclick="structZoom(+1)" title="Увеличить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="plus" class="w-4 h-4"></i></button>
+              <div class="w-px h-6 bg-slate-200 mx-0.5"></div>
+              <button type="button" onclick="structZoomFit()" title="Вписать" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+            </div>
           </div>
           <div id="structSchemaScroll" class="overflow-auto max-h-[calc(100vh-240px)]">
             <div id="structSchemaZoom" class="inline-block p-6 origin-top-left transition-transform duration-150"></div>
@@ -3220,14 +3226,7 @@
       const children = head.children || [];
 
       root.innerHTML = `
-        <!-- Legend -->
-        <div class="flex items-center gap-4 flex-wrap mb-5 pb-4 border-b border-slate-100">
-          <span class="text-xs font-medium text-slate-500">Обозначения:</span>
-          <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-indigo-50 border-2 border-indigo-200"></span>Головная компания</span>
-          <span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700"><span class="w-3 h-3 rounded-md bg-violet-50 border-2 border-violet-200"></span>Дочерняя компания</span>
-        </div>
-
-        <!-- Tree canvas -->
+        <!-- Tree canvas (legend is rendered in the fixed toolbar above) -->
         <div class="min-w-max flex flex-col items-center gap-0 py-4">
           <!-- Head company pill -->
           ${companyPill(head, 'head')}
