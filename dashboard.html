@@ -534,6 +534,41 @@
             </div>
           </div>
 
+          <!-- Column customizer -->
+          <div class="relative" id="tasksColsWrap">
+            <button id="tasksColsBtn" type="button" class="toolbar-btn" onclick="toggleTasksColsDropdown(event)">
+              <i data-lucide="columns-3" class="w-4 h-4"></i>
+              Колонки
+              <span id="tasksColsCount" class="text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-full"></span>
+            </button>
+            <div id="tasksColsDropdown" class="hidden absolute left-0 top-full mt-2 z-40 bg-white rounded-2xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden" style="width:720px">
+              <div class="px-5 py-3 border-b border-slate-100 flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-sm font-bold text-slate-900">Настройка колонок</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Выберите, какие колонки отображать в списке задач · <span id="tasksColsSelectedCount">0</span> из <span id="tasksColsTotalCount">0</span></p>
+                </div>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <button id="tasksColsSelectAll" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors">Выбрать все</button>
+                  <button id="tasksColsDeselectAll" class="text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg transition-colors">Снять все</button>
+                </div>
+              </div>
+              <div class="px-4 py-2 border-b border-slate-100">
+                <div class="relative">
+                  <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"></i>
+                  <input id="tasksColsSearch" type="text" placeholder="Найти колонку..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
+                </div>
+              </div>
+              <div id="tasksColsList" class="max-h-[480px] overflow-y-auto px-4 py-3"></div>
+              <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                <button id="tasksColsReset" class="text-xs text-slate-500 hover:text-slate-900 transition-colors">По умолчанию</button>
+                <div class="flex items-center gap-2">
+                  <button id="tasksColsCancel" class="text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">Отменить</button>
+                  <button id="tasksColsApply" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition-colors">Применить</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Search -->
           <div class="relative">
             <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
@@ -553,17 +588,8 @@
             <div class="scroll-edge-arrow arrow-left"  id="tArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="scroll-edge-arrow arrow-right" id="tArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="overflow-x-auto" id="tasksScroll" style="scrollbar-width:none">
-              <table class="uni-table" style="min-width:1160px">
-                <thead>
-                  <tr>
-                    <th style="min-width:360px">Задача</th>
-                    <th style="min-width:170px">Участники процесса</th>
-                    <th style="min-width:155px">Статус</th>
-                    <th style="min-width:145px">Дата создания</th>
-                    <th style="min-width:145px">Дата исполнения</th>
-                    <th style="min-width:130px">Время в работе</th>
-                  </tr>
-                </thead>
+              <table id="tasksTable" class="uni-table" style="min-width:1160px">
+                <thead><tr></tr></thead>
                 <tbody id="tasksTableBody"></tbody>
               </table>
             </div>
@@ -694,7 +720,19 @@
         <div id="structTableView" class="space-y-2"></div>
 
         <!-- Schema view -->
-        <div id="structSchemaView" class="hidden bg-white rounded-2xl border border-slate-200 p-6 overflow-x-auto"></div>
+        <div id="structSchemaView" class="hidden relative bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <!-- Floating zoom controls -->
+          <div id="structZoomControls" class="absolute top-3 right-3 z-10 flex items-center gap-1 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-sm p-1">
+            <button type="button" onclick="structZoom(-1)" title="Уменьшить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"><i data-lucide="minus" class="w-4 h-4"></i></button>
+            <button type="button" onclick="structZoomReset()" title="100%" class="min-w-[54px] px-2 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"><span id="structZoomLabel">100%</span></button>
+            <button type="button" onclick="structZoom(+1)" title="Увеличить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i></button>
+            <div class="w-px h-6 bg-slate-200 mx-0.5"></div>
+            <button type="button" onclick="structZoomFit()" title="Вписать" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+          </div>
+          <div id="structSchemaScroll" class="overflow-auto max-h-[calc(100vh-220px)]">
+            <div id="structSchemaZoom" class="inline-block p-6 origin-top-left transition-transform duration-150"></div>
+          </div>
+        </div>
       </div>
 
       <!-- ══ PAGE: Реестр документов ══ -->
@@ -761,41 +799,6 @@
               <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between rounded-b-2xl">
                 <button id="dfClear" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>Сбросить</button>
                 <button id="dfApply" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm">Применить</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Column customizer -->
-          <div class="relative" id="docColsWrap">
-            <button id="docColsBtn" type="button" class="toolbar-btn" onclick="toggleDocColsDropdown(event)">
-              <i data-lucide="columns-3" class="w-4 h-4"></i>
-              Колонки
-              <span id="docColsCount" class="text-[10px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-full"></span>
-            </button>
-            <div id="docColsDropdown" class="hidden absolute left-0 top-full mt-2 z-40 bg-white rounded-2xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden" style="width:640px">
-              <div class="px-5 py-3 border-b border-slate-100 flex items-start justify-between gap-4">
-                <div>
-                  <p class="text-sm font-bold text-slate-900">Настройка колонок</p>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Выберите, какие колонки отображать в реестре · <span id="docColsSelectedCount">0</span> из <span id="docColsTotalCount">0</span></p>
-                </div>
-                <div class="flex items-center gap-1.5 flex-shrink-0">
-                  <button id="docColsSelectAll" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded-lg transition-colors">Выбрать все</button>
-                  <button id="docColsDeselectAll" class="text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-lg transition-colors">Снять все</button>
-                </div>
-              </div>
-              <div class="px-4 py-2 border-b border-slate-100">
-                <div class="relative">
-                  <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none"></i>
-                  <input id="docColsSearch" type="text" placeholder="Найти колонку..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all">
-                </div>
-              </div>
-              <div id="docColsList" class="max-h-[480px] overflow-y-auto px-4 py-3"></div>
-              <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                <button id="docColsReset" class="text-xs text-slate-500 hover:text-slate-900 transition-colors">По умолчанию</button>
-                <div class="flex items-center gap-2">
-                  <button id="docColsCancel" class="text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors">Отменить</button>
-                  <button id="docColsApply" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition-colors">Применить</button>
-                </div>
               </div>
             </div>
           </div>
@@ -3123,7 +3126,7 @@
     const conn = (h = 20) => `<div class="w-0.5 bg-slate-300" style="height:${h}px"></div>`;
 
     function renderStructSchema() {
-      const root = document.getElementById('structSchemaView');
+      const root = document.getElementById('structSchemaZoom') || document.getElementById('structSchemaView');
       if (!root) return;
       const head = COMPANIES[0];
       const children = head.children || [];
@@ -3164,6 +3167,7 @@
         </div>
       `;
       if (window.lucide) lucide.createIcons();
+      if (typeof applyStructZoom === 'function') applyStructZoom();
     }
 
     function openEmployeeDrawer(id) {
@@ -3236,6 +3240,55 @@
       STRUCT_QUERY = e.target.value;
       if (STRUCT_VIEW === 'table') renderStructTable();
     });
+
+    // ── Schema zoom ──
+    const STRUCT_ZOOM_STEPS = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.35, 1.5, 1.75, 2.0];
+    let STRUCT_ZOOM_IDX = STRUCT_ZOOM_STEPS.indexOf(1.0);
+    function applyStructZoom() {
+      const z = STRUCT_ZOOM_STEPS[STRUCT_ZOOM_IDX] ?? 1.0;
+      const el = document.getElementById('structSchemaZoom');
+      const lbl = document.getElementById('structZoomLabel');
+      if (el) el.style.transform = `scale(${z})`;
+      if (lbl) lbl.textContent = Math.round(z * 100) + '%';
+    }
+    function structZoom(dir) {
+      STRUCT_ZOOM_IDX = Math.max(0, Math.min(STRUCT_ZOOM_STEPS.length - 1, STRUCT_ZOOM_IDX + dir));
+      applyStructZoom();
+    }
+    function structZoomReset() {
+      STRUCT_ZOOM_IDX = STRUCT_ZOOM_STEPS.indexOf(1.0);
+      applyStructZoom();
+    }
+    function structZoomFit() {
+      const wrap = document.getElementById('structSchemaScroll');
+      const el   = document.getElementById('structSchemaZoom');
+      if (!wrap || !el) return;
+      // Reset to 1.0 to measure natural width
+      const prev = el.style.transform;
+      el.style.transform = 'scale(1)';
+      const natural = el.scrollWidth;
+      el.style.transform = prev;
+      if (!natural) return;
+      const avail = wrap.clientWidth - 24;
+      const target = Math.min(1.0, avail / natural);
+      // Snap target to nearest defined step (rounded down)
+      let idx = 0;
+      for (let i = 0; i < STRUCT_ZOOM_STEPS.length; i++) {
+        if (STRUCT_ZOOM_STEPS[i] <= target + 1e-3) idx = i;
+      }
+      STRUCT_ZOOM_IDX = idx;
+      applyStructZoom();
+    }
+    // Ctrl/Cmd + wheel zoom when hovering the scheme
+    (function () {
+      const wrap = document.getElementById('structSchemaScroll');
+      if (!wrap) return;
+      wrap.addEventListener('wheel', (e) => {
+        if (!(e.ctrlKey || e.metaKey)) return;
+        e.preventDefault();
+        structZoom(e.deltaY < 0 ? +1 : -1);
+      }, { passive: false });
+    })();
 
     // ══════════════════════════════════════════
     // ── NOTIFICATIONS
@@ -3518,71 +3571,15 @@
       { title: 'NDA с ТОО «Аврора Technics»',       num: 'DOC-0369', type: 'Соглашение',         status: 'Подписан',   created: '28.03.2026', due: '28.03.2029', signedAt:'29.03.2026', time: '1д 3ч',  author:'Қойшыбай Темірлан',    responsible:'Анна Смирнова',     owner:'Анна Смирнова',      ownerDept:'Финансовый отдел',       ownerGradient:'from-cyan-500 to-indigo-600',     entity:'ТОО «Adata Holding»',        process:'Партнёрство — NDA',             signatories:[{name:'Анна Смирнова',role:'Финансовый директор',status:'signed',signedAt:'28.03.2026, 14:30',dept:'Финансовый отдел'},{name:'Қойшыбай Темірлан',role:'Юридическая экспертиза',status:'signed',signedAt:'29.03.2026, 09:00',dept:'Юридический отдел'}], counterparty:'ТОО «Аврора Technics»', amount:'—',         signed:'2/2',  dept:'Юридический',   project:'Партнёрство',           modified:'29.03.2026, 09:00', fileSize:'520 КБ', filePages:3 },
     ];
 
-    // All available columns for the registry.
-    // `required` columns can't be hidden; `default` controls initial visibility.
+    // Fixed registry columns — column picker has moved to the All Tasks page.
     const DOC_COLUMNS = [
-      // Identity
-      { id:'document',     label:'Документ',          group:'Основное', minWidth:300, required:true,  default:true  },
-      { id:'type',         label:'Тип',               group:'Основное', minWidth:150, default:false },
-      { id:'status',       label:'Статус',            group:'Основное', minWidth:150, default:true  },
-      { id:'priority',     label:'Приоритет',         group:'Основное', minWidth:130, default:false },
-      { id:'stage',        label:'Этап процесса',     group:'Основное', minWidth:170, default:false },
-      // People
-      { id:'owner',        label:'Владелец',          group:'Участники', minWidth:240, default:true  },
-      { id:'author',       label:'Автор',             group:'Участники', minWidth:180, default:false },
-      { id:'responsible',  label:'Ответственный',     group:'Участники', minWidth:180, default:false },
-      { id:'signers',      label:'Подписанты',        group:'Участники', minWidth:180, default:false },
-      { id:'approvers',    label:'Согласующие',       group:'Участники', minWidth:180, default:false },
-      { id:'watchers',     label:'Наблюдатели',       group:'Участники', minWidth:160, default:false },
-      // Counterparty
-      { id:'counterparty', label:'Контрагент',        group:'Контрагент', minWidth:210, default:false },
-      { id:'inn',          label:'ИИН / БИН',         group:'Контрагент', minWidth:150, default:false },
-      { id:'contact',      label:'Контактное лицо',   group:'Контрагент', minWidth:180, default:false },
-      { id:'email',        label:'E-mail контрагента', group:'Контрагент', minWidth:200, default:false },
-      { id:'phone',        label:'Телефон контрагента', group:'Контрагент', minWidth:170, default:false },
-      // Finance
-      { id:'amount',       label:'Сумма',             group:'Финансы', minWidth:140, default:false },
-      { id:'currency',     label:'Валюта',            group:'Финансы', minWidth:100, default:false },
-      { id:'vat',          label:'НДС',               group:'Финансы', minWidth:100, default:false },
-      { id:'payment',      label:'Тип оплаты',        group:'Финансы', minWidth:150, default:false },
-      // Org
-      { id:'signed',       label:'Подписи',           group:'Процесс', minWidth:120, default:false },
-      { id:'dept',         label:'Подразделение',     group:'Процесс', minWidth:170, default:false },
-      { id:'project',      label:'Проект',            group:'Процесс', minWidth:180, default:false },
-      { id:'tags',         label:'Теги',              group:'Процесс', minWidth:180, default:false },
-      // Dates
-      { id:'created',      label:'Дата создания',     group:'Даты', minWidth:150, default:true  },
-      { id:'due',          label:'Срок',              group:'Даты', minWidth:150, default:true  },
-      { id:'signedAt',     label:'Дата подписания',   group:'Даты', minWidth:170, default:true  },
-      { id:'modified',     label:'Изменён',           group:'Даты', minWidth:170, default:false },
-      { id:'archivedAt',   label:'Архивирован',       group:'Даты', minWidth:170, default:false },
-      // Meta
-      { id:'time',         label:'Время в работе',    group:'Метрики', minWidth:140, default:false },
-      { id:'sla',          label:'SLA',               group:'Метрики', minWidth:120, default:false },
-      { id:'version',      label:'Версия',            group:'Метрики', minWidth:110, default:false },
+      { id:'document',  label:'Документ',        minWidth:300 },
+      { id:'status',    label:'Статус',          minWidth:150 },
+      { id:'created',   label:'Дата создания',   minWidth:150 },
+      { id:'signedAt',  label:'Дата подписания', minWidth:170 },
+      { id:'owner',     label:'Владелец',        minWidth:240 },
     ];
-
-    // Mutable selection (persisted to localStorage)
-    let DOC_VISIBLE = (() => {
-      const validIds = new Set(DOC_COLUMNS.map(c => c.id));
-      try {
-        const saved = JSON.parse(localStorage.getItem('do_doc_cols') || 'null');
-        if (Array.isArray(saved)) {
-          // Purge column ids that no longer exist in DOC_COLUMNS (e.g. old 'number' column)
-          const cleaned = saved.filter(id => validIds.has(id));
-          // If cleaning dropped all columns or there's no owner column saved from an old config,
-          // fall through to defaults so users see the refreshed layout.
-          if (cleaned.length && cleaned.includes('owner')) return new Set(cleaned);
-        }
-      } catch (e) {}
-      return new Set(DOC_COLUMNS.filter(c => c.default).map(c => c.id));
-    })();
-    // Ensure required columns are always on
-    DOC_COLUMNS.filter(c => c.required).forEach(c => DOC_VISIBLE.add(c.id));
-
-    function saveDocColumns() {
-      try { localStorage.setItem('do_doc_cols', JSON.stringify([...DOC_VISIBLE])); } catch (e) {}
-    }
+    const DOC_VISIBLE = new Set(DOC_COLUMNS.map(c => c.id));
 
     function ownerCell(ownerName, dept, gradient) {
       if (!ownerName) return `<span class="text-sm text-slate-400">—</span>`;
@@ -3904,8 +3901,213 @@
       if (table) table.style.minWidth = total + 'px';
     }
 
+    // ══════════════════════════════════════════
+    // ── ALL TASKS: columns config + dynamic render
+    // ══════════════════════════════════════════
+    const TASK_COLUMNS = [
+      // Сотрудник
+      { id:'id',             label:'ID',                              group:'Сотрудник',  minWidth:110, default:true  },
+      { id:'fio',            label:'ФИО',                             group:'Сотрудник',  minWidth:220, default:true  },
+      { id:'iin',            label:'ИИН',                             group:'Сотрудник',  minWidth:150, default:false },
+      { id:'company',        label:'Компания',                        group:'Сотрудник',  minWidth:170, default:false },
+      { id:'position',       label:'Должность',                       group:'Сотрудник',  minWidth:190, default:true  },
+      { id:'phone',          label:'Телефон',                         group:'Сотрудник',  minWidth:160, default:false },
+      { id:'email',          label:'Email',                           group:'Сотрудник',  minWidth:210, default:false },
+      { id:'manager',        label:'Прямой руководитель',             group:'Сотрудник',  minWidth:200, default:false },
+      { id:'region',         label:'Регион',                          group:'Сотрудник',  minWidth:140, default:false },
+      { id:'employmentType', label:'Вид трудоустройства',             group:'Сотрудник',  minWidth:180, default:false },
+      { id:'idDoc',          label:'Удостоверение личности',          group:'Сотрудник',  minWidth:200, default:false },
+      { id:'photo',          label:'Фото',                            group:'Сотрудник',  minWidth:110, default:false },
+      // Финансы
+      { id:'salary',         label:'Зарплата',                        group:'Финансы',    minWidth:150, default:false },
+      // Документы
+      { id:'contract',       label:'Договор',                         group:'Документы',  minWidth:150, default:false },
+      { id:'contractNumber', label:'Номер трудового договора',        group:'Документы',  minWidth:200, default:false },
+      { id:'contractSigned', label:'Дата подписания договора',        group:'Документы',  minWidth:200, default:false },
+      { id:'jobDescription', label:'Должностная инструкция',          group:'Документы',  minWidth:200, default:false },
+      { id:'pdpConsent',     label:'Защита персональных данных',      group:'Документы',  minWidth:220, default:false },
+      { id:'adataReport',    label:'Отчёт Adata по сотруднику',       group:'Документы',  minWidth:220, default:false },
+      // Проверки СБ
+      { id:'sb1Comment',     label:'Комментарий СБ1',                 group:'Проверки СБ',minWidth:200, default:false },
+      { id:'sb2Comment',     label:'Комментарий СБ2',                 group:'Проверки СБ',minWidth:200, default:false },
+      { id:'riskLevel',      label:'Уровень риска',                   group:'Проверки СБ',minWidth:150, default:false },
+      // Комментарии
+      { id:'hrComment',          label:'Комментарий HR',                       group:'Комментарии', minWidth:210, default:false },
+      { id:'initiatorComment',   label:'Комментарий Инициатора',               group:'Комментарии', minWidth:220, default:false },
+      { id:'formOwnerComment',   label:'Комментарий ответственного за анкету', group:'Комментарии', minWidth:260, default:false },
+      { id:'managerFormComment', label:'Комментарий руководителя (анкета)',    group:'Комментарии', minWidth:240, default:false },
+      { id:'simOwnerComment',    label:'Комментарий ответственного за SIM-карту', group:'Комментарии', minWidth:280, default:false },
+      { id:'managerSimComment',  label:'Комментарий руководителя (SIM-карта)', group:'Комментарии', minWidth:250, default:false },
+      { id:'logistComment',      label:'Комментарий логиста',                  group:'Комментарии', minWidth:210, default:false },
+      // Рабочее место
+      { id:'workplaceReady',   label:'Рабочее место подготовлено',     group:'Рабочее место', minWidth:220, default:false },
+      { id:'simRequired',      label:'Требуется Sim-карта',            group:'Рабочее место', minWidth:180, default:false },
+      { id:'bitrixRequired',   label:'Требуется учётная запись в Bitrix', group:'Рабочее место', minWidth:240, default:false },
+      { id:'employeeHandle',   label:'Собачка сотрудника',             group:'Рабочее место', minWidth:190, default:false },
+      // Процесс
+      { id:'created',    label:'Дата создания',          group:'Процесс', minWidth:150, default:true  },
+      { id:'author',     label:'Автор',                  group:'Процесс', minWidth:190, default:true  },
+      { id:'performers', label:'Текущие Исполнители',    group:'Процесс', minWidth:210, default:true  },
+      { id:'status',     label:'Статус заявки',          group:'Процесс', minWidth:160, default:true  },
+      { id:'stage',      label:'Этап бизнес процесса',   group:'Процесс', minWidth:210, default:true  },
+    ];
+
+    let TASK_VISIBLE = (() => {
+      const valid = new Set(TASK_COLUMNS.map(c => c.id));
+      try {
+        const saved = JSON.parse(localStorage.getItem('do_task_cols') || 'null');
+        if (Array.isArray(saved)) {
+          const cleaned = saved.filter(id => valid.has(id));
+          if (cleaned.length) return new Set(cleaned);
+        }
+      } catch (e) {}
+      return new Set(TASK_COLUMNS.filter(c => c.default).map(c => c.id));
+    })();
+    function saveTaskColumns() {
+      try { localStorage.setItem('do_task_cols', JSON.stringify([...TASK_VISIBLE])); } catch (e) {}
+    }
+
+    // Stable synthetic HR-onboarding data, derived from each task so values are consistent.
+    function taskSynth(t, idx) {
+      const primary = (t.members && t.members[0]) || t.author || '—';
+      const hashCode = (s) => { let h=0; for (let i=0;i<s.length;i++) h = ((h<<5)-h + s.charCodeAt(i))|0; return Math.abs(h); };
+      const h = hashCode(t.title + '|' + idx);
+      const positions = ['Менеджер по закупкам','Специалист HR','Аналитик','Бухгалтер','Юрист','Руководитель отдела','Логист','IT-инженер','Маркетолог','Ассистент'];
+      const companies = ['ТОО «Adata Holding»','ТОО «Aliya Fleet»','ТОО «Pura»','ТОО «Digital Office»'];
+      const regions   = ['Алматы','Астана','Шымкент','Караганда','Актобе'];
+      const empTypes  = ['Штатный','По договору ГПХ','Частичная занятость','Совместитель'];
+      const risks     = ['Низкий','Средний','Высокий'];
+      const surname   = primary.split(' ')[0] || 'Сотрудник';
+      const nameSlug  = primary.toLowerCase().replace(/[^a-zа-яё]/gi,'').slice(0,12) || 'ivanov';
+      const translit  = (s) => s.replace(/[а-яё]/gi, ch => ({
+        а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'c',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'
+      }[ch.toLowerCase()] || '') );
+      return {
+        id: 'T-' + String(100 + idx).padStart(4, '0'),
+        fio: primary,
+        iin: String(90 + (h % 10)).padStart(2,'0') + String(1 + (h % 12)).padStart(2,'0') + String(1 + (h % 28)).padStart(2,'0') + String(100000 + (h % 899999)),
+        company: companies[h % companies.length],
+        position: positions[h % positions.length],
+        phone: '+7 (7' + String(100 + (h % 899)) + ') ' + String(100 + (h % 899)) + '-' + String(10 + (h % 89)) + '-' + String(10 + (h % 89)),
+        email: translit(nameSlug) + '@adata.kz',
+        manager: ['Алиев Б.К.','Қойшыбай Темірлан','Нурланов С.М.','Оспанова Л.Е.','Жумабаева А.Т.'][h % 5],
+        region: regions[h % regions.length],
+        employmentType: empTypes[h % empTypes.length],
+        salary: (200 + (h % 30) * 20) + ' 000 ₸',
+        riskLevel: risks[h % risks.length],
+        stage: t.status === 'Завершена' ? 'Завершён' :
+               t.status === 'В разработке' ? 'Оформление' :
+               t.status === 'На согласовании' ? 'Согласование' :
+               t.status === 'Новая' ? 'Инициирование' : 'Проверка',
+        performers: t.members || [],
+        author: t.members && t.members[t.members.length - 1] || primary,
+      };
+    }
+
+    function boolCell(val) {
+      if (val === true)  return `<span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3"></i>Да</span>`;
+      if (val === false) return `<span class="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full"><i data-lucide="minus" class="w-3 h-3"></i>Нет</span>`;
+      return `<span class="text-sm text-slate-400">—</span>`;
+    }
+    function riskBadge(level) {
+      const m = {
+        'Низкий':  'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'Средний': 'bg-amber-50 text-amber-700 border-amber-200',
+        'Высокий': 'bg-rose-50 text-rose-700 border-rose-200',
+      };
+      const cls = m[level] || 'bg-slate-50 text-slate-600 border-slate-200';
+      return level ? `<span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${cls}">${level}</span>` : `<span class="text-sm text-slate-400">—</span>`;
+    }
+    function personCell(name) {
+      if (!name || name === '—') return `<span class="text-sm text-slate-400">—</span>`;
+      const parts = name.replace(/\./g,'').split(/\s+/).filter(Boolean);
+      const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      const esc = name.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+      return `<button type="button" onclick="event.stopPropagation(); openMemberByName('${esc}', event)" class="flex items-center gap-2 min-w-0 hover:opacity-80"><span class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">${initials}</span><span class="text-sm text-slate-800 truncate">${name}</span></button>`;
+    }
+    function fileCell(label) {
+      return `<span class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-lg"><i data-lucide="paperclip" class="w-3 h-3"></i>${label || 'PDF'}</span>`;
+    }
+    function photoCell(name) {
+      const parts = (name || '').replace(/\./g,'').split(/\s+/).filter(Boolean);
+      const initials = ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+      return `<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-[10px] font-bold flex items-center justify-center">${initials || '—'}</div>`;
+    }
+    function truncateText(str) {
+      return `<span class="text-sm text-slate-600 line-clamp-1" title="${(str || '—').replace(/"/g,'&quot;')}">${str || '—'}</span>`;
+    }
+
+    function renderTaskCell(colId, t, idx) {
+      const s = taskSynth(t, idx);
+      const plain = (v) => `<span class="text-sm text-slate-600">${v || '—'}</span>`;
+      switch (colId) {
+        case 'id':             return `<span class="font-mono text-xs font-semibold text-slate-700">${s.id}</span>`;
+        case 'fio':            return personCell(s.fio);
+        case 'iin':            return `<span class="font-mono text-sm text-slate-700">${s.iin}</span>`;
+        case 'company':        return plain(s.company);
+        case 'position':       return plain(s.position);
+        case 'phone':          return `<a href="tel:${s.phone.replace(/\s/g,'')}" onclick="event.stopPropagation()" class="text-sm text-slate-700 hover:text-indigo-600 font-mono">${s.phone}</a>`;
+        case 'email':          return `<a href="mailto:${s.email}" onclick="event.stopPropagation()" class="text-sm text-indigo-600 hover:underline">${s.email}</a>`;
+        case 'manager':        return personCell(s.manager);
+        case 'region':         return plain(s.region);
+        case 'employmentType': return plain(s.employmentType);
+        case 'idDoc':          return fileCell('Уд. личности');
+        case 'photo':          return photoCell(s.fio);
+        case 'salary':         return `<span class="text-sm font-semibold text-slate-900">${s.salary}</span>`;
+        case 'contract':             return fileCell('Договор');
+        case 'contractNumber':       return `<span class="font-mono text-sm text-slate-700">ТД-${String(2000 + idx).padStart(4,'0')}</span>`;
+        case 'contractSigned':       return plain(t.created);
+        case 'jobDescription':       return fileCell('ДИ');
+        case 'pdpConsent':           return boolCell(true);
+        case 'adataReport':          return fileCell('Отчёт');
+        case 'sb1Comment':           return truncateText('Без замечаний');
+        case 'sb2Comment':           return truncateText('Проверка пройдена');
+        case 'riskLevel':            return riskBadge(s.riskLevel);
+        case 'hrComment':            return truncateText('Полный комплект документов');
+        case 'initiatorComment':     return truncateText('Срочное трудоустройство');
+        case 'formOwnerComment':     return truncateText('Анкета заполнена');
+        case 'managerFormComment':   return truncateText('Одобрено');
+        case 'simOwnerComment':      return truncateText('SIM-карта выдана');
+        case 'managerSimComment':    return truncateText('Подтверждено');
+        case 'logistComment':        return truncateText('Техника готова');
+        case 'workplaceReady':       return boolCell(t.status === 'Завершена');
+        case 'simRequired':          return boolCell(idx % 2 === 0);
+        case 'bitrixRequired':       return boolCell(true);
+        case 'employeeHandle':       return `<span class="font-mono text-sm text-indigo-700">@${(s.email.split('@')[0] || 'user')}</span>`;
+        case 'created':    return plain(t.created);
+        case 'author':     return personCell(s.author);
+        case 'performers': return membersStack(s.performers);
+        case 'status':     return statusBadge(t.status);
+        case 'stage':      return `<span class="text-sm text-slate-600">${s.stage}</span>`;
+        default:           return '';
+      }
+    }
+
+    function renderTasksHeader() {
+      const cols = TASK_COLUMNS.filter(c => TASK_VISIBLE.has(c.id));
+      const table = document.getElementById('tasksTable');
+      const head  = table?.querySelector('thead tr');
+      if (head) head.innerHTML = cols.map(c => `<th style="min-width:${c.minWidth}px">${c.label}</th>`).join('');
+      const total = cols.reduce((s, c) => s + c.minWidth, 0);
+      if (table) table.style.minWidth = Math.max(total, 900) + 'px';
+    }
+
+    function renderTasksRow(t, i) {
+      const cols = TASK_COLUMNS.filter(c => TASK_VISIBLE.has(c.id));
+      const cells = cols.map(c => `<td>${renderTaskCell(c.id, t, i)}</td>`).join('');
+      const rowTint = t.isNew ? 'bg-emerald-50/40' : t.hasDraft ? 'bg-amber-50/30' : '';
+      return `<tr data-task-idx="${i}" data-task-source="tasks" onclick="openTaskDetail(${i},'tasks')" class="cursor-pointer hover:bg-slate-50 transition-colors ${rowTint}">${cells}</tr>`;
+    }
+
     // ── Render tables ──
-    function renderTasks(data)   { document.getElementById('tasksTableBody').innerHTML = data.length ? data.map((t,i)=>renderTaskRow(t,i,'tasks')).join('') : emptyRow(6, 'Задачи не найдены'); }
+    function renderTasks(data) {
+      renderTasksHeader();
+      const cols = TASK_COLUMNS.filter(c => TASK_VISIBLE.has(c.id)).length;
+      document.getElementById('tasksTableBody').innerHTML = data.length
+        ? data.map((t,i)=>renderTasksRow(t,i)).join('')
+        : emptyRow(cols || 6, 'Задачи не найдены');
+      if (window.lucide) lucide.createIcons();
+    }
     function renderRequests(data){ document.getElementById('reqTableBody').innerHTML   = data.length ? data.map((t,i)=>renderTaskRow(t,i,'requests')).join('') : emptyRow(6, 'Заявки не найдены'); }
     function renderDocs(data) {
       renderDocHeader();
@@ -4171,17 +4373,16 @@
     initScrollArrows('docScroll',   'dArrowL', 'dArrowR');
 
     // ══════════════════════════════════════════
-    // ── DOC REGISTRY COLUMN PICKER
+    // ── ALL TASKS COLUMN PICKER
     // ══════════════════════════════════════════
-    let DOC_VISIBLE_DRAFT = new Set(DOC_VISIBLE);
+    let TASK_VISIBLE_DRAFT = new Set(TASK_VISIBLE);
+    let TASK_COLS_QUERY = '';
 
-    let DOC_COLS_QUERY = '';
-    function renderDocColsDropdown() {
-      const list = document.getElementById('docColsList');
+    function renderTasksColsDropdown() {
+      const list = document.getElementById('tasksColsList');
       if (!list) return;
-      const q = (DOC_COLS_QUERY || '').toLowerCase();
-      const visibleCols = DOC_COLUMNS.filter(c => !q || c.label.toLowerCase().includes(q));
-      // Group by `group`
+      const q = (TASK_COLS_QUERY || '').toLowerCase();
+      const visibleCols = TASK_COLUMNS.filter(c => !q || c.label.toLowerCase().includes(q));
       const groups = {};
       visibleCols.forEach(c => { (groups[c.group || 'Прочее'] = groups[c.group || 'Прочее'] || []).push(c); });
       list.innerHTML = Object.entries(groups).map(([grp, cols]) => `
@@ -4189,12 +4390,10 @@
           <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">${grp}</p>
           <div class="grid grid-cols-2 gap-x-2 gap-y-0.5">
             ${cols.map(c => {
-              const checked = DOC_VISIBLE_DRAFT.has(c.id);
-              const disabled = c.required;
-              return `<label class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-slate-50 cursor-pointer'} transition-colors">
-                <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} data-col="${c.id}" class="w-4 h-4 accent-indigo-600 flex-shrink-0 ${disabled ? 'cursor-not-allowed' : ''}">
+              const checked = TASK_VISIBLE_DRAFT.has(c.id);
+              return `<label class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+                <input type="checkbox" ${checked ? 'checked' : ''} data-col="${c.id}" class="w-4 h-4 accent-indigo-600 flex-shrink-0">
                 <span class="text-sm text-slate-800 truncate">${c.label}</span>
-                ${disabled ? '<span class="ml-auto text-[10px] text-slate-400 whitespace-nowrap">обязат.</span>' : ''}
               </label>`;
             }).join('')}
           </div>
@@ -4202,75 +4401,73 @@
       `).join('') || '<p class="text-center text-xs text-slate-400 py-6">Колонок по запросу не найдено</p>';
       list.querySelectorAll('input[data-col]').forEach(cb => {
         cb.addEventListener('change', () => {
-          if (cb.checked) DOC_VISIBLE_DRAFT.add(cb.dataset.col);
-          else DOC_VISIBLE_DRAFT.delete(cb.dataset.col);
-          updateDocColsCounts();
+          if (cb.checked) TASK_VISIBLE_DRAFT.add(cb.dataset.col);
+          else TASK_VISIBLE_DRAFT.delete(cb.dataset.col);
+          updateTasksColsCounts();
         });
       });
-      updateDocColsCounts();
+      updateTasksColsCounts();
     }
 
-    function updateDocColsCounts() {
-      const sel = document.getElementById('docColsSelectedCount');
-      const total = document.getElementById('docColsTotalCount');
-      const badge = document.getElementById('docColsCount');
-      if (sel) sel.textContent = DOC_VISIBLE_DRAFT.size;
-      if (total) total.textContent = DOC_COLUMNS.length;
-      if (badge) badge.textContent = DOC_VISIBLE.size;
+    function updateTasksColsCounts() {
+      const sel = document.getElementById('tasksColsSelectedCount');
+      const total = document.getElementById('tasksColsTotalCount');
+      const badge = document.getElementById('tasksColsCount');
+      if (sel) sel.textContent = TASK_VISIBLE_DRAFT.size;
+      if (total) total.textContent = TASK_COLUMNS.length;
+      if (badge) badge.textContent = TASK_VISIBLE.size;
     }
 
-    function toggleDocColsDropdown(e) {
+    function toggleTasksColsDropdown(e) {
       if (e) e.stopPropagation();
-      const dd = document.getElementById('docColsDropdown');
+      const dd = document.getElementById('tasksColsDropdown');
       if (!dd) return;
       const willOpen = dd.classList.contains('hidden');
       dd.classList.toggle('hidden');
       if (willOpen) {
-        DOC_VISIBLE_DRAFT = new Set(DOC_VISIBLE);
-        renderDocColsDropdown();
+        TASK_VISIBLE_DRAFT = new Set(TASK_VISIBLE);
+        renderTasksColsDropdown();
         if (window.lucide) lucide.createIcons();
       }
     }
-    function closeDocColsDropdown() {
-      document.getElementById('docColsDropdown')?.classList.add('hidden');
+    function closeTasksColsDropdown() {
+      document.getElementById('tasksColsDropdown')?.classList.add('hidden');
     }
     document.addEventListener('click', (e) => {
-      const wrap = document.getElementById('docColsWrap');
-      if (wrap && !wrap.contains(e.target)) closeDocColsDropdown();
+      const wrap = document.getElementById('tasksColsWrap');
+      if (wrap && !wrap.contains(e.target)) closeTasksColsDropdown();
     });
-    document.getElementById('docColsCancel')?.addEventListener('click', closeDocColsDropdown);
-    document.getElementById('docColsReset')?.addEventListener('click', () => {
-      DOC_VISIBLE_DRAFT = new Set(DOC_COLUMNS.filter(c => c.default).map(c => c.id));
-      renderDocColsDropdown();
+    document.getElementById('tasksColsCancel')?.addEventListener('click', closeTasksColsDropdown);
+    document.getElementById('tasksColsReset')?.addEventListener('click', () => {
+      TASK_VISIBLE_DRAFT = new Set(TASK_COLUMNS.filter(c => c.default).map(c => c.id));
+      renderTasksColsDropdown();
     });
-    document.getElementById('docColsSelectAll')?.addEventListener('click', () => {
-      DOC_COLUMNS.forEach(c => DOC_VISIBLE_DRAFT.add(c.id));
-      renderDocColsDropdown();
+    document.getElementById('tasksColsSelectAll')?.addEventListener('click', () => {
+      TASK_COLUMNS.forEach(c => TASK_VISIBLE_DRAFT.add(c.id));
+      renderTasksColsDropdown();
     });
-    document.getElementById('docColsDeselectAll')?.addEventListener('click', () => {
-      DOC_VISIBLE_DRAFT.clear();
-      // Keep required columns pinned
-      DOC_COLUMNS.filter(c => c.required).forEach(c => DOC_VISIBLE_DRAFT.add(c.id));
-      renderDocColsDropdown();
+    document.getElementById('tasksColsDeselectAll')?.addEventListener('click', () => {
+      TASK_VISIBLE_DRAFT.clear();
+      renderTasksColsDropdown();
     });
-    document.getElementById('docColsSearch')?.addEventListener('input', (e) => {
-      DOC_COLS_QUERY = e.target.value;
-      renderDocColsDropdown();
+    document.getElementById('tasksColsSearch')?.addEventListener('input', (e) => {
+      TASK_COLS_QUERY = e.target.value;
+      renderTasksColsDropdown();
     });
-    document.getElementById('docColsApply')?.addEventListener('click', () => {
-      // Ensure required columns stay
-      DOC_COLUMNS.filter(c => c.required).forEach(c => DOC_VISIBLE_DRAFT.add(c.id));
-      DOC_VISIBLE = new Set(DOC_VISIBLE_DRAFT);
-      saveDocColumns();
-      renderDocs(DOC_DATA);
-      document.getElementById('docColsCount').textContent = DOC_VISIBLE.size;
-      closeDocColsDropdown();
+    document.getElementById('tasksColsApply')?.addEventListener('click', () => {
+      // Guarantee at least one column remains visible
+      if (TASK_VISIBLE_DRAFT.size === 0) TASK_VISIBLE_DRAFT.add('fio');
+      TASK_VISIBLE = new Set(TASK_VISIBLE_DRAFT);
+      saveTaskColumns();
+      renderTasks(TASKS_DATA);
+      document.getElementById('tasksColsCount').textContent = TASK_VISIBLE.size;
+      closeTasksColsDropdown();
     });
 
-    // Initial paint of the columns count pill
+    // Initial paint
     (function () {
-      const el = document.getElementById('docColsCount');
-      if (el) el.textContent = DOC_VISIBLE.size;
+      const el = document.getElementById('tasksColsCount');
+      if (el) el.textContent = TASK_VISIBLE.size;
     })();
 
     // ══════════════════════════════════════════
