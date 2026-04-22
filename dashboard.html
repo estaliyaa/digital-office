@@ -3791,21 +3791,6 @@
       const m = map[s] || map.pending;
       return `<span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${m.cls}"><span class="w-1.5 h-1.5 rounded-full ${m.dot}"></span>${m.label}</span>`;
     }
-    function switchDocTab(which) {
-      document.querySelectorAll('.doc-pane').forEach(p => p.classList.add('hidden'));
-      document.getElementById('docPane-' + which)?.classList.remove('hidden');
-      document.querySelectorAll('.doc-tab').forEach(t => {
-        t.classList.remove('text-slate-900', 'border-indigo-600');
-        t.classList.add('text-slate-500', 'border-transparent');
-      });
-      const active = document.getElementById('docTab-' + which);
-      if (active) {
-        active.classList.add('text-slate-900', 'border-indigo-600');
-        active.classList.remove('text-slate-500', 'border-transparent');
-      }
-      if (window.lucide) lucide.createIcons();
-    }
-
     function renderDocumentDetail(idx) {
       const d = DOC_DATA[idx];
       const host = document.getElementById('documentDetailBody');
@@ -3900,36 +3885,25 @@
               <p class="text-sm text-slate-500 mt-1">${d.entity || '—'}${d.process ? ' · ' + d.process : ''}</p>
             </div>
 
-            <!-- Action slot -->
+            <!-- Action slot: single Download button with dropdown (signed option disabled when unsigned) -->
             <div class="flex items-center gap-2 flex-wrap justify-end flex-shrink-0">
-              <button class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="printer" class="w-4 h-4"></i>Печать</button>
-              <button class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300 rounded-xl text-sm font-semibold transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i>Поделиться</button>
-              ${canDownloadSigned
-                ? `<button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-emerald-500/30 transition-colors"><i data-lucide="download" class="w-4 h-4"></i>Скачать подписанный</button>`
-                : `<button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors"><i data-lucide="pen-line" class="w-4 h-4"></i>Подписать</button>`}
+              <div class="relative tdDocDl-wrap">
+                <button type="button" onclick="toggleTdDocDl(this, event)" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-sm shadow-indigo-500/30 transition-colors">
+                  <i data-lucide="download" class="w-4 h-4"></i>Скачать<i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-80"></i>
+                </button>
+                <div class="tdDocDl-menu hidden absolute right-0 top-full mt-2 z-30 w-64 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+                  ${canDownloadSigned
+                    ? `<button class="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2.5 transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ</button>`
+                    : `<button disabled title="Документ ещё не подписан" class="w-full px-4 py-3 text-left text-sm text-slate-400 bg-slate-50/60 cursor-not-allowed flex items-center gap-2.5"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ<span class="ml-auto text-[10px] font-normal">недоступно</span></button>`}
+                  <button class="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2.5 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригинал документа</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ═══ Document-level tabs ═══ -->
-        <div class="border-b border-slate-200 mb-3 flex items-center gap-1 overflow-x-auto" role="tablist">
-          <button type="button" id="docTab-overview" onclick="switchDocTab('overview')" class="doc-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-semibold text-slate-900 border-b-2 border-indigo-600 transition-colors whitespace-nowrap">
-            <i data-lucide="layout-grid" class="w-4 h-4"></i>Обзор
-          </button>
-          <button type="button" id="docTab-signers" onclick="switchDocTab('signers')" class="doc-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
-            <i data-lucide="users" class="w-4 h-4"></i>Подписанты
-            <span class="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full">${signerList.length}</span>
-          </button>
-          <button type="button" id="docTab-comments" onclick="switchDocTab('comments')" class="doc-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
-            <i data-lucide="message-circle" class="w-4 h-4"></i>Комментарии
-          </button>
-          <button type="button" id="docTab-history" onclick="switchDocTab('history')" class="doc-tab inline-flex items-center gap-2 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 border-b-2 border-transparent transition-colors whitespace-nowrap">
-            <i data-lucide="history" class="w-4 h-4"></i>История
-          </button>
-        </div>
-
-        <!-- ═══ Обзор pane ═══ -->
-        <div id="docPane-overview" class="doc-pane">
+        <!-- ═══ One-screen content (no tabs) ═══ -->
+        <div>
 
           <!-- ── ROW 1: Основная информация ── -->
           <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-3">
@@ -3996,7 +3970,6 @@
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Подписанты <span class="text-slate-400 font-medium">· ${d.signed || '0/0'}</span></p>
-                  <button onclick="switchDocTab('signers')" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1 transition-colors">Все <i data-lucide="arrow-right" class="w-3 h-3"></i></button>
                 </div>
                 ${signerList.length
                   ? `<div class="flex items-center -space-x-2 mb-3">${signerAvatars}</div>
@@ -4016,22 +3989,20 @@
               </div>
             </div>
 
-            <!-- File card (1/3) -->
+            <!-- File card (1/3) — info only; download lives in the hero -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5">
               <div class="flex items-center justify-between mb-3">
                 <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Документ</p>
-                <span class="text-[11px] text-slate-400">1 файл</span>
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold ${canDownloadSigned ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-amber-700 bg-amber-50 border-amber-200'} border px-2 py-0.5 rounded-full">
+                  ${canDownloadSigned ? '<i data-lucide="check" class="w-3 h-3" stroke-width="3"></i>Подписан' : '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>На подписании'}
+                </span>
               </div>
-              <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 mb-3">
+              <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-semibold text-slate-900 truncate" title="${filename}">${filename}</p>
                   <p class="text-[11px] text-slate-500 mt-0.5">PDF · ${d.fileSize || '—'} · ${d.filePages || 1} стр.</p>
                 </div>
-              </div>
-              <div class="flex flex-col gap-2">
-                <button class="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-2.5 rounded-xl transition-colors"><i data-lucide="download" class="w-4 h-4"></i>Скачать оригинал</button>
-                <button ${canDownloadSigned ? '' : 'disabled'} class="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold ${canDownloadSigned ? 'text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-500/20' : 'text-slate-400 bg-slate-100 cursor-not-allowed'} px-3 py-2.5 rounded-xl transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Скачать подписанный</button>
               </div>
             </div>
           </div>
@@ -4052,81 +4023,6 @@
         </div>
 
         <!-- ═══ Подписанты pane ═══ -->
-        <div id="docPane-signers" class="doc-pane hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <div>
-                <p class="text-sm font-bold text-slate-900">Все подписанты</p>
-                <p class="text-[11px] text-slate-500 mt-0.5">Маршрут согласования и подписания</p>
-              </div>
-              <span class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg">${d.signed || '0/0'} подписано</span>
-            </div>
-            <div class="divide-y divide-slate-100">
-              ${signerList.length ? signerList.map(signerRow).join('') : `<p class="text-sm text-slate-400 text-center py-10">Подписанты не назначены</p>`}
-            </div>
-          </div>
-        </div>
-
-        <!-- ═══ Комментарии pane ═══ -->
-        <div id="docPane-comments" class="doc-pane hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 p-6">
-            <div class="space-y-4 mb-3">
-              <div class="flex gap-3">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br ${ownerGrad} text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">${ownerInitials || '—'}</div>
-                <div class="flex-1 min-w-0 bg-slate-50 border border-slate-100 rounded-2xl rounded-tl-sm px-4 py-3">
-                  <div class="flex items-baseline gap-2 mb-1 flex-wrap">
-                    <p class="text-sm font-semibold text-slate-900">${d.owner || '—'}</p>
-                    <span class="text-[11px] text-slate-400">${d.ownerDept || '—'} · ${d.created}</span>
-                  </div>
-                  <p class="text-sm text-slate-700">Документ создан и направлен на согласование.</p>
-                  <button class="text-xs text-indigo-600 hover:text-indigo-700 font-medium mt-2 transition-colors inline-flex items-center gap-1"><i data-lucide="corner-up-left" class="w-3 h-3"></i>Ответить</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-start gap-3">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">Я</div>
-              <div class="flex-1 bg-white border border-slate-200 rounded-2xl focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-500/10 transition-all">
-                <textarea rows="2" placeholder="Напишите комментарий или упомяните коллегу через @" class="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 outline-none px-3.5 py-2.5 resize-none rounded-t-2xl"></textarea>
-                <div class="flex items-center justify-between border-t border-slate-100 px-3 py-2">
-                  <div class="flex items-center gap-1">
-                    <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors"><i data-lucide="paperclip" class="w-4 h-4"></i></button>
-                    <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors"><i data-lucide="at-sign" class="w-4 h-4"></i></button>
-                    <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors"><i data-lucide="smile" class="w-4 h-4"></i></button>
-                  </div>
-                  <button class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="send" class="w-3 h-3"></i>Отправить</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ═══ История pane ═══ -->
-        <div id="docPane-history" class="doc-pane hidden">
-          <div class="bg-white rounded-2xl border border-slate-200 p-6">
-            <ol class="relative border-l-2 border-slate-100 ml-2 space-y-5 pl-6">
-              <li class="relative">
-                <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-indigo-500 border-4 border-white ring-1 ring-indigo-200 flex items-center justify-center"><i data-lucide="plus" class="w-2.5 h-2.5 text-white" stroke-width="4"></i></span>
-                <p class="text-sm text-slate-700"><span class="font-semibold text-slate-900">${d.owner || '—'}</span> создал документ</p>
-                <p class="text-xs text-slate-400 mt-0.5">${fmtLong(d.created)}</p>
-              </li>
-              ${signerList.filter(s => s.signedAt).sort((a,b) => (a.signedAt||'').localeCompare(b.signedAt||'')).map(s => `
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full ${s.status === 'rejected' ? 'bg-rose-500 ring-rose-200' : 'bg-emerald-500 ring-emerald-200'} border-4 border-white ring-1 flex items-center justify-center"><i data-lucide="${s.status === 'rejected' ? 'x' : 'check'}" class="w-2.5 h-2.5 text-white" stroke-width="4"></i></span>
-                  <p class="text-sm text-slate-700"><span class="font-semibold text-slate-900">${s.name}</span> ${s.status === 'rejected' ? 'отклонил документ' : 'подписал документ'}</p>
-                  <p class="text-xs text-slate-400 mt-0.5">${s.signedAt}</p>
-                  ${s.comment ? `<p class="text-[11px] text-rose-600 mt-1 italic">${s.comment}</p>` : ''}
-                </li>
-              `).join('')}
-              ${d.signedAt ? `
-                <li class="relative">
-                  <span class="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-white ring-1 ring-emerald-200 flex items-center justify-center"><i data-lucide="check-check" class="w-2.5 h-2.5 text-white" stroke-width="4"></i></span>
-                  <p class="text-sm text-slate-700">Документ полностью подписан</p>
-                  <p class="text-xs text-slate-400 mt-0.5">${fmtLong(d.signedAt)}</p>
-                </li>` : ''}
-            </ol>
-          </div>
-        </div>
       `;
       if (window.lucide) lucide.createIcons();
     }
