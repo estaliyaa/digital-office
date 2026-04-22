@@ -720,16 +720,17 @@
         <div id="structTableView" class="space-y-2"></div>
 
         <!-- Schema view -->
-        <div id="structSchemaView" class="hidden relative bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <!-- Floating zoom controls -->
-          <div id="structZoomControls" class="absolute top-3 right-3 z-10 flex items-center gap-1 bg-white/95 backdrop-blur border border-slate-200 rounded-xl shadow-sm p-1">
-            <button type="button" onclick="structZoom(-1)" title="Уменьшить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"><i data-lucide="minus" class="w-4 h-4"></i></button>
-            <button type="button" onclick="structZoomReset()" title="100%" class="min-w-[54px] px-2 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"><span id="structZoomLabel">100%</span></button>
-            <button type="button" onclick="structZoom(+1)" title="Увеличить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"><i data-lucide="plus" class="w-4 h-4"></i></button>
+        <div id="structSchemaView" class="hidden bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col">
+          <!-- Fixed zoom toolbar — stays anchored at the top of the card, never moves with scroll -->
+          <div id="structZoomControls" class="flex items-center justify-end gap-1 px-3 py-2 border-b border-slate-100 bg-slate-50/60 flex-shrink-0">
+            <span class="mr-auto text-[11px] font-semibold uppercase tracking-wider text-slate-400 pl-2">Масштаб</span>
+            <button type="button" onclick="structZoom(-1)" title="Уменьшить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="minus" class="w-4 h-4"></i></button>
+            <button type="button" onclick="structZoomReset()" title="100%" class="min-w-[54px] px-2 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-slate-700 hover:bg-white hover:shadow-sm transition-all"><span id="structZoomLabel">100%</span></button>
+            <button type="button" onclick="structZoom(+1)" title="Увеличить" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="plus" class="w-4 h-4"></i></button>
             <div class="w-px h-6 bg-slate-200 mx-0.5"></div>
-            <button type="button" onclick="structZoomFit()" title="Вписать" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
+            <button type="button" onclick="structZoomFit()" title="Вписать" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-white hover:shadow-sm transition-all"><i data-lucide="maximize-2" class="w-4 h-4"></i></button>
           </div>
-          <div id="structSchemaScroll" class="overflow-auto max-h-[calc(100vh-220px)]">
+          <div id="structSchemaScroll" class="overflow-auto max-h-[calc(100vh-240px)]">
             <div id="structSchemaZoom" class="inline-block p-6 origin-top-left transition-transform duration-150"></div>
           </div>
         </div>
@@ -1139,30 +1140,56 @@
               <span class="text-[11px] text-slate-400">3 файла</span>
             </div>
             <div class="space-y-2">
-              <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 transition-colors group">
+              <!-- Signed -->
+              <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100/60 transition-colors">
                 <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-text" class="w-4 h-4"></i></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-slate-900 truncate">Заявление на отпуск.pdf</p>
                   <p class="text-[10px] text-slate-400">PDF · 124 KB</p>
                 </div>
-                <i data-lucide="download" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600"></i>
-              </a>
-              <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 transition-colors group">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full flex-shrink-0"><i data-lucide="check" class="w-3 h-3" stroke-width="3"></i>Подписан</span>
+                <div class="relative tdDocDl-wrap flex-shrink-0">
+                  <button type="button" onclick="toggleTdDocDl(this, event)" title="Скачать" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-500 flex items-center justify-center transition-colors"><i data-lucide="download" class="w-4 h-4"></i></button>
+                  <div class="tdDocDl-menu hidden absolute right-0 top-full mt-1 z-20 w-56 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+                    <button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2 transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ</button>
+                    <button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригинал документа</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Awaiting signature -->
+              <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100/60 transition-colors">
                 <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0"><i data-lucide="image" class="w-4 h-4"></i></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-slate-900 truncate">Документ.jpg</p>
                   <p class="text-[10px] text-slate-400">JPG · 1.2 MB</p>
                 </div>
-                <i data-lucide="download" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600"></i>
-              </a>
-              <a href="#" class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 transition-colors group">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full flex-shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>На подписании</span>
+                <div class="relative tdDocDl-wrap flex-shrink-0">
+                  <button type="button" onclick="toggleTdDocDl(this, event)" title="Скачать" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-500 flex items-center justify-center transition-colors"><i data-lucide="download" class="w-4 h-4"></i></button>
+                  <div class="tdDocDl-menu hidden absolute right-0 top-full mt-1 z-20 w-56 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+                    <button disabled title="Документ ещё не подписан" class="w-full px-3.5 py-2.5 text-left text-sm text-slate-400 bg-slate-50/60 cursor-not-allowed flex items-center gap-2"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ<span class="ml-auto text-[10px] font-normal">недоступно</span></button>
+                    <button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригинал документа</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Signed -->
+              <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100/60 transition-colors">
                 <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0"><i data-lucide="file-text" class="w-4 h-4"></i></div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-slate-900 truncate">Удостоверение.pdf</p>
                   <p class="text-[10px] text-slate-400">PDF · 560 KB</p>
                 </div>
-                <i data-lucide="download" class="w-4 h-4 text-slate-400 group-hover:text-indigo-600"></i>
-              </a>
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full flex-shrink-0"><i data-lucide="check" class="w-3 h-3" stroke-width="3"></i>Подписан</span>
+                <div class="relative tdDocDl-wrap flex-shrink-0">
+                  <button type="button" onclick="toggleTdDocDl(this, event)" title="Скачать" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-500 flex items-center justify-center transition-colors"><i data-lucide="download" class="w-4 h-4"></i></button>
+                  <div class="tdDocDl-menu hidden absolute right-0 top-full mt-1 z-20 w-56 bg-white rounded-xl border border-slate-200 shadow-[0_12px_32px_-8px_rgba(15,23,42,0.15)] overflow-hidden">
+                    <button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2 transition-colors"><i data-lucide="file-check-2" class="w-4 h-4"></i>Подписанный документ</button>
+                    <button class="w-full px-3.5 py-2.5 text-left text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2 border-t border-slate-100 transition-colors"><i data-lucide="file" class="w-4 h-4"></i>Оригинал документа</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -3576,7 +3603,7 @@
       { id:'status',    label:'Статус',          minWidth:150 },
       { id:'created',   label:'Дата создания',   minWidth:150 },
       { id:'signedAt',  label:'Дата подписания', minWidth:170 },
-      { id:'owner',     label:'Владелец',        minWidth:240 },
+      { id:'owner',     label:'Ответственный',    minWidth:240 },
     ];
     const DOC_VISIBLE = new Set(DOC_COLUMNS.map(c => c.id));
 
@@ -3878,7 +3905,7 @@
             </div>
           </div>
 
-          <!-- ── ROW 3: Команда (Владелец + Подписанты) + Документ ── -->
+          <!-- ── ROW 3: Команда (Ответственный + Подписанты) + Документ ── -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-3">
 
             <!-- Team card (2/3) -->
@@ -3888,9 +3915,9 @@
                 <span class="text-[11px] text-slate-400">${1 + signerList.length} ${signerList.length >= 1 ? 'человек' : 'человека'}</span>
               </div>
 
-              <!-- Owner row -->
+              <!-- Responsible (Ответственный) row -->
               <div class="mb-4 pb-4 border-b border-slate-100">
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 mb-2">Владелец</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-600 mb-2">Ответственный</p>
                 <div class="flex items-center gap-3">
                   <div class="w-11 h-11 rounded-full bg-gradient-to-br ${ownerGrad} text-white text-sm font-bold flex items-center justify-center flex-shrink-0">${ownerInitials || '—'}</div>
                   <div class="min-w-0 flex-1">
@@ -4897,6 +4924,24 @@
     }
 
     // ── Task-level tabs (Обзор / Выполнение / Комментарии / Протокол) ──
+    // Toggle the "download" dropdown on a task-detail document row.
+    // Only one menu open at a time; clicking outside closes it.
+    function toggleTdDocDl(btn, e) {
+      if (e) e.stopPropagation();
+      const wrap = btn.closest('.tdDocDl-wrap');
+      const menu = wrap?.querySelector('.tdDocDl-menu');
+      if (!menu) return;
+      const willOpen = menu.classList.contains('hidden');
+      // Close any other open menus first
+      document.querySelectorAll('.tdDocDl-menu').forEach(m => m.classList.add('hidden'));
+      if (willOpen) menu.classList.remove('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.tdDocDl-wrap')) {
+        document.querySelectorAll('.tdDocDl-menu').forEach(m => m.classList.add('hidden'));
+      }
+    });
+
     function switchTaskTab(which) {
       document.querySelectorAll('.task-pane').forEach(p => p.classList.add('hidden'));
       document.getElementById('taskPane-' + which)?.classList.remove('hidden');
