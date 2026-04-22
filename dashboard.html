@@ -74,29 +74,38 @@
     /* ── Scroll arrows (Bitrix24 style) ── */
     .table-scroll-wrapper { position: relative; }
     .scroll-edge-arrow {
-      position: absolute; top: 0; bottom: 0; width: 72px;
+      position: absolute; top: 0; bottom: 0; width: 84px;
       display: flex; align-items: center; z-index: 10;
       opacity: 0; transition: opacity 0.18s ease; pointer-events: none;
     }
-    .scroll-edge-arrow.show { opacity: 1; pointer-events: all; }
     .scroll-edge-arrow.arrow-left {
       left: 0;
-      background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
-      justify-content: flex-start; padding-left: 10px;
+      background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 55%, rgba(255,255,255,0) 100%);
+      justify-content: flex-start; padding-left: 12px;
     }
     .scroll-edge-arrow.arrow-right {
       right: 0;
-      background: linear-gradient(to left, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
-      justify-content: flex-end; padding-right: 10px;
+      background: linear-gradient(to left, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 55%, rgba(255,255,255,0) 100%);
+      justify-content: flex-end; padding-right: 12px;
+    }
+    /* Reveal the arrow as soon as the wrapper is hovered AND there's
+       actually overflow in that direction. */
+    .table-scroll-wrapper.can-left:hover .scroll-edge-arrow.arrow-left,
+    .table-scroll-wrapper.can-right:hover .scroll-edge-arrow.arrow-right {
+      opacity: 1; pointer-events: all;
     }
     .scroll-edge-arrow .arrow-btn {
-      width: 32px; height: 32px; background: white;
+      width: 36px; height: 36px; background: white;
       border: 1px solid #e2e8f0; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.15s;
+      cursor: pointer; box-shadow: 0 4px 12px rgba(15,23,42,0.14); transition: all 0.15s;
       flex-shrink: 0;
     }
-    .scroll-edge-arrow .arrow-btn:hover { background: #f1f5f9; transform: scale(1.1); }
+    .scroll-edge-arrow:hover .arrow-btn {
+      background: #4f46e5; border-color: #4f46e5;
+      box-shadow: 0 6px 18px rgba(79,70,229,0.4);
+    }
+    .scroll-edge-arrow:hover .arrow-btn svg { color: #fff !important; stroke: #fff; }
 
     /* ── Filter dropdown ── */
     .filter-dropdown {
@@ -515,10 +524,10 @@
             <div class="scroll-edge-arrow arrow-left"  id="tArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="scroll-edge-arrow arrow-right" id="tArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="overflow-x-auto" id="tasksScroll" style="scrollbar-width:none">
-              <table class="uni-table" style="min-width:1080px">
+              <table class="uni-table" style="min-width:1160px">
                 <thead>
                   <tr>
-                    <th style="min-width:280px">Задача</th>
+                    <th style="min-width:360px">Задача</th>
                     <th style="min-width:170px">Участники процесса</th>
                     <th style="min-width:155px">Статус</th>
                     <th style="min-width:145px">Дата создания</th>
@@ -589,10 +598,10 @@
             <div class="scroll-edge-arrow arrow-left"  id="rArrowL"><button class="arrow-btn"><i data-lucide="chevron-left"  class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="scroll-edge-arrow arrow-right" id="rArrowR"><button class="arrow-btn"><i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i></button></div>
             <div class="overflow-x-auto" id="reqScroll" style="scrollbar-width:none">
-              <table class="uni-table" style="min-width:1080px">
+              <table class="uni-table" style="min-width:1160px">
                 <thead>
                   <tr>
-                    <th style="min-width:280px">Задача</th>
+                    <th style="min-width:360px">Задача</th>
                     <th style="min-width:170px">Участники процесса</th>
                     <th style="min-width:155px">Статус</th>
                     <th style="min-width:145px">Дата создания</th>
@@ -3648,23 +3657,37 @@
 
       const wrapper = scrollEl.closest('.table-scroll-wrapper');
       let ival = null;
-      let hoveringWrapper = false;
 
       function canLeft()  { return scrollEl.scrollLeft > 2; }
       function canRight() { return scrollEl.scrollLeft + scrollEl.clientWidth < scrollEl.scrollWidth - 2; }
 
+      // The arrow visibility is pure CSS now: the wrapper carries
+      // can-left / can-right toggled from JS; arrows reveal via
+      // .can-*:hover in CSS so there's no timing race.
       function refresh() {
-        leftArrow.classList.toggle('show',  canLeft()  && hoveringWrapper);
-        rightArrow.classList.toggle('show', canRight() && hoveringWrapper);
+        wrapper.classList.toggle('can-left',  canLeft());
+        wrapper.classList.toggle('can-right', canRight());
       }
 
-      wrapper.addEventListener('mouseenter', () => { hoveringWrapper = true;  refresh(); });
-      wrapper.addEventListener('mouseleave', () => { hoveringWrapper = false; refresh(); });
       scrollEl.addEventListener('scroll', refresh);
+      // Re-evaluate when table contents change size (e.g. column toggle)
+      if (window.ResizeObserver) {
+        new ResizeObserver(refresh).observe(scrollEl);
+      } else {
+        window.addEventListener('resize', refresh);
+      }
 
+      // Auto-scroll while the mouse is over the arrow (by its whole hover
+      // zone, not only the circular button).
       function startScroll(dir) {
         clearInterval(ival);
-        ival = setInterval(() => { scrollEl.scrollLeft += dir * 9; refresh(); }, 16);
+        ival = setInterval(() => {
+          scrollEl.scrollLeft += dir * 12;
+          refresh();
+          if ((dir < 0 && !canLeft()) || (dir > 0 && !canRight())) {
+            clearInterval(ival); ival = null;
+          }
+        }, 16);
       }
       function stopScroll() { clearInterval(ival); ival = null; }
 
